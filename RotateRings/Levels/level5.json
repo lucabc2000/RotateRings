@@ -1,0 +1,89 @@
+{
+  "board" : {
+    "height" : 640,
+    "width" : 360
+  },
+  "id" : 5,
+  "name" : "Slider",
+  "pieces" : [
+    {
+      "color" : "purple",
+      "id" : "r1",
+      "position" : [
+        180,
+        395
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 45,
+            "start" : 310,
+            "sweep" : 280
+          }
+        }
+      ]
+    },
+    {
+      "color" : "mint",
+      "id" : "s1",
+      "motion" : "slide",
+      "position" : [
+        180,
+        300
+      ],
+      "rotation" : 90,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -100,
+              0
+            ],
+            "to" : [
+              50,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "clips" : [
+        {
+          "grips" : "r1",
+          "stemEnd" : [
+            -60,
+            0
+          ],
+          "stemStart" : [
+            -40,
+            0
+          ]
+        }
+      ],
+      "color" : "coral",
+      "id" : "r2",
+      "position" : [
+        285,
+        395
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 40,
+            "start" : 130,
+            "sweep" : 280
+          }
+        }
+      ]
+    }
+  ]
+}

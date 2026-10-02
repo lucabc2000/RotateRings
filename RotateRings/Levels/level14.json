@@ -1,0 +1,241 @@
+{
+  "board" : {
+    "height" : 640,
+    "width" : 360
+  },
+  "id" : 14,
+  "name" : "Medley",
+  "pieces" : [
+    {
+      "clips" : [
+        {
+          "grips" : "r2",
+          "stemEnd" : [
+            0,
+            60
+          ],
+          "stemStart" : [
+            0,
+            40
+          ]
+        }
+      ],
+      "color" : "yellow",
+      "id" : "r1",
+      "position" : [
+        180,
+        440.333
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 40,
+            "start" : 310,
+            "sweep" : 280
+          }
+        }
+      ]
+    },
+    {
+      "color" : "coral",
+      "id" : "r2",
+      "position" : [
+        180,
+        540.333
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 40,
+            "start" : 85,
+            "sweep" : 280
+          }
+        }
+      ]
+    },
+    {
+      "clips" : [
+        {
+          "grips" : "r1",
+          "stemEnd" : [
+            -60,
+            0
+          ],
+          "stemStart" : [
+            -40,
+            0
+          ]
+        }
+      ],
+      "color" : "purple",
+      "id" : "r3",
+      "position" : [
+        280,
+        440.333
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 40,
+            "start" : 40,
+            "sweep" : 280
+          }
+        }
+      ]
+    },
+    {
+      "clips" : [
+        {
+          "grips" : "r5",
+          "stemEnd" : [
+            0,
+            65
+          ],
+          "stemStart" : [
+            0,
+            45
+          ]
+        }
+      ],
+      "color" : "mint",
+      "id" : "r4",
+      "position" : [
+        118,
+        154.667
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 45,
+            "start" : 220,
+            "sweep" : 280
+          }
+        }
+      ]
+    },
+    {
+      "color" : "sky",
+      "id" : "r5",
+      "position" : [
+        118,
+        264.667
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 45,
+            "start" : 85,
+            "sweep" : 280
+          }
+        }
+      ]
+    },
+    {
+      "clips" : [
+        {
+          "grips" : "r6",
+          "stemEnd" : [
+            0,
+            60
+          ],
+          "stemStart" : [
+            0,
+            40
+          ]
+        },
+        {
+          "grips" : "r7",
+          "stemEnd" : [
+            0,
+            -60
+          ],
+          "stemStart" : [
+            0,
+            -40
+          ]
+        }
+      ],
+      "color" : "yellow",
+      "id" : "o1",
+      "position" : [
+        242,
+        209.667
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 40,
+            "start" : 0,
+            "sweep" : 360
+          }
+        }
+      ]
+    },
+    {
+      "color" : "coral",
+      "id" : "r6",
+      "position" : [
+        242,
+        314.667
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 45,
+            "start" : 85,
+            "sweep" : 280
+          }
+        }
+      ]
+    },
+    {
+      "color" : "purple",
+      "id" : "r7",
+      "position" : [
+        242,
+        104.667
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 45,
+            "start" : 265,
+            "sweep" : 280
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,129 @@
+{
+  "board" : {
+    "height" : 640,
+    "width" : 360
+  },
+  "id" : 4,
+  "name" : "Star of 3",
+  "pieces" : [
+    {
+      "clips" : [
+        {
+          "grips" : "r1",
+          "stemEnd" : [
+            0,
+            60
+          ],
+          "stemStart" : [
+            0,
+            40
+          ]
+        },
+        {
+          "grips" : "r2",
+          "stemEnd" : [
+            -51.962,
+            -30
+          ],
+          "stemStart" : [
+            -34.641,
+            -20
+          ]
+        },
+        {
+          "grips" : "r3",
+          "stemEnd" : [
+            51.962,
+            -30
+          ],
+          "stemStart" : [
+            34.641,
+            -20
+          ]
+        }
+      ],
+      "color" : "mint",
+      "id" : "o1",
+      "position" : [
+        180,
+        293.75
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 40,
+            "start" : 0,
+            "sweep" : 360
+          }
+        }
+      ]
+    },
+    {
+      "color" : "purple",
+      "id" : "r1",
+      "position" : [
+        180,
+        398.75
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 45,
+            "start" : 345,
+            "sweep" : 300
+          }
+        }
+      ]
+    },
+    {
+      "color" : "sky",
+      "id" : "r2",
+      "position" : [
+        89.067,
+        241.25
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 45,
+            "start" : 295,
+            "sweep" : 280
+          }
+        }
+      ]
+    },
+    {
+      "color" : "coral",
+      "id" : "r3",
+      "position" : [
+        270.933,
+        241.25
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 45,
+            "start" : 225,
+            "sweep" : 300
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "board" : {
+    "height" : 640,
+    "width" : 360
+  },
+  "id" : 2,
+  "name" : "Chain of 3",
+  "pieces" : [
+    {
+      "clips" : [
+        {
+          "grips" : "r2",
+          "stemEnd" : [
+            0,
+            60
+          ],
+          "stemStart" : [
+            0,
+            40
+          ]
+        }
+      ],
+      "color" : "yellow",
+      "id" : "r1",
+      "position" : [
+        180,
+        220
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 40,
+            "start" : 220,
+            "sweep" : 280
+          }
+        }
+      ]
+    },
+    {
+      "clips" : [
+        {
+          "grips" : "r3",
+          "stemEnd" : [
+            0,
+            60
+          ],
+          "stemStart" : [
+            0,
+            40
+          ]
+        }
+      ],
+      "color" : "purple",
+      "id" : "r2",
+      "position" : [
+        180,
+        320
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 40,
+            "start" : 345,
+            "sweep" : 300
+          }
+        }
+      ]
+    },
+    {
+      "color" : "coral",
+      "id" : "r3",
+      "position" : [
+        180,
+        420
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 40,
+            "start" : 40,
+            "sweep" : 280
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,211 @@
+{
+  "board" : {
+    "height" : 640,
+    "width" : 360
+  },
+  "id" : 15,
+  "name" : "Medley",
+  "pieces" : [
+    {
+      "clips" : [
+        {
+          "grips" : "r2",
+          "stemEnd" : [
+            0,
+            65
+          ],
+          "stemStart" : [
+            0,
+            45
+          ]
+        }
+      ],
+      "color" : "mint",
+      "id" : "r1",
+      "position" : [
+        118,
+        387.415
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 45,
+            "start" : 265,
+            "sweep" : 280
+          }
+        }
+      ]
+    },
+    {
+      "color" : "coral",
+      "id" : "r2",
+      "position" : [
+        118,
+        497.415
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 45,
+            "start" : 255,
+            "sweep" : 300
+          }
+        }
+      ]
+    },
+    {
+      "clips" : [
+        {
+          "grips" : "r4",
+          "stemEnd" : [
+            0,
+            -65
+          ],
+          "stemStart" : [
+            0,
+            -45
+          ]
+        }
+      ],
+      "color" : "sky",
+      "id" : "r3",
+      "position" : [
+        242,
+        497.415
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 45,
+            "start" : 40,
+            "sweep" : 280
+          }
+        }
+      ]
+    },
+    {
+      "color" : "purple",
+      "id" : "r4",
+      "position" : [
+        242,
+        387.415
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 45,
+            "start" : 265,
+            "sweep" : 280
+          }
+        }
+      ]
+    },
+    {
+      "color" : "yellow",
+      "id" : "r5",
+      "position" : [
+        180,
+        211.831
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 45,
+            "start" : 130,
+            "sweep" : 280
+          }
+        }
+      ]
+    },
+    {
+      "color" : "mint",
+      "id" : "l1",
+      "motion" : "slide",
+      "position" : [
+        105,
+        151.831
+      ],
+      "rotation" : 90,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -50,
+              0
+            ],
+            "to" : [
+              112,
+              0
+            ]
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              112,
+              0
+            ],
+            "to" : [
+              112,
+              -75
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "clips" : [
+        {
+          "grips" : "r5",
+          "stemEnd" : [
+            -42.426,
+            42.426
+          ],
+          "stemStart" : [
+            -28.284,
+            28.284
+          ]
+        }
+      ],
+      "color" : "coral",
+      "id" : "r6",
+      "position" : [
+        254.246,
+        137.585
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 40,
+            "start" : 85,
+            "sweep" : 280
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,132 @@
+{
+  "board" : {
+    "height" : 640,
+    "width" : 360
+  },
+  "id" : 9,
+  "name" : "Tail",
+  "pieces" : [
+    {
+      "color" : "mint",
+      "id" : "t1",
+      "position" : [
+        180,
+        317.5
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 45,
+            "start" : 75,
+            "sweep" : 300
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              -45,
+              0
+            ],
+            "to" : [
+              -65,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "clips" : [
+        {
+          "grips" : "t1",
+          "stemEnd" : [
+            0,
+            -60
+          ],
+          "stemStart" : [
+            0,
+            -40
+          ]
+        }
+      ],
+      "color" : "coral",
+      "id" : "r1",
+      "position" : [
+        180,
+        422.5
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 40,
+            "start" : 85,
+            "sweep" : 280
+          }
+        }
+      ]
+    },
+    {
+      "color" : "sky",
+      "id" : "r2",
+      "position" : [
+        75,
+        317.5
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 40,
+            "start" : 40,
+            "sweep" : 280
+          }
+        }
+      ]
+    },
+    {
+      "clips" : [
+        {
+          "grips" : "r2",
+          "stemEnd" : [
+            0,
+            60
+          ],
+          "stemStart" : [
+            0,
+            40
+          ]
+        }
+      ],
+      "color" : "purple",
+      "id" : "r3",
+      "position" : [
+        75,
+        217.5
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 40,
+            "start" : 355,
+            "sweep" : 280
+          }
+        }
+      ]
+    }
+  ]
+}

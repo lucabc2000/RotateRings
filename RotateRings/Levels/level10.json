@@ -1,0 +1,155 @@
+{
+  "board" : {
+    "height" : 640,
+    "width" : 360
+  },
+  "id" : 10,
+  "name" : "Double hook",
+  "pieces" : [
+    {
+      "clips" : [
+        {
+          "grips" : "r1",
+          "stemEnd" : [
+            0,
+            85
+          ],
+          "stemStart" : [
+            0,
+            65
+          ]
+        },
+        {
+          "grips" : "r2",
+          "stemEnd" : [
+            0,
+            -85
+          ],
+          "stemStart" : [
+            0,
+            -65
+          ]
+        }
+      ],
+      "color" : "yellow",
+      "id" : "t1",
+      "position" : [
+        180,
+        320
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 40,
+            "start" : 75,
+            "sweep" : 300
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              0,
+              40
+            ],
+            "to" : [
+              0,
+              65
+            ]
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              0,
+              -40
+            ],
+            "to" : [
+              0,
+              -65
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "coral",
+      "id" : "r1",
+      "position" : [
+        180,
+        445
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 40,
+            "start" : 345,
+            "sweep" : 300
+          }
+        }
+      ]
+    },
+    {
+      "color" : "purple",
+      "id" : "r2",
+      "position" : [
+        180,
+        195
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 40,
+            "start" : 165,
+            "sweep" : 300
+          }
+        }
+      ]
+    },
+    {
+      "clips" : [
+        {
+          "grips" : "t1",
+          "stemEnd" : [
+            -60,
+            0
+          ],
+          "stemStart" : [
+            -40,
+            0
+          ]
+        }
+      ],
+      "color" : "sky",
+      "id" : "r3",
+      "position" : [
+        280,
+        320
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 40,
+            "start" : 310,
+            "sweep" : 280
+          }
+        }
+      ]
+    }
+  ]
+}

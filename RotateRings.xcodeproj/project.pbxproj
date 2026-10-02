@@ -6,14 +6,38 @@
 	objectVersion = 110;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		912F81F0306E4EF800D2EB4E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 912F818D306E498800D2EB4E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 912F8194306E498800D2EB4E;
+			remoteInfo = RotateRings;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		911DFFAE306FA26E00F2E8B5 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolder = None;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		911DFFB0306FA26E00F2E8B5 /* LevelForge */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = LevelForge; sourceTree = BUILT_PRODUCTS_DIR; };
 		912F8195306E498800D2EB4E /* RotateRings.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RotateRings.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		912F81DC306E4EF800D2EB4E /* RotateRingsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RotateRingsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
 		912F81AA306E498B00D2EB4E /* Exceptions for "RotateRings" folder in "RotateRings" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Core,
 				Info.plist,
 			);
 			target = 912F8194306E498800D2EB4E /* RotateRings */;
@@ -21,6 +45,11 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		911DFFB1306FA26E00F2E8B5 /* LevelForge */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = LevelForge;
+			sourceTree = "<group>";
+		};
 		912F8197306E498800D2EB4E /* RotateRings */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -29,10 +58,25 @@
 			path = RotateRings;
 			sourceTree = "<group>";
 		};
+		912F81DD306E4EF800D2EB4E /* RotateRingsTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = RotateRingsTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		911DFFAD306FA26E00F2E8B5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
 		912F8192306E498800D2EB4E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+		912F81D9306E4EF800D2EB4E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
 			);
@@ -44,6 +88,8 @@
 			isa = PBXGroup;
 			children = (
 				912F8197306E498800D2EB4E /* RotateRings */,
+				912F81DD306E4EF800D2EB4E /* RotateRingsTests */,
+				911DFFB1306FA26E00F2E8B5 /* LevelForge */,
 				912F8196306E498800D2EB4E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -52,6 +98,8 @@
 			isa = PBXGroup;
 			children = (
 				912F8195306E498800D2EB4E /* RotateRings.app */,
+				912F81DC306E4EF800D2EB4E /* RotateRingsTests.xctest */,
+				911DFFB0306FA26E00F2E8B5 /* LevelForge */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -59,6 +107,25 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		911DFFAF306FA26E00F2E8B5 /* LevelForge */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 911DFFB4306FA26E00F2E8B5 /* Build configuration list for PBXNativeTarget "LevelForge" */;
+			buildPhases = (
+				911DFFAC306FA26E00F2E8B5 /* Sources */,
+				911DFFAD306FA26E00F2E8B5 /* Frameworks */,
+				911DFFAE306FA26E00F2E8B5 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				911DFFB1306FA26E00F2E8B5 /* LevelForge */,
+				912F8197306E498800D2EB4E /* RotateRings */,
+			);
+			name = LevelForge;
+			productName = LevelForge;
+			productReference = 911DFFB0306FA26E00F2E8B5 /* LevelForge */;
+			productType = "com.apple.product-type.tool";
+		};
 		912F8194306E498800D2EB4E /* RotateRings */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 912F81AB306E498B00D2EB4E /* Build configuration list for PBXNativeTarget "RotateRings" */;
@@ -77,6 +144,27 @@
 			productReference = 912F8195306E498800D2EB4E /* RotateRings.app */;
 			productType = "com.apple.product-type.application";
 		};
+		912F81DB306E4EF800D2EB4E /* RotateRingsTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 912F81E0306E4EF800D2EB4E /* Build configuration list for PBXNativeTarget "RotateRingsTests" */;
+			buildPhases = (
+				912F81D8306E4EF800D2EB4E /* Sources */,
+				912F81D9306E4EF800D2EB4E /* Frameworks */,
+				912F81DA306E4EF800D2EB4E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				912F81F1306E4EF800D2EB4E /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				912F81DD306E4EF800D2EB4E /* RotateRingsTests */,
+			);
+			name = RotateRingsTests;
+			productName = RotateRingsTests;
+			productReference = 912F81DC306E4EF800D2EB4E /* RotateRingsTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -87,8 +175,15 @@
 				LastSwiftUpdateCheck = 2700;
 				LastUpgradeCheck = 2700;
 				TargetAttributes = {
+					911DFFAF306FA26E00F2E8B5 = {
+						CreatedOnToolsVersion = 27.0;
+					};
 					912F8194306E498800D2EB4E = {
 						CreatedOnToolsVersion = 27.0;
+					};
+					912F81DB306E4EF800D2EB4E = {
+						CreatedOnToolsVersion = 27.0;
+						TestTargetID = 912F8194306E498800D2EB4E;
 					};
 				};
 			};
@@ -107,6 +202,8 @@
 			projectRoot = "";
 			targets = (
 				912F8194306E498800D2EB4E /* RotateRings */,
+				912F81DB306E4EF800D2EB4E /* RotateRingsTests */,
+				911DFFAF306FA26E00F2E8B5 /* LevelForge */,
 			);
 		};
 /* End PBXProject section */
@@ -117,32 +214,105 @@
 			files = (
 			);
 		};
+		912F81DA306E4EF800D2EB4E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		911DFFAC306FA26E00F2E8B5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
 		912F8191306E498800D2EB4E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+		912F81D8306E4EF800D2EB4E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
 			);
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		912F81F1306E4EF800D2EB4E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 912F8194306E498800D2EB4E /* RotateRings */;
+			targetProxy = 912F81F0306E4EF800D2EB4E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		911DFFB5306FA26E00F2E8B5 /* Debug configuration for PBXNativeTarget "LevelForge" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				EXCLUDED_SOURCE_FILE_NAMES = (
+					"$(SRCROOT)/RotateRings/App/*",
+					"$(SRCROOT)/RotateRings/App/Debug/*",
+					"$(SRCROOT)/RotateRings/Scene/*",
+					"$(SRCROOT)/RotateRings/Sounds/*",
+					"$(SRCROOT)/RotateRings/Levels/*",
+					"$(SRCROOT)/RotateRings/AppIcon.icon",
+					"$(SRCROOT)/RotateRings/Info.plist",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		911DFFB6306FA26E00F2E8B5 /* Release configuration for PBXNativeTarget "LevelForge" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				EXCLUDED_SOURCE_FILE_NAMES = (
+					"$(SRCROOT)/RotateRings/App/*",
+					"$(SRCROOT)/RotateRings/App/Debug/*",
+					"$(SRCROOT)/RotateRings/Scene/*",
+					"$(SRCROOT)/RotateRings/Sounds/*",
+					"$(SRCROOT)/RotateRings/Levels/*",
+					"$(SRCROOT)/RotateRings/AppIcon.icon",
+					"$(SRCROOT)/RotateRings/Info.plist",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 		912F81AC306E498B00D2EB4E /* Debug configuration for PBXNativeTarget "RotateRings" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 6T946YUXZF;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RotateRings/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UIStatusBarHidden = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIStatusBarHidden = NO;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleLightContent;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UIUserInterfaceStyle = Dark;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -152,11 +322,11 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -165,16 +335,18 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 6T946YUXZF;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RotateRings/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UIStatusBarHidden = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIStatusBarHidden = NO;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleLightContent;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UIUserInterfaceStyle = Dark;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -184,11 +356,11 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -313,9 +485,69 @@
 			};
 			name = Release;
 		};
+		912F81E1306E4EF800D2EB4E /* Debug configuration for PBXNativeTarget "RotateRingsTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yourcompany.RotateRingsTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RotateRings.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/RotateRings";
+				XROS_DEPLOYMENT_TARGET = 27.0;
+			};
+			name = Debug;
+		};
+		912F81E2306E4EF800D2EB4E /* Release configuration for PBXNativeTarget "RotateRingsTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MACOSX_DEPLOYMENT_TARGET = 27.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yourcompany.RotateRingsTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/RotateRings.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/RotateRings";
+				XROS_DEPLOYMENT_TARGET = 27.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		911DFFB4306FA26E00F2E8B5 /* Build configuration list for PBXNativeTarget "LevelForge" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				911DFFB5306FA26E00F2E8B5 /* Debug configuration for PBXNativeTarget "LevelForge" */,
+				911DFFB6306FA26E00F2E8B5 /* Release configuration for PBXNativeTarget "LevelForge" */,
+			);
+			defaultConfigurationName = Release;
+		};
 		912F8190306E498800D2EB4E /* Build configuration list for PBXProject "RotateRings" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -329,6 +561,14 @@
 			buildConfigurations = (
 				912F81AC306E498B00D2EB4E /* Debug configuration for PBXNativeTarget "RotateRings" */,
 				912F81AD306E498B00D2EB4E /* Release configuration for PBXNativeTarget "RotateRings" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		912F81E0306E4EF800D2EB4E /* Build configuration list for PBXNativeTarget "RotateRingsTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				912F81E1306E4EF800D2EB4E /* Debug configuration for PBXNativeTarget "RotateRingsTests" */,
+				912F81E2306E4EF800D2EB4E /* Release configuration for PBXNativeTarget "RotateRingsTests" */,
 			);
 			defaultConfigurationName = Release;
 		};

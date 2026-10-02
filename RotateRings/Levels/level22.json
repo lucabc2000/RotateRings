@@ -1,0 +1,391 @@
+{
+  "board" : {
+    "height" : 640,
+    "width" : 360
+  },
+  "id" : 22,
+  "name" : "Gridlock",
+  "pieces" : [
+    {
+      "color" : "purple",
+      "id" : "l1",
+      "motion" : "slide",
+      "position" : [
+        32,
+        212.5
+      ],
+      "rotation" : 270,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -200,
+              0
+            ],
+            "to" : [
+              22,
+              0
+            ]
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              22,
+              0
+            ],
+            "to" : [
+              22,
+              74
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "coral",
+      "id" : "l2",
+      "motion" : "slide",
+      "position" : [
+        54,
+        153.5
+      ],
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -22,
+              0
+            ],
+            "to" : [
+              89,
+              0
+            ]
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              89,
+              0
+            ],
+            "to" : [
+              89,
+              37
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "yellow",
+      "id" : "l3",
+      "motion" : "slide",
+      "position" : [
+        180,
+        353.5
+      ],
+      "rotation" : 90,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -163,
+              0
+            ],
+            "to" : [
+              22,
+              0
+            ]
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              22,
+              0
+            ],
+            "to" : [
+              22,
+              111
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "sky",
+      "id" : "l4",
+      "motion" : "slide",
+      "position" : [
+        91,
+        412.5
+      ],
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -22,
+              0
+            ],
+            "to" : [
+              126,
+              0
+            ]
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              126,
+              0
+            ],
+            "to" : [
+              126,
+              -111
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "mint",
+      "id" : "l5",
+      "motion" : "slide",
+      "position" : [
+        254,
+        353.5
+      ],
+      "rotation" : 270,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -22,
+              0
+            ],
+            "to" : [
+              89,
+              0
+            ]
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              89,
+              0
+            ],
+            "to" : [
+              89,
+              -37
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "purple",
+      "id" : "s1",
+      "motion" : "slide",
+      "position" : [
+        239,
+        227.5
+      ],
+      "rotation" : 180,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -52,
+              0
+            ],
+            "to" : [
+              22,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "coral",
+      "id" : "l6",
+      "motion" : "slide",
+      "position" : [
+        328,
+        353.5
+      ],
+      "rotation" : 270,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -22,
+              0
+            ],
+            "to" : [
+              163,
+              0
+            ]
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              163,
+              0
+            ],
+            "to" : [
+              163,
+              -74
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "yellow",
+      "id" : "s2",
+      "motion" : "slide",
+      "position" : [
+        202,
+        153.5
+      ],
+      "rotation" : 180,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -89,
+              0
+            ],
+            "to" : [
+              22,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "sky",
+      "id" : "s3",
+      "motion" : "slide",
+      "position" : [
+        291,
+        286.5
+      ],
+      "rotation" : 90,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -22,
+              0
+            ],
+            "to" : [
+              163,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "purple",
+      "id" : "l7",
+      "motion" : "slide",
+      "position" : [
+        235.5,
+        486.5
+      ],
+      "rotation" : 180,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -55.5,
+              0
+            ],
+            "to" : [
+              55.5,
+              0
+            ]
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              55.5,
+              0
+            ],
+            "to" : [
+              55.5,
+              37
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "coral",
+      "id" : "s4",
+      "motion" : "slide",
+      "position" : [
+        91,
+        449.5
+      ],
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -22,
+              0
+            ],
+            "to" : [
+              52,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "mint",
+      "id" : "l8",
+      "motion" : "slide",
+      "position" : [
+        121,
+        486.5
+      ],
+      "rotation" : 180,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -22,
+              0
+            ],
+            "to" : [
+              89,
+              0
+            ]
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              89,
+              0
+            ],
+            "to" : [
+              89,
+              37
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

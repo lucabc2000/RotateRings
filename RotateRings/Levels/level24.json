@@ -1,0 +1,392 @@
+{
+  "board" : {
+    "height" : 640,
+    "width" : 360
+  },
+  "id" : 24,
+  "name" : "Workshop",
+  "pieces" : [
+    {
+      "color" : "sky",
+      "id" : "r1",
+      "position" : [
+        250,
+        334
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 38,
+            "start" : 220,
+            "sweep" : 280
+          }
+        }
+      ]
+    },
+    {
+      "clips" : [
+        {
+          "grips" : "r1",
+          "stemEnd" : [
+            0,
+            18
+          ],
+          "stemStart" : [
+            0,
+            0
+          ]
+        }
+      ],
+      "color" : "coral",
+      "id" : "b1",
+      "position" : [
+        250,
+        278
+      ],
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -28,
+              0
+            ],
+            "to" : [
+              28,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "mint",
+      "id" : "s1",
+      "motion" : "slide",
+      "position" : [
+        228,
+        334
+      ],
+      "rotation" : 180,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -22,
+              0
+            ],
+            "to" : [
+              34,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "yellow",
+      "id" : "l1",
+      "motion" : "slide",
+      "position" : [
+        166,
+        340
+      ],
+      "rotation" : 90,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -90,
+              0
+            ],
+            "to" : [
+              22,
+              0
+            ]
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              22,
+              0
+            ],
+            "to" : [
+              22,
+              -28
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "purple",
+      "id" : "r2",
+      "position" : [
+        110,
+        306
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 38,
+            "start" : 40,
+            "sweep" : 280
+          }
+        }
+      ]
+    },
+    {
+      "clips" : [
+        {
+          "grips" : "r2",
+          "stemEnd" : [
+            0,
+            -18
+          ],
+          "stemStart" : [
+            0,
+            0
+          ]
+        }
+      ],
+      "color" : "sky",
+      "id" : "b2",
+      "position" : [
+        110,
+        362
+      ],
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              28,
+              0
+            ],
+            "to" : [
+              -28,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "coral",
+      "id" : "l2",
+      "motion" : "slide",
+      "position" : [
+        76,
+        390
+      ],
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -22,
+              0
+            ],
+            "to" : [
+              90,
+              0
+            ]
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              90,
+              0
+            ],
+            "to" : [
+              90,
+              56
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "purple",
+      "id" : "s2",
+      "motion" : "slide",
+      "position" : [
+        194,
+        460
+      ],
+      "rotation" : 90,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -70,
+              0
+            ],
+            "to" : [
+              70,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "yellow",
+      "id" : "s3",
+      "motion" : "slide",
+      "position" : [
+        132,
+        558
+      ],
+      "rotation" : 180,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -62,
+              0
+            ],
+            "to" : [
+              22,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "sky",
+      "id" : "s4",
+      "motion" : "slide",
+      "position" : [
+        256,
+        558
+      ],
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -34,
+              0
+            ],
+            "to" : [
+              22,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "sky",
+      "id" : "r3",
+      "position" : [
+        110,
+        502
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 38,
+            "start" : 220,
+            "sweep" : 280
+          }
+        }
+      ]
+    },
+    {
+      "clips" : [
+        {
+          "grips" : "r3",
+          "stemEnd" : [
+            0,
+            18
+          ],
+          "stemStart" : [
+            0,
+            0
+          ]
+        }
+      ],
+      "color" : "mint",
+      "id" : "b3",
+      "position" : [
+        110,
+        446
+      ],
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -28,
+              0
+            ],
+            "to" : [
+              28,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "mint",
+      "id" : "s5",
+      "motion" : "slide",
+      "position" : [
+        306,
+        536
+      ],
+      "rotation" : 90,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -90,
+              0
+            ],
+            "to" : [
+              22,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "coral",
+      "id" : "s6",
+      "motion" : "slide",
+      "position" : [
+        306,
+        348
+      ],
+      "rotation" : 270,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -70,
+              0
+            ],
+            "to" : [
+              70,
+              0
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

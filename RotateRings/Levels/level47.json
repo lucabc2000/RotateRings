@@ -1,0 +1,702 @@
+{
+  "board" : {
+    "height" : 640,
+    "width" : 360
+  },
+  "id" : 47,
+  "name" : "Gridlock",
+  "pieces" : [
+    {
+      "color" : "mint",
+      "id" : "l1",
+      "motion" : "slide",
+      "position" : [
+        330,
+        177
+      ],
+      "rotation" : 90,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -22,
+              0
+            ],
+            "to" : [
+              158,
+              0
+            ]
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              158,
+              0
+            ],
+            "to" : [
+              158,
+              60
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "purple",
+      "id" : "l2",
+      "motion" : "slide",
+      "position" : [
+        308,
+        365
+      ],
+      "rotation" : 180,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -22,
+              0
+            ],
+            "to" : [
+              98,
+              0
+            ]
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              98,
+              0
+            ],
+            "to" : [
+              98,
+              -90
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "sky",
+      "id" : "l3",
+      "motion" : "slide",
+      "position" : [
+        180,
+        297
+      ],
+      "rotation" : 270,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -158,
+              0
+            ],
+            "to" : [
+              22,
+              0
+            ]
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              22,
+              0
+            ],
+            "to" : [
+              22,
+              -90
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "yellow",
+      "id" : "s1",
+      "motion" : "slide",
+      "position" : [
+        165,
+        245
+      ],
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -75,
+              0
+            ],
+            "to" : [
+              75,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "coral",
+      "id" : "l4",
+      "motion" : "slide",
+      "position" : [
+        60,
+        237
+      ],
+      "rotation" : 90,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -22,
+              0
+            ],
+            "to" : [
+              158,
+              0
+            ]
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              158,
+              0
+            ],
+            "to" : [
+              158,
+              -60
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "mint",
+      "id" : "s2",
+      "motion" : "slide",
+      "position" : [
+        128,
+        425
+      ],
+      "rotation" : 180,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -22,
+              0
+            ],
+            "to" : [
+              38,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "purple",
+      "id" : "l5",
+      "motion" : "slide",
+      "position" : [
+        60,
+        523
+      ],
+      "rotation" : 90,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -98,
+              0
+            ],
+            "to" : [
+              22,
+              0
+            ]
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              22,
+              0
+            ],
+            "to" : [
+              22,
+              -90
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "sky",
+      "id" : "l6",
+      "motion" : "slide",
+      "position" : [
+        188,
+        575
+      ],
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -128,
+              0
+            ],
+            "to" : [
+              22,
+              0
+            ]
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              22,
+              0
+            ],
+            "to" : [
+              22,
+              -30
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "yellow",
+      "id" : "s3",
+      "motion" : "slide",
+      "position" : [
+        240,
+        470
+      ],
+      "rotation" : 270,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -75,
+              0
+            ],
+            "to" : [
+              75,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "coral",
+      "id" : "s4",
+      "motion" : "slide",
+      "position" : [
+        262,
+        575
+      ],
+      "rotation" : 180,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -38,
+              0
+            ],
+            "to" : [
+              22,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "mint",
+      "id" : "l7",
+      "motion" : "slide",
+      "position" : [
+        330,
+        553
+      ],
+      "rotation" : 270,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -22,
+              0
+            ],
+            "to" : [
+              38,
+              0
+            ]
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              38,
+              0
+            ],
+            "to" : [
+              38,
+              -30
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "sky",
+      "id" : "s5",
+      "motion" : "slide",
+      "position" : [
+        300,
+        463
+      ],
+      "rotation" : 270,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -22,
+              0
+            ],
+            "to" : [
+              38,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "coral",
+      "id" : "s6",
+      "motion" : "slide",
+      "position" : [
+        292,
+        395
+      ],
+      "rotation" : 180,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -38,
+              0
+            ],
+            "to" : [
+              22,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "coral",
+      "id" : "l8",
+      "motion" : "slide",
+      "position" : [
+        112,
+        515
+      ],
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -22,
+              0
+            ],
+            "to" : [
+              68,
+              0
+            ]
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              68,
+              0
+            ],
+            "to" : [
+              68,
+              -30
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "mint",
+      "id" : "s7",
+      "motion" : "slide",
+      "position" : [
+        112,
+        215
+      ],
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -22,
+              0
+            ],
+            "to" : [
+              158,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "purple",
+      "id" : "l9",
+      "motion" : "slide",
+      "position" : [
+        300,
+        117
+      ],
+      "rotation" : 270,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -158,
+              0
+            ],
+            "to" : [
+              22,
+              0
+            ]
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              22,
+              0
+            ],
+            "to" : [
+              22,
+              -60
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "sky",
+      "id" : "l10",
+      "motion" : "slide",
+      "position" : [
+        308,
+        65
+      ],
+      "rotation" : 180,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -22,
+              0
+            ],
+            "to" : [
+              128,
+              0
+            ]
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              128,
+              0
+            ],
+            "to" : [
+              128,
+              -90
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "coral",
+      "id" : "s8",
+      "motion" : "slide",
+      "position" : [
+        150,
+        163
+      ],
+      "rotation" : 270,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -22,
+              0
+            ],
+            "to" : [
+              68,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "yellow",
+      "id" : "l11",
+      "motion" : "slide",
+      "position" : [
+        82,
+        65
+      ],
+      "rotation" : 180,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -68,
+              0
+            ],
+            "to" : [
+              22,
+              0
+            ]
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              22,
+              0
+            ],
+            "to" : [
+              22,
+              -60
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "purple",
+      "id" : "l12",
+      "motion" : "slide",
+      "position" : [
+        30,
+        117
+      ],
+      "rotation" : 90,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -22,
+              0
+            ],
+            "to" : [
+              38,
+              0
+            ]
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              38,
+              0
+            ],
+            "to" : [
+              38,
+              -60
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "sky",
+      "id" : "s9",
+      "motion" : "slide",
+      "position" : [
+        30,
+        207
+      ],
+      "rotation" : 90,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -22,
+              0
+            ],
+            "to" : [
+              98,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "sky",
+      "id" : "s10",
+      "motion" : "slide",
+      "position" : [
+        30,
+        433
+      ],
+      "rotation" : 90,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -98,
+              0
+            ],
+            "to" : [
+              22,
+              0
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "yellow",
+      "id" : "s11",
+      "motion" : "slide",
+      "position" : [
+        30,
+        523
+      ],
+      "rotation" : 90,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -38,
+              0
+            ],
+            "to" : [
+              22,
+              0
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

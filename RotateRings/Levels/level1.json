@@ -1,0 +1,65 @@
+{
+  "board" : {
+    "height" : 640,
+    "width" : 360
+  },
+  "id" : 1,
+  "name" : "Two rings",
+  "pieces" : [
+    {
+      "clips" : [
+        {
+          "grips" : "r2",
+          "stemEnd" : [
+            0,
+            65
+          ],
+          "stemStart" : [
+            0,
+            45
+          ]
+        }
+      ],
+      "color" : "mint",
+      "id" : "r1",
+      "position" : [
+        180,
+        265
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 45,
+            "start" : 220,
+            "sweep" : 280
+          }
+        }
+      ]
+    },
+    {
+      "color" : "purple",
+      "id" : "r2",
+      "position" : [
+        180,
+        375
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 45,
+            "start" : 345,
+            "sweep" : 300
+          }
+        }
+      ]
+    }
+  ]
+}

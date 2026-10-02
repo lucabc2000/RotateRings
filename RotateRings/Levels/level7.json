@@ -1,0 +1,101 @@
+{
+  "board" : {
+    "height" : 640,
+    "width" : 360
+  },
+  "id" : 7,
+  "name" : "Elbow slider",
+  "pieces" : [
+    {
+      "color" : "yellow",
+      "id" : "r1",
+      "position" : [
+        180,
+        349
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 45,
+            "start" : 130,
+            "sweep" : 280
+          }
+        }
+      ]
+    },
+    {
+      "color" : "coral",
+      "id" : "l1",
+      "motion" : "slide",
+      "position" : [
+        255,
+        289
+      ],
+      "rotation" : 90,
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -50,
+              0
+            ],
+            "to" : [
+              112,
+              0
+            ]
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              112,
+              0
+            ],
+            "to" : [
+              112,
+              75
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "clips" : [
+        {
+          "grips" : "r1",
+          "stemEnd" : [
+            60,
+            0
+          ],
+          "stemStart" : [
+            40,
+            0
+          ]
+        }
+      ],
+      "color" : "mint",
+      "id" : "r2",
+      "position" : [
+        75,
+        349
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 40,
+            "start" : 130,
+            "sweep" : 280
+          }
+        }
+      ]
+    }
+  ]
+}

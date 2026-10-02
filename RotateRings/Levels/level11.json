@@ -1,0 +1,188 @@
+{
+  "board" : {
+    "height" : 640,
+    "width" : 360
+  },
+  "id" : 11,
+  "name" : "Medley",
+  "pieces" : [
+    {
+      "color" : "mint",
+      "id" : "r1",
+      "position" : [
+        180,
+        372
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 45,
+            "start" : 40,
+            "sweep" : 280
+          }
+        }
+      ]
+    },
+    {
+      "clips" : [
+        {
+          "grips" : "r2",
+          "stemEnd" : [
+            20,
+            100
+          ],
+          "stemStart" : [
+            20,
+            80
+          ]
+        }
+      ],
+      "color" : "yellow",
+      "id" : "b1",
+      "position" : [
+        270,
+        372
+      ],
+      "shapes" : [
+        {
+          "segment" : {
+            "from" : [
+              -105,
+              0
+            ],
+            "to" : [
+              20,
+              0
+            ]
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              20,
+              0
+            ],
+            "to" : [
+              20,
+              80
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "purple",
+      "id" : "r2",
+      "position" : [
+        290,
+        502
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 30,
+            "start" : 252.5,
+            "sweep" : 305
+          }
+        }
+      ]
+    },
+    {
+      "clips" : [
+        {
+          "grips" : "r1",
+          "stemEnd" : [
+            60,
+            0
+          ],
+          "stemStart" : [
+            40,
+            0
+          ]
+        }
+      ],
+      "color" : "coral",
+      "id" : "r3",
+      "position" : [
+        75,
+        372
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 40,
+            "start" : 310,
+            "sweep" : 280
+          }
+        }
+      ]
+    },
+    {
+      "clips" : [
+        {
+          "grips" : "r4",
+          "stemEnd" : [
+            28.284,
+            28.284
+          ],
+          "stemStart" : [
+            45.962,
+            45.962
+          ]
+        }
+      ],
+      "color" : "sky",
+      "id" : "o1",
+      "position" : [
+        180,
+        173
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 65,
+            "start" : 0,
+            "sweep" : 360
+          }
+        }
+      ]
+    },
+    {
+      "color" : "mint",
+      "id" : "r4",
+      "position" : [
+        180,
+        173
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 40,
+            "start" : 30,
+            "sweep" : 300
+          }
+        }
+      ]
+    }
+  ]
+}

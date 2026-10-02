@@ -1,0 +1,97 @@
+{
+  "board" : {
+    "height" : 640,
+    "width" : 360
+  },
+  "id" : 3,
+  "name" : "Anchor",
+  "pieces" : [
+    {
+      "clips" : [
+        {
+          "grips" : "r1",
+          "stemEnd" : [
+            0,
+            60
+          ],
+          "stemStart" : [
+            0,
+            40
+          ]
+        },
+        {
+          "grips" : "r2",
+          "stemEnd" : [
+            0,
+            -60
+          ],
+          "stemStart" : [
+            0,
+            -40
+          ]
+        }
+      ],
+      "color" : "purple",
+      "id" : "o1",
+      "position" : [
+        180,
+        320
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 40,
+            "start" : 0,
+            "sweep" : 360
+          }
+        }
+      ]
+    },
+    {
+      "color" : "yellow",
+      "id" : "r1",
+      "position" : [
+        180,
+        425
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 45,
+            "start" : 220,
+            "sweep" : 280
+          }
+        }
+      ]
+    },
+    {
+      "color" : "sky",
+      "id" : "r2",
+      "position" : [
+        180,
+        215
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 45,
+            "start" : 40,
+            "sweep" : 280
+          }
+        }
+      ]
+    }
+  ]
+}
