@@ -11,7 +11,9 @@
 //  - maze: nothing but sliding bars, packed so they block each other's way out (`GridWorld`);
 //  - cages: rings pinned by T-bars in a grid, with bars in the lanes between them; with only some
 //    of the cages filled in, a workshop of bars around a few rings;
-//  - showcase (every fifth level): the sun, or the largest board of one of the genres above.
+//  - tangle: a free-form cluster grown from one seed (chains, used for the hard ones) or from
+//    several closed hubs (easy and pretty); planet wraps one in a giant ring (`Tangle`);
+//  - showcase (every fifth level): the sun, the bullseye, or the largest board of a genre above.
 //
 
 import Foundation
@@ -82,6 +84,78 @@ enum Compositions {
         return LevelTemplate.single(shapeID + (tails > 0 ? "-tails" : ""), kinds: kinds) { rng in RingNet.build(shape, options: options, rng: &rng) }
     }
 
+    // MARK: Hub webs
+
+    /// Masks for hub webs. Holes (`o`) sit where a hub would, two cells apart, so the rings around
+    /// them can be poked by a bar.
+    static let webShapes: [String: RingNet.Shape] = {
+        let list: [RingNet.Shape] = [
+            // Square, three big rings across.
+            shape("hubs-nine", "Nine", .square, radius: 44, stem: 18, ["###", "###", "###"]),
+            shape("hubs-twelve", "Twelve", .square, radius: 44, stem: 18, ["###", "###", "###", "###"]),
+            shape("hubs-grand", "Grand web", .square, radius: 44, stem: 18, ["###", "###", "###", "###", "###"]),
+            // Square, three medium rings across.
+            shape("hubs-column", "Column", .square, radius: 40, stem: 20, ["###", "###", "###", "###", "###", "###"]),
+            // Square, four small rings across. All holes of a mask sit on cells of one colour of
+            // the checkerboard (column + row even), because that colour becomes the hubs.
+            shape("hubs-field", "Field", .square, radius: 30, stem: 20, ["####", "####", "####", "####", "####", "####"]),
+            shape("hubs-tall", "Tall field", .square, radius: 30, stem: 20, ["####", "####", "####", "####", "####", "####", "####"]),
+            shape("hubs-diamond", "Cut web", .square, radius: 30, stem: 20, [".##.", "####", "####", "####", "####", "####", ".##."]),
+            shape("hubs-gaps", "Gaps", .square, radius: 30, stem: 20, ["####", "#o##", "####", "###o", "####", "#o##", "####"]),
+            shape("hubs-sieve", "Sieve", .square, radius: 30, stem: 20, ["o###", "####", "##o#", "####", "o###", "####", "##o#"]),
+            shape("hubs-riddle", "Riddle", .square, radius: 30, stem: 20, ["####", "#o##", "####", "###o", "o###", "####", "##o#"]),
+            shape("hubs-lace", "Lace", .square, radius: 30, stem: 20, ["####", "#o##", "##o#", "####", "o###", "###o", "####"]),
+            shape("hubs-ports", "Ports", .square, radius: 30, stem: 20, [".##.", "#o##", "####", "####", "##o#", "####", ".##."]),
+            shape("hubs-final", "Stronghold", .square, radius: 30, stem: 20, ["####", "#o##", "####", "####", "####", "###o", "####"]),
+            // Diagonal, five columns of small rings. Only half as many cells of one colour as of the
+            // other, so these webs need less preparing; holes would thin the hubs further.
+            shape("hubs-kite", "Web kite", .diagonal, radius: 32, stem: 18, ["..#..", ".#.#.", "#.#.#", ".#.#.", "#.#.#", ".#.#.", "#.#.#", ".#.#.", "..#.."]),
+            shape("hubs-weave", "Woven web", .diagonal, radius: 32, stem: 18, ["#.#.#", ".#.#.", "#.#.#", ".#.#.", "#.#.#", ".#.#.", "#.#.#", ".#.#.", "#.#.#"]),
+        ]
+        return Dictionary(uniqueKeysWithValues: list.map { ($0.template, $0) })
+    }()
+
+    /// A web of closed hubs and shared rings (`HubWeb`).
+    static func hubWeb(_ shapeID: String, clips: ClosedRange<Int> = 2...4, holders: Int = 3, bars: Int = 0, tails: Double = 0) -> LevelTemplate {
+        let shape = webShapes[shapeID]!
+        var options = HubWeb.Options()
+        options.clips = clips
+        options.holdersPerRing = holders
+        options.bars = bars
+        options.tailShare = tails
+        options.name = shape.name
+        let id = shapeID + (tails > 0 ? "-tails" : "")
+        options.template = id
+        var kinds: Set<PieceKind> = [.cRing, .closedRing]
+        if bars > 0 { kinds.insert(.slideBar) }
+        if tails > 0 { kinds.insert(.tailRing) }
+        return LevelTemplate.single(id, kinds: kinds) { rng in HubWeb.build(shape, options: options, rng: &rng) }
+    }
+
+    /// Rings that hold and are held (`Knot`), on one of the web masks.
+    static func knot(_ shapeID: String, holders: Int = 2, clips: Int = 2, link: Double = 0.85, anchors: Double = 0.25, bars: Int = 0, uBars: Int = 0,
+                     tails: Double = 0, bombs: Int = 0) -> LevelTemplate {
+        let shape = webShapes[shapeID]!
+        var options = Knot.Options()
+        options.maxHolders = holders
+        options.maxClips = clips
+        options.linkChance = link
+        options.anchorChance = anchors
+        options.tailShare = tails
+        options.bars = bars
+        options.uBars = uBars
+        options.bombs = bombs
+        options.name = shape.name
+        let id = shapeID.replacingOccurrences(of: "hubs-", with: "knot-") + "-\(holders)\(clips)" + (bars > 0 ? "-b\(bars)" : "")
+            + (uBars > 0 ? "-u\(uBars)" : "") + (tails > 0 ? "-tails" : "") + (bombs > 0 ? "-bomb\(bombs)" : "")
+        options.template = id
+        var kinds: Set<PieceKind> = [.cRing, .closedRing]
+        if tails > 0 { kinds.insert(.tailRing) }
+        if bars > 0 { kinds.insert(.slideBar) }
+        if uBars > 0 { kinds.insert(.uBar) }
+        return LevelTemplate.single(id, kinds: kinds) { rng in Knot.build(shape, options: options, rng: &rng) }
+    }
+
     // MARK: Grids
 
     /// Sliding bars only. Small mazes use wider lanes so they still fill the board. With `freeLimit`
@@ -110,7 +184,45 @@ enum Compositions {
         }
     }
 
+    // MARK: Tangles
+
+    /// A free-form cluster of rings and bars. `planet` wraps it in a giant ring.
+    static func tangle(rings: ClosedRange<Int>, pokes: Int = 0, latches: Int = 0, planet: Bool = false, hubs: Int = 1,
+                       chain: Double = 0.55, blocked: Bool = false, lock: ClosedRange<Int>) -> LevelTemplate {
+        var options = Tangle.Options(rings: rings)
+        options.hubs = hubs
+        options.blockedPokes = blocked
+        options.pokeBars = pokes
+        options.latchBars = latches
+        options.planet = planet
+        options.chain = chain
+        options.lockRange = lock
+        if rings.upperBound >= 16 { options.radii = [22, 24, 26, 30, 32, 36] } else if rings.upperBound >= 12 { options.radii = [24, 28, 30, 34, 40, 46] }
+        options.name = planet ? "Planet" : "Tangle"
+        options.template = (planet ? "planet-" : "tangle-") + "\(rings.lowerBound)-\(rings.upperBound)"
+            + (pokes + latches > 0 ? "-locked" : "") + (hubs > 1 ? "-\(hubs)hubs" : "") + (blocked ? "-tight" : "")
+        var kinds: Set<PieceKind> = [.cRing, .closedRing]
+        if pokes > 0 { kinds.insert(.slideBar) }
+        if latches > 0 { kinds.insert(.latchBar) }
+        let template = options.template
+        return LevelTemplate.single(template, kinds: kinds) { rng in Tangle.build(options, rng: &rng) }
+    }
+
     // MARK: Showcase
+
+    /// A bullseye of four nested rings sharing the board with a small tangle.
+    static func bullseye(lock: ClosedRange<Int>) -> LevelTemplate {
+        LevelTemplate.stack("bullseye", name: "Bullseye", kinds: [.closedRing, .cRing, .slideBar]) { rng in
+            var options = Tangle.Options(rings: 6...8)
+            options.pokeBars = 1
+            options.radii = [24, 28, 30, 34, 38]
+            options.halfHeight = 138
+            options.lockRange = lock
+            options.template = "bullseye"
+            guard let target = Motifs.bullseye(lockRange: lock, rng: &rng), let tangle = Tangle.build(options, rng: &rng) else { return nil }
+            return [target, tangle]
+        }
+    }
 
     static func sun(lock: ClosedRange<Int>) -> LevelTemplate {
         LevelTemplate.single("sun", kinds: [.closedRing, .cRing, .slideBar, .lBar]) { rng in Motifs.sun(lockRange: lock, rng: &rng) }
@@ -131,47 +243,111 @@ enum Compositions {
 
     /// Levels built to be hard: few pieces are free at any time, so the player has to trace what
     /// holds what. They alternate with easier levels, and the sun showcases stay easy.
-    static let hardLevels: Set<Int> = [22, 25, 27, 30, 32, 34, 35, 37, 39, 42, 44, 45, 47, 49, 50]
+    /// Past level 50 everything is hard except the breather at each 5; see `lateTemplates`.
+    // PLAN-BEGIN
+    /// No level is ranked as hard any more: every level from 11 on takes the candidate closest to
+    /// its target on the difficulty curve (`DifficultyCurve.targets`).
+    static let hardLevels: Set<Int> = []
 
-    /// The designs level `level` (16–50) may be built from.
+    /// The design of each level from 11 to 100. The table is written by hand-tuned planning, not
+    /// by a formula: targets rise in uneven waves (LEVEL-DESIGN.md §10), and each level gets the
+    /// design whose usual difficulty is closest to its target, never the same kind of board twice
+    /// running and preferably not the same kind of difficulty either (finding a chain, things in
+    /// the way, lining rings up, ordering bars, reading a picture).
     static func templates(level: Int) -> [LevelTemplate] {
-        let lock = level < 30 ? 1...3 : 1...4
+        let lock = 1...4
         switch level {
-        case 16: return [net("figure-block", lock: lock), net("figure-window", lock: lock, bars: 1)]
-        case 17: return [maze(cols: 7, rows: 9, bars: 9), maze(cols: 8, rows: 8, bars: 10)]
-        case 18: return [net("weave-diamond", lock: lock), net("weave-cross", lock: lock, bars: 1)]
-        case 19: return [cages(across: 2, down: 2, lanes: 2, border: 1, bars: 6)]
-        case 20: return [sun(lock: lock)]
-        case 21: return [net("figure-hourglass", lock: lock, bars: 2), net("figure-pillars", lock: lock, bars: 1), net("figure-totem", lock: lock, bars: 1)]
-        case 22: return [maze(cols: 9, rows: 10, bars: 12, freeLimit: 2), maze(cols: 8, rows: 11, bars: 12, freeLimit: 2)]
-        case 23: return [net("weave-hexagon", lock: lock, mirrored: false, bars: 2), net("weave-kite", lock: lock)]
-        case 24: return [cages(across: 2, down: 3, count: 3, lanes: 2, border: 1, bars: 8)]
-        case 25: return [net("figure-grand", lock: lock, crossClips: 1, tails: 3)]
-        case 26: return [net("figure-frame", lock: lock, bars: 1), net("figure-spine", lock: lock, bars: 2)]
-        case 27: return [cages(across: 2, down: 3, lanes: 2, border: 1, bars: 9, freeLimit: 3)]
-        case 28: return [maze(cols: 10, rows: 12, bars: 16)]
-        case 29: return [net("figure-diamond", lock: lock, bars: 2), net("figure-border", lock: lock, bars: 2)]
-        case 30: return [cages(across: 3, down: 3, border: 0, bars: 10, freeLimit: 4)]
-        case 31: return [net("weave-butterfly", lock: lock), net("weave-kite", lock: lock, crossClips: 1)]
-        case 32: return [cages(across: 3, down: 3, count: 4, border: 0, bars: 13, freeLimit: 3)]
-        case 33: return [maze(cols: 11, rows: 14, bars: 20)]
-        case 34: return [net("figure-tower", lock: lock, crossClips: 1, tails: 3), net("figure-goblet", lock: lock, bars: 1, tails: 2)]
-        case 35: return [net("weave-crystal", lock: lock, crossClips: 1, tails: 3)]
-        case 36: return [cages(across: 3, down: 3, border: 0, bars: 8)]
-        case 37: return [net("figure-waist", lock: lock, bars: 2, tails: 2), net("figure-gate", lock: lock, bars: 3, tails: 2)]
-        case 38: return [maze(cols: 11, rows: 16, bars: 23)]
-        case 39: return [net("weave-lantern", lock: lock, bars: 1, tails: 3), net("weave-tapestry", lock: lock, tails: 3)]
-        case 40: return [sunAndMoons(lock: lock)]
-        case 41: return [net("figure-tree", lock: lock, bars: 2), net("figure-border", lock: lock, crossClips: 1, bars: 2)]
-        case 42: return [cages(across: 3, down: 4, count: 9, border: 0, bars: 11, freeLimit: 4)]
-        case 43: return [maze(cols: 11, rows: 17, bars: 25)]
-        case 44: return [net("figure-castle", lock: lock, bars: 3, tails: 2), net("figure-gate", lock: lock, crossClips: 1, bars: 3, tails: 3)]
-        case 45: return [net("weave-tapestry", lock: lock, crossClips: 2, tails: 4)]
-        case 46: return [net("weave-lantern", lock: lock, crossClips: 1, bars: 1), net("weave-butterfly", lock: lock, crossClips: 2)]
-        case 47: return [maze(cols: 11, rows: 18, bars: 26, freeLimit: 3)]
-        case 48: return [cages(across: 3, down: 4, count: 10, border: 0, bars: 8)]
-        case 49: return [net("figure-castle", lock: lock, mirrored: false, crossClips: 2, bars: 4, tails: 5), net("figure-waist", lock: lock, crossClips: 2, bars: 2, tails: 3)]
-        default: return [cages(across: 3, down: 4, count: 10, border: 0, bars: 10, freeLimit: 4)]
+        case 11: return [knot("hubs-nine", holders: 2)]
+        case 12: return [knot("hubs-nine", holders: 2, tails: 0.4)]
+        case 13: return [hubWeb("hubs-nine", clips: 2...3, holders: 2, tails: 0.85)]
+        case 14: return [tangle(rings: 15...18, pokes: 2, latches: 1, hubs: 3, lock: lock)]
+        case 15: return [knot("hubs-nine", holders: 2, bars: 1, tails: 0.4)]
+        case 16: return [maze(cols: 8, rows: 10, bars: 11, freeLimit: 2)]
+        case 17: return [net("weave-crystal", lock: lock, crossClips: 1, tails: 3)]
+        case 18: return [knot("hubs-twelve", holders: 2)]
+        case 19: return [knot("hubs-twelve", holders: 2, bars: 2)]
+        case 20: return [knot("hubs-grand", holders: 2, bars: 1, uBars: 1)]
+        case 21: return [net("figure-block", lock: lock)]
+        case 22: return [knot("hubs-twelve", holders: 2, bars: 2, tails: 0.4)]
+        case 23: return [knot("hubs-grand", holders: 2, bars: 3)]
+        case 24: return [net("weave-butterfly", lock: lock)]
+        case 25: return [knot("hubs-twelve", holders: 2, uBars: 1)]
+        case 26: return [knot("hubs-grand", holders: 2, bombs: 1)]
+        case 27: return [cages(across: 3, down: 3, count: 4, border: 0, bars: 13, freeLimit: 3)]
+        case 28: return [knot("hubs-nine", holders: 2, bars: 1)]
+        case 29: return [maze(cols: 10, rows: 14, bars: 17, freeLimit: 2)]
+        case 30: return [knot("hubs-column", holders: 3, bars: 1, uBars: 1)]
+        case 31: return [hubWeb("hubs-twelve", clips: 2...3, holders: 2, tails: 0.85)]
+        case 32: return [knot("hubs-column", holders: 3, bombs: 1)]
+        case 33: return [tangle(rings: 11...14, pokes: 1, latches: 1, lock: lock)]
+        case 34: return [knot("hubs-grand", holders: 2, bars: 3, tails: 0.4)]
+        case 35: return [hubWeb("hubs-grand", clips: 3...4, holders: 3, tails: 0.85)]
+        case 36: return [net("weave-lantern", lock: lock, bars: 1, tails: 3)]
+        case 37: return [knot("hubs-column", holders: 3, bars: 3, tails: 0.4, bombs: 1)]
+        case 38: return [sunAndMoons(lock: lock)]
+        case 39: return [knot("hubs-kite", holders: 2, tails: 0.3)]
+        case 40: return [tangle(rings: 13...16, pokes: 2, latches: 2, chain: 0.7, lock: lock)]
+        case 41: return [knot("hubs-grand", holders: 2, tails: 0.4, bombs: 1)]
+        case 42: return [hubWeb("hubs-weave", clips: 3...4, holders: 3, tails: 0.85)]
+        case 43: return [net("weave-tapestry", lock: lock, crossClips: 2, tails: 4)]
+        case 44: return [knot("hubs-twelve", holders: 2, tails: 0.4, bombs: 1)]
+        case 45: return [knot("hubs-field", holders: 3, uBars: 2)]
+        case 46: return [net("weave-kite", lock: lock, crossClips: 1)]
+        case 47: return [hubWeb("hubs-column", clips: 3...4, holders: 3, tails: 0.85)]
+        case 48: return [maze(cols: 11, rows: 18, bars: 23, freeLimit: 3)]
+        case 49: return [knot("hubs-column", holders: 3, bars: 3, bombs: 1)]
+        case 50: return [knot("hubs-field", holders: 3, bars: 2, uBars: 1)]
+        case 51: return [net("weave-lantern", lock: lock, bars: 1, tails: 3)]
+        case 52: return [maze(cols: 11, rows: 16, bars: 21, freeLimit: 3)]
+        case 53: return [hubWeb("hubs-weave", clips: 3...4, holders: 3, tails: 0.85)]
+        case 54: return [tangle(rings: 17...21, pokes: 3, latches: 2, chain: 0.75, lock: lock)]
+        case 55: return [maze(cols: 11, rows: 20, bars: 26, freeLimit: 3)]
+        case 56: return [hubWeb("hubs-kite", clips: 3...4, holders: 3, tails: 0.85)]
+        case 57: return [cages(across: 3, down: 4, count: 5, border: 0, bars: 15, freeLimit: 3)]
+        case 58: return [knot("hubs-column", holders: 3, bombs: 1)]
+        case 59: return [knot("hubs-field", holders: 3, bars: 4)]
+        case 60: return [maze(cols: 11, rows: 15, bars: 19, freeLimit: 3)]
+        case 61: return [knot("hubs-column", holders: 3, bars: 1, uBars: 1, bombs: 1)]
+        case 62: return [knot("hubs-column", holders: 3, tails: 0.4)]
+        case 63: return [knot("hubs-weave", holders: 3, tails: 0.4)]
+        case 64: return [knot("hubs-grand", holders: 2, bars: 1, uBars: 1, bombs: 1)]
+        case 65: return [net("weave-tapestry", lock: lock, crossClips: 2, tails: 4)]
+        case 66: return [maze(cols: 11, rows: 18, bars: 23, freeLimit: 3)]
+        case 67: return [hubWeb("hubs-field", clips: 3...4, holders: 3, tails: 0.85)]
+        case 68: return [cages(across: 3, down: 4, count: 6, border: 0, bars: 16, freeLimit: 3)]
+        case 69: return [knot("hubs-tall", holders: 3, bars: 2, uBars: 2, bombs: 1)]
+        case 70: return [knot("hubs-column", holders: 3, bars: 3, tails: 0.4)]
+        case 71: return [cages(across: 3, down: 4, count: 5, border: 0, bars: 15, freeLimit: 3)]
+        case 72: return [knot("hubs-field", holders: 3, bombs: 1)]
+        case 73: return [knot("hubs-field", holders: 3, uBars: 2)]
+        case 74: return [knot("hubs-field", holders: 3, bars: 4, tails: 0.4)]
+        case 75: return [hubWeb("hubs-riddle", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
+        case 76: return [maze(cols: 11, rows: 15, bars: 19, freeLimit: 3)]
+        case 77: return [knot("hubs-field", holders: 3, bars: 2, uBars: 1, bombs: 2)]
+        case 78: return [knot("hubs-field", holders: 3, tails: 0.4)]
+        case 79: return [maze(cols: 11, rows: 16, bars: 21, freeLimit: 3)]
+        case 80: return [knot("hubs-field", holders: 3, bars: 4)]
+        case 81: return [hubWeb("hubs-gaps", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
+        case 82: return [knot("hubs-tall", holders: 3, bars: 6, tails: 0.4, bombs: 2)]
+        case 83: return [cages(across: 3, down: 3, count: 4, border: 0, bars: 13, freeLimit: 3)]
+        case 84: return [hubWeb("hubs-lace", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
+        case 85: return [hubWeb("hubs-field", clips: 3...4, holders: 3, tails: 0.85)]
+        case 86: return [knot("hubs-field", holders: 3, bombs: 2)]
+        case 87: return [knot("hubs-tall", holders: 3, bars: 6)]
+        case 88: return [knot("hubs-weave", holders: 3, tails: 0.4)]
+        case 89: return [knot("hubs-column", holders: 3, tails: 0.4, bombs: 1)]
+        case 90: return [hubWeb("hubs-riddle", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
+        case 91: return [knot("hubs-field", holders: 3, bars: 4, tails: 0.4)]
+        case 92: return [hubWeb("hubs-tall", clips: 3...4, holders: 3, tails: 0.85)]
+        case 93: return [maze(cols: 11, rows: 20, bars: 26, freeLimit: 3)]
+        case 94: return [knot("hubs-tall", holders: 3, tails: 0.4, bombs: 2)]
+        case 95: return [cages(across: 3, down: 4, count: 6, border: 0, bars: 16, freeLimit: 3)]
+        case 96: return [hubWeb("hubs-gaps", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
+        case 97: return [knot("hubs-field", holders: 3, tails: 0.4)]
+        case 98: return [knot("hubs-tall", holders: 3, bars: 2, uBars: 2)]
+        case 99: return [knot("hubs-field", holders: 3, bombs: 1)]
+        case 100: return [knot("hubs-tall", holders: 3, tails: 0.4)]
+        default: return [knot("hubs-nine", holders: 2)]
         }
     }
 
@@ -186,6 +362,28 @@ enum Compositions {
 }
 
 extension Motifs {
+
+    /// Four rings inside each other. The closed outer ring grips the next one in, which grips the
+    /// next, down to the smallest: free the middle first and work outwards. Each ring's clip sits
+    /// well away from the clip that holds it, so its gap has room one step from its own clip.
+    static func bullseye(lockRange: ClosedRange<Int>, rng: inout SplitMix64) -> Motif? {
+        let radii = [112.0, 88, 64, 40]
+        var draft = LevelDraft(name: "Bullseye", template: "bullseye")
+        draft.pieces.append(.closedRing("c0", at: .zero, radius: radii[0]))
+        for i in 1..<radii.count { draft.pieces.append(.ring("c\(i)", at: .zero, radius: radii[i])) }
+        var degrees = Double(rng.int(in: 0...7)) * 45
+        for i in 0..<(radii.count - 1) {
+            let direction = Point(cos(AngleMath.radians(fromDegrees: degrees)), sin(AngleMath.radians(fromDegrees: degrees)))
+            guard draft.addClip(from: "c\(i)", at: direction * radii[i], to: "c\(i + 1)") else { return nil }
+            degrees = normalizedDegrees(degrees + rng.pick([135.0, 180, 225]))
+        }
+        for i in 1..<(radii.count - 1) {
+            // Gripping and gripped: a single step, as in the lattices.
+            guard let used = draft.planGap(for: "c\(i)", lockSteps: rng.bool() ? 1 : -1), abs(used) == 1 else { return nil }
+        }
+        guard draft.planGap(for: "c\(radii.count - 1)", lockSteps: rng.lockSteps(in: lockRange)) != nil else { return nil }
+        return Motif(name: draft.name, template: draft.template, pieces: draft.pieces)
+    }
 
     /// The flower with rays: a closed anchor with eight satellites, six of them locked by a bar that
     /// points away from the centre with its inner end in the satellite's gap. Slide a ray out, then

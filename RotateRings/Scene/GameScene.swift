@@ -228,6 +228,10 @@ final class GameScene: SKScene {
         guard let result = board.drag(state.pieceID, by: delta) else { return }
         state.node.apply(movement: result.value)
 
+        if case .bomb(let other) = result.blockedBy {
+            explode(state.pieceID, other)
+            return
+        }
         if result.blockedBy != nil {
             if !state.isPressingObstruction {
                 impact(bumpHaptic, intensity: 0.9)
@@ -292,6 +296,38 @@ final class GameScene: SKScene {
             directions[state.pieceID] = state.slideAxis * pulled
         }
         finishMove(removing: result.removedPieceIDs, directions: directions)
+    }
+
+    // MARK: Bombs
+
+    /// A bomb has touched something: the drag ends, the two pieces blow up together, and whatever
+    /// they were holding flies off.
+    private func explode(_ movingID: Piece.ID, _ otherID: Piece.ID) {
+        guard let moving = board.piece(movingID), let other = board.piece(otherID) else { return }
+        drag = nil
+        isBusy = true
+        let bomb = moving.worldBomb ?? other.worldBomb ?? moving.translation
+        let point = CGPoint(x: bomb.x, y: bomb.y)
+        impact(heavyHaptic, intensity: 1.0)
+        SoundPlayer.shared.play(.lightningStrike)
+        onScreenFlash?(ScreenFlash(color: .white, peakOpacity: 0.45, attack: 0.03, hold: 0.02, release: 0.35))
+        cameraNode.run(PowerUpEffects.shakeAction(around: cameraRest, amplitude: 10, duration: 0.45))
+        PowerUpEffects.addExplosion(at: point, in: self)
+        var freed: [Piece.ID] = []
+        for id in [movingID, otherID] {
+            guard let result = board.destroy(id), let node = pieceNodes.removeValue(forKey: id) else { continue }
+            freed += result.freedPieceIDs
+            node.zPosition = 11
+            PowerUpEffects.addShards(for: node, color: node.color, count: 12, to: self)
+            node.run(PowerUpEffects.burstAction())
+        }
+        run(.wait(forDuration: 0.6)) { [weak self] in
+            guard let self else { return }
+            self.flyOff(freed, delay: 0) { [weak self] in
+                self?.isBusy = false
+                self?.checkCompletion()
+            }
+        }
     }
 
     // MARK: Boosters

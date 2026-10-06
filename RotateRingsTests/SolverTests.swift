@@ -112,16 +112,19 @@ struct SolverTests {
     }
 
     @Test func difficultyScoreIsBoundedAndMonotonic() {
-        func metrics(moves: Int, deadEndRate: Double, branching: Double) -> SolverMetrics {
-            SolverMetrics(minMoves: moves, reachableStates: 0, solvableStates: 0, deadEndStates: 0, deadEndMoves: 0,
-                          totalMoves: 0, deadEndRate: deadEndRate, branching: branching, fullyExplored: true,
-                          isEstimate: false, playouts: nil, elapsed: 0)
+        func metrics(moves: Int, freedom: Double, setup: Int) -> SolverMetrics {
+            var result = SolverMetrics(minMoves: moves, reachableStates: 0, solvableStates: 0, deadEndStates: 0, deadEndMoves: 0,
+                                       totalMoves: 0, deadEndRate: 0, branching: 1, fullyExplored: true,
+                                       isEstimate: false, playouts: nil, elapsed: 0)
+            result.freedom = freedom
+            result.setupMoves = setup
+            return result
         }
-        let easy = DifficultyScore.score(metrics: metrics(moves: 1, deadEndRate: 0, branching: 1), pieceCount: 2, distinctKinds: 1)
-        let hard = DifficultyScore.score(metrics: metrics(moves: 30, deadEndRate: 0.5, branching: 20), pieceCount: 26, distinctKinds: 6)
-        #expect(easy >= 0 && easy < 5)
+        let easy = DifficultyScore.score(metrics: metrics(moves: 1, freedom: 0.6, setup: 0), pieceCount: 2, distinctKinds: 1)
+        let hard = DifficultyScore.score(metrics: metrics(moves: 40, freedom: 0.1, setup: 12), pieceCount: 28, distinctKinds: 6)
+        #expect(easy == 0)
         #expect(hard == 100)
-        let mid = DifficultyScore.score(metrics: metrics(moves: 15, deadEndRate: 0, branching: 1), pieceCount: 2, distinctKinds: 1)
+        let mid = DifficultyScore.score(metrics: metrics(moves: 20, freedom: 0.3, setup: 4), pieceCount: 15, distinctKinds: 3)
         #expect(mid > easy && mid < hard)
     }
 }

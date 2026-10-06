@@ -32,6 +32,11 @@ enum GameRules {
     static let touchDistance: Double = 16
     /// Side length of the square at the end of a clip stem.
     static let clipSize: Double = 16
+    /// Radius of a bomb's body. It goes off when its edge comes within a stroke's edge of another
+    /// piece, so the distance from its centre to that piece's centre line is `bombRadius +
+    /// strokeThickness / 2`.
+    static let bombRadius: Double = 12
+    static var bombReach: Double { bombRadius + strokeThickness / 2 }
     /// Half the width of the hub's slot, measured from the axis: how close a bent arm may come to the
     /// hub's center before it is stopped (see `hubClearance`).
     static let hubRadius: Double = 9

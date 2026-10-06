@@ -226,6 +226,20 @@ enum PowerUpEffects {
         sparks.run(.sequence([.wait(forDuration: 1.2), .removeFromParent()]))
     }
 
+    /// A bomb going off: a fireball with sparks flying out of it.
+    static func addExplosion(at point: CGPoint, in scene: SKScene) {
+        addImpactGlow(at: point, color: UIColor(red: 1, green: 0.55, blue: 0.15, alpha: 1), radius: 26, in: scene)
+        addSparks(at: point, color: UIColor(red: 1, green: 0.45, blue: 0.1, alpha: 1), count: 40, speed: 260, in: scene)
+        let smoke = SKShapeNode(circleOfRadius: 22)
+        smoke.position = point
+        smoke.fillColor = UIColor(white: 0.2, alpha: 0.6)
+        smoke.strokeColor = .clear
+        smoke.zPosition = 26
+        smoke.setScale(0.3)
+        scene.addChild(smoke)
+        smoke.run(.sequence([.group([.scale(to: 2.2, duration: 0.6), .fadeOut(withDuration: 0.6)]), .removeFromParent()]))
+    }
+
     /// Scatters shards in the piece's colour from the piece's footprint.
     static func addShards(for node: SKNode, color: UIColor, count: Int, to scene: SKScene) {
         let frame = node.calculateAccumulatedFrame()

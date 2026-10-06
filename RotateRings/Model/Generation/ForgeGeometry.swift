@@ -90,6 +90,7 @@ struct DraftPiece {
     var shapes: [LevelFile.ShapeSpec]
     var clips: [LevelFile.ClipSpec] = []
     var color: String?
+    var bomb: Point?
 
     // MARK: Ring access
 
@@ -275,6 +276,18 @@ struct DraftPiece {
                    shapes: [.segment(.init(from: Point(from, 0), to: Point(to, 0)))])
     }
 
+    /// A U-bar: two arms `width` apart, each through its own hub, running from `from` to `to` along
+    /// the axis, joined by a crossbar at the `to` end. The crossbar can never pass the hubs, so the
+    /// bar only leaves towards `to`; its open ends at `from` can sit in two rings' gaps at once.
+    static func uBar(_ id: String, at position: Point, width: Double, from: Double, to: Double, angleDegrees: Double = 90) -> DraftPiece {
+        let half = width / 2
+        return DraftPiece(id: id, kind: .uBar, motion: .slide, position: position, rotationDegrees: angleDegrees, shapes: [
+            .segment(.init(from: Point(from, -half), to: Point(to, -half))),
+            .segment(.init(from: Point(from, half), to: Point(to, half))),
+            .segment(.init(from: Point(to, -half), to: Point(to, half))),
+        ])
+    }
+
     /// An L-bar in a hub: the arm through the hub runs from `from` to `to` along the axis, and a leg
     /// of signed length `legLength` leaves the `to` end perpendicular to the axis (positive is the
     /// axis turned 90° counterclockwise). The leg can never pass the hub, so the bar only leaves at
@@ -304,7 +317,8 @@ struct DraftPiece {
                     return .segment(.init(from: Self.tidy(segment.from), to: Self.tidy(segment.to)))
                 }
             },
-            clips: clips.isEmpty ? nil : clips.map { .init(stemStart: Self.tidy($0.stemStart), stemEnd: Self.tidy($0.stemEnd), grips: $0.grips) }
+            clips: clips.isEmpty ? nil : clips.map { .init(stemStart: Self.tidy($0.stemStart), stemEnd: Self.tidy($0.stemEnd), grips: $0.grips) },
+            bomb: bomb.map(Self.tidy)
         )
     }
 

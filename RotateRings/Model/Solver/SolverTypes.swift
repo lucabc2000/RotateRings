@@ -63,6 +63,11 @@ struct SolverMetrics: Codable, Equatable, Sendable {
     /// over the steps of the solution. Low means the player has to hunt for the few pieces that are
     /// free. Filled in by the generator; nil in older reports.
     var freedom: Double? = nil
+    /// Moves of the solution that take nothing off the board: they only prepare a later move, such
+    /// as turning a ring onto one hub's clip while another ring still holds that hub. A level where
+    /// every drag removes a piece has none, and plays easy however few pieces are free.
+    /// Filled in by the generator; nil in older reports.
+    var setupMoves: Int? = nil
 }
 
 struct SolverResult: Equatable, Sendable {

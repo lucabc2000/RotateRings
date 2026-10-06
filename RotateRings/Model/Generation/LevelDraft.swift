@@ -139,11 +139,13 @@ struct LevelDraft {
     /// Simulated degree by degree from the actual geometry; rounded up to a multiple of 5. Two
     /// contacts up to a quarter turn apart are released together, with the gap over both; the gap
     /// then also leaves `sharedReleaseWindowDegrees` of play around the pair.
-    func sharedGapRequirement(for ringID: String) -> Double {
+    /// With `together` false the gap is not widened to span two contacts: the ring then lets its
+    /// owners go one at a time.
+    func sharedGapRequirement(for ringID: String, together: Bool = true) -> Double {
         guard let ring = self[ringID], let radius = ring.radius else { return ForgeRules.sharedGapDegrees }
         let band = GameRules.strokeThickness + GameRules.clipSize / 2
         var halfGap = ForgeRules.sharedGapDegrees / 2
-        let contacts = contactAngles(on: ringID)
+        let contacts = together ? contactAngles(on: ringID) : []
         for (index, first) in contacts.enumerated() {
             for second in contacts[(index + 1)...] where degreeDifference(first, second) <= 90 {
                 let span = degreeDifference(first, second) + 2 * ForgeRules.clipHalfAngleDegrees(radius: radius)
@@ -199,6 +201,7 @@ struct LevelDraft {
             case .latchBar: prefix = "b"
             case .lBar: prefix = "l"
             case .slideBar: prefix = "s"
+            case .uBar: prefix = "u"
             }
             mapping[piece.id] = "\(prefix)\(count)"
         }

@@ -20,6 +20,10 @@ struct Board: Equatable, Sendable {
         case heldByClip(Connection)
         /// A bent arm or corner of a sliding bar ran into its own hub; only the axial arm passes through.
         case hub
+        /// A bomb would touch the given piece: the moving piece's bomb, or the moving piece running
+        /// into a bomb. For the solver a move that sets off a bomb is simply not available; the app
+        /// turns it into an explosion.
+        case bomb(with: Piece.ID)
     }
 
     /// Where a sliding bar ends up when pushed in one direction.
@@ -174,12 +178,12 @@ struct Board: Equatable, Sendable {
     /// that do not slide. The player drags bars by hand (`drag`/`settle`); this is the solver's
     /// macro move, one push as far as it goes.
     func slideStop(_ id: Piece.ID, direction: Double) -> SlideStop? {
-        guard let piece = piece(id), piece.motion == .slide, let arm = piece.axialArm else { return nil }
+        guard let piece = piece(id), piece.motion == .slide, !piece.arms.isEmpty else { return nil }
         let sign: Double = direction >= 0 ? 1 : -1
         let half = GameRules.holderLength / 2
-        let low = min(arm.from.x, arm.to.x)
-        let high = max(arm.from.x, arm.to.x)
-        // Offset at which the trailing end of the arm has cleared the hub by a hair.
+        let low = piece.arms.map { min($0.from.x, $0.to.x) }.min()!
+        let high = piece.arms.map { max($0.from.x, $0.to.x) }.max()!
+        // Offset at which the trailing end of the last arm has cleared its hub by a hair.
         let exitOffset = sign > 0 ? half + 1 - low : -half - 1 - high
         let fullDelta = exitOffset - piece.offset
         guard fullDelta * sign > 0 else { return SlideStop(delta: 0, exits: true, reason: nil) }
@@ -324,12 +328,14 @@ struct Board: Equatable, Sendable {
         let primitives: [WorldPrimitive]
         let center: Point
         let reach: Double
+        let bomb: Point?
     }
 
     private func collisionTargets(excluding id: Piece.ID) -> [CollisionTarget] {
         pieces.compactMap { other in
             guard other.id != id else { return nil }
-            return CollisionTarget(id: other.id, primitives: other.worldPrimitives(), center: other.translation, reach: other.collisionReach)
+            return CollisionTarget(id: other.id, primitives: other.worldPrimitives(), center: other.translation,
+                                   reach: other.collisionReach + (other.bomb == nil ? 0 : GameRules.bombReach), bomb: other.worldBomb)
         }
     }
 
@@ -352,12 +358,13 @@ struct Board: Equatable, Sendable {
         var moving = piece
         moving.movement = value
 
-        // A sliding bar's bent arms cannot pass through its own hub.
+        // A sliding bar's bent arms cannot pass through any of its hubs.
         if moving.motion == .slide {
+            let hubs = moving.hubOffsets.map { moving.position + $0.rotated(by: moving.rotation) }
             for shape in moving.shapes {
                 guard case .segment(let local) = shape, !Piece.isAxial(local) else { continue }
                 let world = local.transformed(rotation: moving.rotation, translation: moving.translation)
-                if Geometry.distance(from: moving.position, to: world) < GameRules.hubClearance { return .hub }
+                if hubs.contains(where: { Geometry.distance(from: $0, to: world) < GameRules.hubClearance }) { return .hub }
             }
         }
 
@@ -375,6 +382,14 @@ struct Board: Equatable, Sendable {
                         return .collision(with: other.id)
                     }
                 }
+            }
+            // Bombs: the moving piece's bomb against the other piece, and the moving piece against
+            // the other piece's bomb.
+            if let bomb = moving.worldBomb, other.primitives.contains(where: { Geometry.distance(from: bomb, to: $0.primitive) < GameRules.bombReach }) {
+                return .bomb(with: other.id)
+            }
+            if let bomb = other.bomb, movingPrimitives!.contains(where: { Geometry.distance(from: bomb, to: $0.primitive) < GameRules.bombReach }) {
+                return .bomb(with: other.id)
             }
         }
         return nil
@@ -407,13 +422,14 @@ struct Board: Equatable, Sendable {
 
     // MARK: Connections
 
-    /// Whether the arm of a sliding piece still runs through its hub.
+    /// Whether any arm of a sliding piece still runs through its hub.
     static func isInHolder(_ piece: Piece) -> Bool {
-        guard let arm = piece.axialArm else { return false }
-        let low = min(arm.from.x, arm.to.x) + piece.offset
-        let high = max(arm.from.x, arm.to.x) + piece.offset
         let half = GameRules.holderLength / 2
-        return high > -half && low < half
+        return piece.arms.contains { arm in
+            let low = min(arm.from.x, arm.to.x) + piece.offset
+            let high = max(arm.from.x, arm.to.x) + piece.offset
+            return high > -half && low < half
+        }
     }
 
     /// A clip connection is released when the grip point sits fully inside the ring's gap.
@@ -479,6 +495,7 @@ extension Piece {
                 reach = max(reach, circle.center.length + circle.radius)
             }
         }
+        if let bomb { reach = max(reach, bomb.length + GameRules.bombReach) }
         return reach
     }
 }

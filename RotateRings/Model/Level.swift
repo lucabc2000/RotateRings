@@ -84,6 +84,9 @@ struct LevelFile: Codable, Equatable, Sendable {
         var rotation: Double?
         var shapes: [ShapeSpec]
         var clips: [ClipSpec]?
+        /// Local position of a bomb riding on the piece. It explodes, with whatever it touches, the
+        /// moment the two meet.
+        var bomb: Point?
     }
 
     var id: Int
@@ -176,13 +179,14 @@ extension LevelFile {
                 position: spec.position,
                 rotation: AngleMath.radians(fromDegrees: spec.rotation ?? 0),
                 shapes: shapes,
-                clips: clips
+                clips: clips,
+                bomb: spec.bomb
             )
         }
 
         for piece in modelPieces {
             if piece.motion == .slide {
-                guard piece.axialArm != nil else { throw LevelError.slideBarWithoutAxialArm(piece: piece.id) }
+                guard !piece.arms.isEmpty else { throw LevelError.slideBarWithoutAxialArm(piece: piece.id) }
                 guard Board.isInHolder(piece) else { throw LevelError.slideBarOutsideHub(piece: piece.id) }
             } else if piece.ringArc == nil && piece.clips.isEmpty {
                 throw LevelError.turningBarWithoutClip(piece: piece.id)

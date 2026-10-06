@@ -48,8 +48,10 @@ struct Piece: Identifiable, Hashable, Sendable {
     /// Body primitives in local space.
     let shapes: [Primitive]
     let clips: [Clip]
+    /// A bomb riding on the piece, in local space. It goes off when it touches another piece.
+    let bomb: Point?
 
-    init(id: ID, color: String = "coral", motion: Motion = .rotation, position: Point, rotation: Double = 0, shapes: [Primitive], clips: [Clip] = []) {
+    init(id: ID, color: String = "coral", motion: Motion = .rotation, position: Point, rotation: Double = 0, shapes: [Primitive], clips: [Clip] = [], bomb: Point? = nil) {
         self.id = id
         self.color = color
         self.motion = motion
@@ -58,6 +60,12 @@ struct Piece: Identifiable, Hashable, Sendable {
         self.baseRotation = rotation
         self.shapes = shapes
         self.clips = clips
+        self.bomb = bomb
+    }
+
+    /// World position of the bomb, if the piece carries one.
+    var worldBomb: Point? {
+        bomb?.transformed(rotation: rotation, translation: translation)
     }
 
     /// The value the player changes: rotation or slide offset, depending on `motion`.
@@ -97,21 +105,29 @@ struct Piece: Identifiable, Hashable, Sendable {
 
     // MARK: Hub
 
-    /// Only sliding pieces have a hub: the fixed metal sleeve at `position` that the arm on the local
-    /// x axis runs through. Turning pieces never show one.
+    /// Only sliding pieces have hubs: fixed metal sleeves that the arms run through. Turning pieces
+    /// never show one.
     var hasHub: Bool { motion == .slide }
 
-    /// The arm of a sliding piece that runs through its hub: the body segment lying on the local x axis.
-    var axialArm: Segment? {
-        for shape in shapes {
+    /// The arms of a sliding piece: every body segment parallel to the local x axis. Each runs
+    /// through its own hub at `(0, y)`. A straight bar or L-bar has one arm on the axis itself; a
+    /// U-bar has two, one either side, joined by a crossbar.
+    var arms: [Segment] {
+        shapes.compactMap { shape in
             if case .segment(let segment) = shape, Self.isAxial(segment) { return segment }
+            return nil
         }
-        return nil
     }
 
-    /// Whether a local segment lies on the x axis (the hub axis).
+    /// The arm on the local x axis, if there is one.
+    var axialArm: Segment? { arms.first { abs($0.from.y) < 0.5 } ?? arms.first }
+
+    /// Local positions of the hubs, one per arm.
+    var hubOffsets: [Point] { arms.map { Point(0, ($0.from.y + $0.to.y) / 2) } }
+
+    /// Whether a local segment runs parallel to the x axis (the slide axis), so it is an arm.
     static func isAxial(_ segment: Segment) -> Bool {
-        abs(segment.from.y) < 0.5 && abs(segment.to.y) < 0.5
+        abs(segment.from.y - segment.to.y) < 0.5
     }
 
     // MARK: World geometry

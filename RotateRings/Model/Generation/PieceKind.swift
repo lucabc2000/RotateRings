@@ -23,6 +23,8 @@ enum PieceKind: String, Codable, CaseIterable, Sendable, Comparable {
     case lBar
     /// A straight bar in a fixed metal hub: slides along the hub's axis.
     case slideBar
+    /// A U-shaped bar with two arms, each in its own hub, joined by a crossbar.
+    case uBar
 
     var displayName: String {
         switch self {
@@ -32,6 +34,7 @@ enum PieceKind: String, Codable, CaseIterable, Sendable, Comparable {
         case .latchBar: "latch bar"
         case .lBar: "L-bar"
         case .slideBar: "sliding bar"
+        case .uBar: "U-bar"
         }
     }
 
@@ -48,7 +51,10 @@ enum PieceKind: String, Codable, CaseIterable, Sendable, Comparable {
             case .segment: segments += 1
             }
         }
-        if spec.motion == .slide { return segments >= 2 ? .lBar : .slideBar }
+        if spec.motion == .slide {
+            let arms = spec.shapes.filter { if case .segment(let s) = $0 { return abs(s.from.y - s.to.y) < 0.5 } else { return false } }
+            return arms.count >= 2 ? .uBar : segments >= 2 ? .lBar : .slideBar
+        }
         if let ring = arcs.first {
             if segments > 0 { return .tailRing }
             return ring.sweep >= 360 ? .closedRing : .cRing

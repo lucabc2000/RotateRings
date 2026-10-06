@@ -45,7 +45,7 @@ struct LevelTests {
         #expect(entry.chosen.solution.count == entry.chosen.metrics.minMoves)
     }
 
-    @Test(arguments: levelNumbers.filter { $0 <= 15 })
+    @Test(arguments: levelNumbers.filter { $0 <= 10 })
     func tutorialLevelMetricsMatchReport(number: Int) throws {
         let report = try LevelLoader.loadReport(in: appBundle)
         let entry = try #require(report.levels.first { $0.number == number })
@@ -118,11 +118,12 @@ struct LevelTests {
         #expect(piece.axialArm == Segment(from: Point(-40, 0), to: Point(60, 0)))
         #expect(board.connections == [Connection(holderOf: "s")])
 
-        // No segment on the axis: nothing runs through the hub.
+        // No segment parallel to the axis: nothing runs through a hub. (A parallel segment off the
+        // axis would be an arm with its own hub, as in a U-bar.)
         let noArm = """
         { "id": 1, "name": "x", "board": { "width": 1, "height": 1 },
           "pieces": [ { "id": "s", "motion": "slide", "position": [0, 0],
-                        "shapes": [ { "segment": { "from": [0, 10], "to": [60, 10] } } ] } ] }
+                        "shapes": [ { "segment": { "from": [0, 10], "to": [60, 40] } } ] } ] }
         """
         #expect(throws: LevelError.slideBarWithoutAxialArm(piece: "s")) {
             try LevelLoader.decode(Data(noArm.utf8)).makeBoard()

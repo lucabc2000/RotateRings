@@ -152,13 +152,14 @@ enum RingNet {
         let treeOwners = Set(edges.map(\.owner))
         var crossEdges: [(owner: Cell, target: Cell)] = []
         var attempts = 0
-        while crossEdges.count < options.crossClips && attempts < 40 {
+        while crossEdges.count < options.crossClips && attempts < 40 + 30 * options.crossClips {
             attempts += 1
             let target = rng.pick(half)
-            guard !onAxis(target), !treeOwners.contains(target), !crossEdges.contains(where: { $0.target == target }) else { continue }
+            guard !onAxis(target), !treeOwners.contains(target), !crossEdges.contains(where: { $0.target == target || $0.owner == target }) else { continue }
             let owners = neighbors(target).filter { owner in
-                inHalf(owner) && !onAxis(owner) && wired.contains(owner) && owner != (parent[target] ?? nil)
-                    && (depth[owner] ?? 0) < (depth[target] ?? 0) && !crossEdges.contains { $0.owner == owner }
+                guard inHalf(owner), !onAxis(owner), wired.contains(owner), let first = parent[target] ?? nil, owner != first,
+                      !crossEdges.contains(where: { $0.owner == owner || $0.target == owner }) else { return false }
+                return (depth[owner] ?? 0) < (depth[target] ?? 0)
             }
             if let owner = owners.first { crossEdges.append((owner, target)) }
         }

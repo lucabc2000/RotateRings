@@ -3,7 +3,7 @@
 //  RotateRings
 //
 //  What each of the first fifteen levels must teach and the constraints its candidates must meet.
-//  Levels 16–50 take their designs from `Compositions`.
+//  Levels 11–100 take their designs from `Compositions`.
 //
 
 import Foundation
@@ -19,13 +19,13 @@ struct LevelGoal {
     let maxDeadEndMoves: Int
     /// Level 1 only: the first solution move is a single step that removes a piece.
     let firstMoveFrees: Bool
-    /// Curve target for levels 16+.
+    /// Curve target for levels 11+.
     let targetDifficulty: Double?
     /// Hard levels pick the candidate with the fewest free pieces instead of the one closest to
     /// the curve.
     var isHard = false
 
-    var isTutorial: Bool { level <= 15 }
+    var isTutorial: Bool { level <= 10 }
 }
 
 enum TutorialPlan {
@@ -65,24 +65,11 @@ enum TutorialPlan {
         case 10:
             return LevelGoal(level: 10, templates: [MotifCatalog.single("tailClip2", lockRange: 1...3)],
                              newKind: .tailRing, pieceRange: 4...8, targetMinMoves: 2, maxDeadEndMoves: 3, firstMoveFrees: false, targetDifficulty: nil)
-        case 11...15:
-            let count = level <= 12 ? 2 : 3
-            let pool = count == 2 ? MotifCatalog.compact : MotifCatalog.small
-            let lock = level <= 13 ? 1...2 : 1...3
-            return LevelGoal(level: level, templates: [
-                MotifCatalog.stack(count: count, pool: pool, lockRange: lock, idSuffix: "mix"),
-                MotifCatalog.stack(count: count, pool: pool, required: [rotatingPick(level)], lockRange: lock, idSuffix: "feature"),
-            ], newKind: nil, pieceRange: 6...10, targetMinMoves: 3 + (level - 11), maxDeadEndMoves: level >= 14 ? 5 : 3, firstMoveFrees: false, targetDifficulty: nil)
         default:
             return LevelGoal(level: level, templates: Compositions.templates(level: level), newKind: nil,
                              pieceRange: DifficultyCurve.pieceRange(level: level), targetMinMoves: 0, maxDeadEndMoves: .max,
                              firstMoveFrees: false, targetDifficulty: DifficultyCurve.target(level: level),
                              isHard: Compositions.hardLevels.contains(level))
         }
-    }
-
-    /// Levels 11–15 each put one of the taught motifs centre stage.
-    private static func rotatingPick(_ level: Int) -> String {
-        ["elbowLatch", "tailGate", "elbowSlide", "tailClip", "slideLatch"][(level - 11) % 5]
     }
 }

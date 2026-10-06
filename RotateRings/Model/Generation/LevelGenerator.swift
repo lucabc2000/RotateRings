@@ -62,7 +62,7 @@ struct GeneratedLevel {
 }
 
 enum LevelGenerator {
-    static let levelCount = 50
+    static let levelCount = 100
 
     static func candidateSeed(master: UInt64, level: Int, index: Int) -> UInt64 {
         var rng = SplitMix64(seed: master).derived(UInt64(level) &* 0x9E37_79B9).derived(UInt64(index) &+ 1)
@@ -119,6 +119,7 @@ enum LevelGenerator {
         var result = solver.solve()
         guard result.isSolvable, let solution = result.solution else { throw Failure.unsolvable(template: draft.template) }
         result.metrics.freedom = solver.freedom(along: solution)
+        result.metrics.setupMoves = solution.filter { $0.removed.isEmpty }.count
         if goal.isTutorial {
             guard result.metrics.fullyExplored else { throw Failure.notFullyExplored(template: draft.template) }
             guard result.metrics.deadEndMoves <= goal.maxDeadEndMoves else { throw Failure.deadEnds(template: draft.template, count: result.metrics.deadEndMoves) }
@@ -140,7 +141,7 @@ enum LevelGenerator {
         let members = file.pieces.filter { PieceKind.classify($0) == kind }
         guard !members.isEmpty else { return false }
         switch kind {
-        case .cRing, .tailRing, .slideBar, .lBar:
+        case .cRing, .tailRing, .slideBar, .lBar, .uBar:
             // The new kind moves in the solution.
             return solution.contains { kindOf[$0.piece] == kind }
         case .closedRing:
@@ -199,7 +200,7 @@ enum LevelGenerator {
             }
             if goal.isHard {
                 // Hard levels compare a full set of candidates.
-                if candidates.count >= hardCandidates { break }
+                if candidates.count >= (level > 50 ? lateHardCandidates : hardCandidates) { break }
             } else if !goal.isTutorial, let target = goal.targetDifficulty,
                candidates.count >= 4,
                candidates.contains(where: { abs($0.difficulty - target) <= tolerance(for: $0, target: target) }) {
@@ -224,6 +225,9 @@ enum LevelGenerator {
 
     /// Candidates compared for a hard level.
     private static let hardCandidates = 8
+    /// The same for levels past 50, which are meant to be harder still: a wider field to pick the
+    /// tightest board from.
+    private static let lateHardCandidates = 12
 
     /// Rebuilds a level and its runner-ups from the seeds recorded in the report, without choosing
     /// again: for after a drafting rule changed and the same boards should pick it up. Nil when the
@@ -239,11 +243,14 @@ enum LevelGenerator {
     }
 
     /// Lower ranks first. Tutorial: fewest dead-end moves, closest to the target move count, fewest
-    /// pieces. Hard: fewest pieces free along the solution, then most pieces. Curve: closest to the
-    /// target difficulty, then exact metrics over estimates.
+    /// pieces. Hard: most preparing moves, then fewest pieces free along the solution, then most
+    /// pieces. Curve: closest to the target difficulty, then exact metrics over estimates.
     private static func rank(_ candidate: Candidate, goal: LevelGoal) -> (Double, Double, Double, UInt64) {
         if goal.isHard {
-            return ((candidate.metrics.freedom ?? 1).rounded(toPlaces: 2), -Double(candidate.file.pieces.count), 0, candidate.seed)
+            // Most preparing moves first: that is what makes a level take thought. Then fewest
+            // pieces free, then most pieces.
+            return (-Double(candidate.metrics.setupMoves ?? 0), (candidate.metrics.freedom ?? 1).rounded(toPlaces: 2),
+                    -Double(candidate.file.pieces.count), candidate.seed)
         }
         if goal.isTutorial {
             return (Double(candidate.metrics.deadEndMoves), abs(Double(candidate.metrics.minMoves - goal.targetMinMoves)), Double(candidate.file.pieces.count), candidate.seed)

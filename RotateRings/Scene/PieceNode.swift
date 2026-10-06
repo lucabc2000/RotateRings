@@ -69,18 +69,60 @@ final class PieceNode: SKNode {
         addChild(bodyNode)
         setOffset(piece.offset)
 
-        // The fixed metal hub of a sliding piece, at the local origin. Only sliding pieces have one.
+        // The fixed metal hubs of a sliding piece, one per arm. Only sliding pieces have them.
         if piece.hasHub {
-            let hubShadow = Self.makeShadowGroup()
-            hubShadow.zPosition = 2.5
-            hubShadow.addChild(Self.hubNode(shadow: true))
-            addChild(hubShadow)
+            for offset in piece.hubOffsets {
+                let hubShadow = Self.makeShadowGroup()
+                hubShadow.zPosition = 2.5
+                hubShadow.addChild(Self.hubNode(shadow: true))
+                hubShadow.position = CGPoint(x: offset.x, y: offset.y)
+                addChild(hubShadow)
 
-            let hub = Self.hubNode(shadow: false)
-            hub.zPosition = 3
-            addChild(hub)
-            hubNodes = [hubShadow, hub]
+                let hub = Self.hubNode(shadow: false)
+                hub.zPosition = 3
+                hub.position = CGPoint(x: offset.x, y: offset.y)
+                addChild(hub)
+                hubNodes += [hubShadow, hub]
+            }
         }
+
+        // The bomb rides on the body and turns with it.
+        if let bomb = piece.bomb {
+            let node = Self.bombNode()
+            node.position = CGPoint(x: bomb.x, y: bomb.y)
+            node.zPosition = 4
+            bodyNode.addChild(node)
+        }
+    }
+
+    /// A round black bomb with a highlight and a short lit fuse.
+    private static func bombNode() -> SKNode {
+        let radius = CGFloat(GameRules.bombRadius)
+        let body = SKShapeNode(circleOfRadius: radius)
+        body.fillColor = UIColor(red: 0.16, green: 0.15, blue: 0.19, alpha: 1)
+        body.strokeColor = UIColor(red: 0.05, green: 0.05, blue: 0.08, alpha: 1)
+        body.lineWidth = 1.5
+        let shine = SKShapeNode(circleOfRadius: radius * 0.3)
+        shine.fillColor = UIColor(white: 1, alpha: 0.35)
+        shine.strokeColor = .clear
+        shine.position = CGPoint(x: -radius * 0.35, y: radius * 0.35)
+        body.addChild(shine)
+        let fusePath = CGMutablePath()
+        fusePath.move(to: CGPoint(x: radius * 0.4, y: radius * 0.75))
+        fusePath.addQuadCurve(to: CGPoint(x: radius * 1.1, y: radius * 1.5), control: CGPoint(x: radius * 0.4, y: radius * 1.5))
+        let fuse = SKShapeNode(path: fusePath)
+        fuse.strokeColor = UIColor(red: 0.55, green: 0.42, blue: 0.3, alpha: 1)
+        fuse.lineWidth = 2
+        fuse.lineCap = .round
+        body.addChild(fuse)
+        let spark = SKShapeNode(circleOfRadius: 2.5)
+        spark.fillColor = UIColor(red: 1, green: 0.78, blue: 0.2, alpha: 1)
+        spark.strokeColor = UIColor(red: 1, green: 0.45, blue: 0.1, alpha: 1)
+        spark.glowWidth = 3
+        spark.position = CGPoint(x: radius * 1.1, y: radius * 1.5)
+        spark.run(.repeatForever(.sequence([.scale(to: 1.4, duration: 0.25), .scale(to: 0.8, duration: 0.25)])))
+        body.addChild(spark)
+        return body
     }
 
     /// Leaves the hub behind when the bar flies off: it stays bolted where it was and fades out, while

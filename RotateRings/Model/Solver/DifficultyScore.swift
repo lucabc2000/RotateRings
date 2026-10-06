@@ -2,65 +2,48 @@
 //  DifficultyScore.swift
 //  RotateRings
 //
-//  Difficulty of a level on a 0–100 scale, computed from solver metrics and the piece inventory.
+//  Difficulty of a level on a 0–100 scale, from what the solver measured. An estimate of how hard
+//  a level plays, used to place levels on the curve; it has disagreed with the owner's own play
+//  before, so treat it as a guide.
 //
-//  Formula (every weight and scale below is a named constant):
+//      score = 100 × ( piecesWeight  × (pieces − 6) / 22
+//                    + movesWeight   × (minMoves − 6) / 34
+//                    + freedomWeight × (0.5 − freedom) / 0.4
+//                    + setupWeight   × setupMoves / 12 )        each term clamped to 0…1
 //
-//      score = 100 × ( minMovesWeight   × min(1, minMoves / minMovesScale)
-//                    + deadEndWeight    × min(1, deadEndRate / deadEndScale)
-//                    + branchingWeight  × min(1, (branching − 1) / branchingScale)
-//                    + pieceCountWeight × min(1, (pieceCount − 2) / pieceCountScale)
-//                    + varietyWeight    × min(1, distinctKinds / kindCount) )
-//
-//  The weights sum to 1. Each term saturates at its scale so one extreme metric cannot dominate.
-//  When the metrics are an estimate the score is the same number; the generator widens its target
-//  tolerance by `estimateUncertainty` and the browser marks the value with "≈".
+//  Pieces and moves are size. Freedom is the share of pieces that can do something useful at a
+//  time: the lower, the harder it is to find the next move. Setup moves are drags that remove
+//  nothing and only prepare a later one.
 //
 
 import Foundation
 
 enum DifficultyWeights {
-    static let minMovesWeight = 0.35
-    static let deadEndWeight = 0.25
-    static let branchingWeight = 0.15
-    static let pieceCountWeight = 0.15
-    static let varietyWeight = 0.10
+    static let piecesWeight = 0.35
+    static let movesWeight = 0.25
+    static let freedomWeight = 0.25
+    static let setupWeight = 0.15
 
-    /// Min moves at which the move term saturates.
-    static let minMovesScale = 30.0
-    /// Dead-end rate (share of moves from solvable states that lead into a dead end) at which the
-    /// dead-end term saturates.
-    static let deadEndScale = 0.35
-    /// Branching above 1 at which the branching term saturates.
-    static let branchingScale = 16.0
-    /// Pieces above 2 at which the piece-count term saturates.
-    static let pieceCountScale = 24.0
-    /// Number of piece kinds in the game.
-    static let kindCount = 6.0
-
-    /// Extra tolerance, in score points, allowed when a level's metrics are estimates.
-    static let estimateUncertainty = 8.0
+    /// Extra tolerance, in score points, allowed when a level's metrics are estimates. Nearly every
+    /// level past the tutorial is an estimate, so this no longer separates candidates.
+    static let estimateUncertainty = 0.0
 
     /// The formula as text, written into the generation report.
     static let formula = """
-    100 * (0.35*min(1,minMoves/30) + 0.25*min(1,deadEndRate/0.35) + 0.15*min(1,(branching-1)/16) \
-    + 0.15*min(1,(pieces-2)/24) + 0.10*min(1,kinds/6))
+    100 * (0.35*clamp((pieces-6)/22) + 0.25*clamp((minMoves-6)/34) + 0.25*clamp((0.5-freedom)/0.4) \
+    + 0.15*clamp(setupMoves/12))
     """
 }
 
 enum DifficultyScore {
     static func score(metrics: SolverMetrics, pieceCount: Int, distinctKinds: Int) -> Double {
         func clamp(_ x: Double) -> Double { min(1, max(0, x)) }
-        let moves = clamp(Double(metrics.minMoves) / DifficultyWeights.minMovesScale)
-        let deadEnds = clamp(metrics.deadEndRate / DifficultyWeights.deadEndScale)
-        let branching = clamp((metrics.branching - 1) / DifficultyWeights.branchingScale)
-        let pieces = clamp(Double(pieceCount - 2) / DifficultyWeights.pieceCountScale)
-        let variety = clamp(Double(distinctKinds) / DifficultyWeights.kindCount)
-        let total = DifficultyWeights.minMovesWeight * moves
-            + DifficultyWeights.deadEndWeight * deadEnds
-            + DifficultyWeights.branchingWeight * branching
-            + DifficultyWeights.pieceCountWeight * pieces
-            + DifficultyWeights.varietyWeight * variety
+        let pieces = clamp(Double(pieceCount - 6) / 22)
+        let moves = clamp(Double(metrics.minMoves - 6) / 34)
+        let freedom = clamp((0.5 - (metrics.freedom ?? 0.5)) / 0.4)
+        let setup = clamp(Double(metrics.setupMoves ?? 0) / 12)
+        let total = DifficultyWeights.piecesWeight * pieces + DifficultyWeights.movesWeight * moves
+            + DifficultyWeights.freedomWeight * freedom + DifficultyWeights.setupWeight * setup
         return (100 * total * 10).rounded() / 10
     }
 }

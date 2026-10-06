@@ -13,9 +13,12 @@
 //                                          Generate levels into RotateRings/Levels (honouring level-selection.json).
 //                                          With --keep-seeds the levels are rebuilt from the seeds in the report
 //                                          instead of chosen again, e.g. after a drafting rule changed.
+//    diagnose <level.json>...              Play greedily and explain what blocks the pieces left over.
 //    compose <template>... [--count N] [--out DIR] [--no-solve]
 //                                          Build curve designs by template id for a few seeds, solve them and
 //                                          write them to DIR (default /tmp) for a look. No id lists the ids.
+//
+//  LEVEL-DESIGN.md next to this file explains how levels are made and what makes them fun.
 //
 //  Run from Xcode or `xcodebuild -scheme LevelForge build`; paths are resolved from the repository
 //  root, which is derived from this file's location, so no working directory setup is needed.
@@ -109,7 +112,8 @@ func fail(_ message: String) -> Never {
 
 func formatMetrics(_ metrics: SolverMetrics) -> String {
     let flag = metrics.isEstimate ? " ≈" : ""
-    let freedom = metrics.freedom.map { String(format: "  freedom %.0f%%", $0 * 100) } ?? ""
+    let freedom = (metrics.freedom.map { String(format: "  freedom %.0f%%", $0 * 100) } ?? "")
+        + (metrics.setupMoves.map { "  setup \($0)" } ?? "")
     return "moves \(metrics.minMoves)\(flag)\(freedom)  states \(metrics.reachableStates)  dead-end moves \(metrics.deadEndMoves)/\(metrics.totalMoves) (\(String(format: "%.0f%%", metrics.deadEndRate * 100)))  branching \(String(format: "%.1f", metrics.branching))  \(String(format: "%.2fs", metrics.elapsed))"
 }
 
@@ -331,6 +335,8 @@ func composeCommand(_ arguments: Arguments) throws {
     }
     var config = SolverConfig()
     if let cap = arguments.double("time-cap") { config.timeCap = cap }
+    // --keep-stuck: write tangles that fail their playout check anyway, to look at them.
+    Tangle.keepStuck = arguments.options["keep-stuck"] != nil
     for name in arguments.positional {
         guard let template = Compositions.catalog[name] else { fail("compose: unknown template \(name)") }
         for index in 0..<count {
@@ -359,9 +365,43 @@ func composeCommand(_ arguments: Arguments) throws {
             let solver = LevelSolver(board: board, config: config)
             var result = solver.solve()
             result.metrics.freedom = result.solution.map { solver.freedom(along: $0) }
+            result.metrics.setupMoves = result.solution.map { $0.filter { $0.removed.isEmpty }.count }
             let file = draft.levelFile(number: 99)
             let difficulty = DifficultyScore.score(metrics: result.metrics, pieceCount: file.pieces.count, distinctKinds: PieceKind.kinds(in: file).count)
             print("\(name) seed \(seed): pieces \(draft.pieces.count) built in \(String(format: "%.1fs", built))  \(result.isSolvable ? "solvable" : "UNSOLVABLE")  difficulty \(difficulty)  \(formatMetrics(result.metrics))  → \(url.lastPathComponent)")
+        }
+    }
+}
+
+/// Plays a level file greedily and, when that gets stuck, says what blocks each remaining piece.
+func diagnoseCommand(_ arguments: Arguments) throws {
+    for path in arguments.positional {
+        let url = URL(fileURLWithPath: path, relativeTo: URL(fileURLWithPath: FileManager.default.currentDirectoryPath))
+        let board = try LevelLoader.decode(Data(contentsOf: url)).makeBoard()
+        let solver = LevelSolver(board: board)
+        let stuck = solver.greedyPlayout()
+        guard !stuck.isEmpty else {
+            print("\(url.lastPathComponent): plays through")
+            continue
+        }
+        print("\(url.lastPathComponent): stuck with \(stuck.joined(separator: ", "))")
+        // Rebuild the stuck position by replaying the same greedy moves.
+        var state = solver.start
+        var position = board
+        while let pick = solver.successors(of: state).first(where: { !$0.move.removed.isEmpty })
+            ?? solver.successors(of: state).first(where: { $0.state.connections.nonzeroBitCount < state.connections.nonzeroBitCount }) {
+            _ = position.move(pick.move.piece, by: pick.move.delta)
+            state = pick.state
+        }
+        for piece in position.pieces {
+            let held = position.connections.filter { $0.owner == piece.id && !$0.isHolder }.map(\.ring)
+            var lines = ["  \(piece.id):"]
+            if !held.isEmpty { lines.append("pinned by its clips on \(held.joined(separator: ", "))") }
+            for direction in [1.0, -1.0] {
+                let obstruction = position.obstruction(for: piece.id, movingBy: direction * GameRules.rotationStep)
+                lines.append("\(direction > 0 ? "+1" : "-1"): " + (obstruction.map { "\($0.reason) after \(String(format: "%.0f°", AngleMath.degrees(fromRadians: abs($0.stop - piece.movement))))" } ?? "free"))
+            }
+            print(lines.joined(separator: "  "))
         }
     }
 }
@@ -380,6 +420,7 @@ do {
     case "probe": try probeCommand(arguments)
     case "motif": try motifCommand(arguments)
     case "compose": try composeCommand(arguments)
+    case "diagnose": try diagnoseCommand(arguments)
     default:
         print("usage: LevelForge solve <level.json>... | report | generate [--levels 1-50] [--seed N] [--candidates N] [--state-cap N] [--time-cap S] [--jobs N] | compose <template>... [--count N] [--out DIR]")
     }

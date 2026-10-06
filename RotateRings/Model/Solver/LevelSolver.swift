@@ -304,6 +304,76 @@ final class LevelSolver {
         return result
     }
 
+    /// Plays the level with the obvious move each time (take a piece off, else release a clip) and
+    /// returns the pieces left when no such move remains: none when that empties the board. A
+    /// cheap check that a generated draft can be played the way it was built; a level that needs
+    /// cleverer ordering may leave pieces behind here and still be solvable.
+    func greedyPlayout(maxMoves: Int = 400) -> [Piece.ID] {
+        var state = start
+        for _ in 0..<maxMoves {
+            if isGoal(state) { return [] }
+            let next = successors(of: state)
+            guard let pick = next.first(where: { !$0.move.removed.isEmpty })
+                ?? next.first(where: { $0.state.connections.nonzeroBitCount < state.connections.nonzeroBitCount }) else { break }
+            state = pick.state
+        }
+        return pieces.indices.filter { state.values[$0] != Self.removed }.map { pieces[$0].id }
+    }
+
+    /// Solves the level the way a player would: take off whatever comes off in one move; failing
+    /// that, pick a piece pinned by its own clips and turn every ring it grips onto its clip, which
+    /// lets it go. Finds a solution for boards whose move graph is far too large to search (a web
+    /// of hubs has eight positions per ring), though not necessarily the shortest one. Nil when it
+    /// runs out of ideas.
+    func ownerPlayout(maxMoves: Int = 600) -> [SolverMove]? {
+        var state = start
+        var moves: [SolverMove] = []
+        var visited: Set<State> = [start]
+        search: while !isGoal(state) {
+            guard moves.count < maxMoves else { return nil }
+            let next = successors(of: state)
+            if let pick = next.first(where: { !$0.move.removed.isEmpty }) {
+                state = pick.state
+                moves.append(pick.move)
+                visited.insert(state)
+                continue
+            }
+            // Free one owner: every ring it grips turns its gap onto that owner's clip.
+            for owner in pieces.indices where state.values[owner] != Self.removed && state.connections & ownerBits[owner] != 0 {
+                var trial = state
+                var sequence: [SolverMove] = []
+                var released: UInt64 = 0
+                var complete = true
+                for (bit, connection) in connections.enumerated() where ownerBits[owner] & (1 << UInt64(bit)) != 0 && state.connections & (1 << UInt64(bit)) != 0 {
+                    let mask: UInt64 = 1 << UInt64(bit)
+                    // A move of the gripped ring that lets this clip go without re-gripping an earlier one.
+                    guard let step = successors(of: trial).first(where: {
+                        $0.move.piece == connection.ring && $0.state.connections & mask == 0 && $0.state.connections & released == 0
+                    }) else {
+                        complete = false
+                        break
+                    }
+                    trial = step.state
+                    sequence.append(step.move)
+                    released |= mask
+                    if trial.values[owner] == Self.removed { break }
+                }
+                // The owner leaves, or (when something still grips it) is at least free to turn.
+                if complete, !sequence.isEmpty, visited.insert(trial).inserted {
+                    state = trial
+                    moves += sequence
+                    continue search
+                }
+            }
+            // Nothing lets go completely: release any one clip not tried from here before.
+            guard let pick = next.first(where: { $0.state.connections.nonzeroBitCount < state.connections.nonzeroBitCount && !visited.contains($0.state) }) else { return nil }
+            state = pick.state
+            moves.append(pick.move)
+            visited.insert(state)
+        }
+        return moves
+    }
+
     /// How open the level is along `solution`: at every step, the pieces that have a move which
     /// releases a connection or takes a piece off the board, against the pieces still on the board;
     /// both summed over the steps, so the last few pieces (where everything is free) weigh little.
@@ -455,7 +525,7 @@ final class LevelSolver {
         // Bounded mode. BFS still finds the goal at minimum depth if it found it at all.
         var solution = goal.map(chain)
         if solution == nil {
-            solution = bestFirstSolution(from: start, budget: config.boundedExpansions)
+            solution = ownerPlayout() ?? bestFirstSolution(from: start, budget: config.boundedExpansions)
         }
 
         // Dead ends within the explored prefix. Unexpanded frontier states are treated as solvable,
