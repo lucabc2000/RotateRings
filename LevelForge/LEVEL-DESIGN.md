@@ -137,6 +137,13 @@ to find them (8 s per unsolvable candidate), so generators check them up front.
   blocked by another ring (`Tangle.addPokeBar(blocked:)`, `GridWorld.freeLimit`), or simply fewer
   leaves (long chains). Measured: free pokes and latches left tangles at 30–40 % free however many
   were added.
+- **A sleeve works one way round** (`Board.isExcludedPair`, `clipSitsOnRing`,
+  `GameRules.clipSquarenessDegrees` = 7°, raised from 4° because lining up was fiddly). After a clip has slipped off, its piece can be turned a
+  little; the square then still crosses the ring's circle, but askew. The ring cannot be threaded
+  back through a tilted sleeve and nothing grips there (owner reports, 2026-10-07: pieces "fully
+  stuck inside each other", and "you can still slide it through the clip from a weird angle").
+  The clip's own piece, on the other hand, can always slide its sleeve along the ring and off the
+  ring's end, so letting go still works however the gap sits.
 - **Deadlocks by construction**: a tail or bar must not lock a ring that the locking piece itself
   waits for (`RingNet.waitsFor`, latch bars only on leaves). A ring with two owners can only be
   freed if one owner disappears when released.

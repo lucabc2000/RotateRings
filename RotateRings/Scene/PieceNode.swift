@@ -252,13 +252,22 @@ final class PieceNode: SKNode {
         stemPath.addLine(to: CGPoint(x: clip.stemEnd.x, y: clip.stemEnd.y))
         let stem = strokeNode(path: stemPath, color: stemColor, lineWidth: GameRules.strokeThickness * 0.7)
 
+        // The sleeve: a rounded square in the piece's own colour (as the competitor draws it), with
+        // a darker channel across it showing which way the gripped ring runs through.
         let size = GameRules.clipSize
         let square = SKShapeNode(rectOf: CGSize(width: size, height: size), cornerRadius: 3.5)
         if shadow {
             square.fillColor = Palette.shadow
             square.strokeColor = .clear
         } else {
-            silverFill(square)
+            square.fillColor = stemColor
+            square.strokeColor = stemColor.darker(by: 0.25)
+            square.lineWidth = 1.5
+            let channel = SKShapeNode(rectOf: CGSize(width: 3, height: size - 5), cornerRadius: 1.5)
+            channel.fillColor = stemColor.darker(by: 0.35)
+            channel.strokeColor = .clear
+            channel.zPosition = 0.1
+            square.addChild(channel)
         }
         square.position = CGPoint(x: clip.stemEnd.x, y: clip.stemEnd.y)
         square.zRotation = CGFloat((clip.stemEnd - clip.stemStart).angle)

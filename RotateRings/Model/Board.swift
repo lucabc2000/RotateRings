@@ -400,24 +400,37 @@ struct Board: Equatable, Sendable {
     }
 
     /// A clip square is a sleeve: the arc of the ring it is aimed at passes through it freely, whether
-    /// the clip currently grips (square on the arc) or has slipped off (square in the gap). So the pair
-    /// is excluded whenever the clip targets that ring and its square sits on the ring's circle.
+    /// the clip currently grips (square on the arc) or has slipped off (square in the gap). Which way
+    /// round matters:
+    /// - When the clip's own piece moves, the sleeve travels along the ring and off its end, so the
+    ///   pair is excluded as long as the square is on the ring's circle.
+    /// - When the ring moves, it can only be threaded through a sleeve that sits squarely on it. A
+    ///   clip whose piece has been turned askew is a solid square like any other, just as a real
+    ///   ring would not go through a tilted sleeve.
     private func isExcludedPair(_ a: WorldPrimitive, of pieceA: Piece, _ b: WorldPrimitive, ofPiece idB: Piece.ID, ringArcIndex arcIndexB: Int?) -> Bool {
         if case .clip(let clipIndex) = a.source, case .body(let bodyIndex) = b.source, bodyIndex == arcIndexB {
-            return clipSitsOnRing(owner: pieceA, clipIndex: clipIndex, ringID: idB)
+            return clipSitsOnRing(owner: pieceA, clipIndex: clipIndex, ringID: idB, squarely: false)
         }
         if case .clip(let clipIndex) = b.source, case .body(let bodyIndex) = a.source, bodyIndex == pieceA.ringArcIndex,
            let owner = piece(idB) {
-            return clipSitsOnRing(owner: owner, clipIndex: clipIndex, ringID: pieceA.id)
+            return clipSitsOnRing(owner: owner, clipIndex: clipIndex, ringID: pieceA.id, squarely: true)
         }
         return false
     }
 
-    /// Whether the clip is aimed at `ringID` and its square lies on that ring's circle.
-    private func clipSitsOnRing(owner: Piece, clipIndex: Int, ringID: Piece.ID) -> Bool {
+    /// Whether the clip is aimed at `ringID` and its square sits on that ring's circle; with
+    /// `squarely`, also with the stem pointing at the ring's centre (within
+    /// `GameRules.clipSquarenessDegrees`).
+    private func clipSitsOnRing(owner: Piece, clipIndex: Int, ringID: Piece.ID, squarely: Bool) -> Bool {
         guard owner.clips[clipIndex].grips == ringID, let ring = piece(ringID), let arc = ring.worldRingArc() else { return false }
         let grip = owner.worldGripPoint(clipIndex: clipIndex)
-        return abs(grip.distance(to: arc.center) - arc.radius) <= GameRules.clipHoldTolerance
+        guard abs(grip.distance(to: arc.center) - arc.radius) <= GameRules.clipHoldTolerance else { return false }
+        guard squarely else { return true }
+        let clip = owner.clips[clipIndex]
+        let stem = (clip.stemEnd - clip.stemStart).rotated(by: owner.rotation).normalized()
+        let radial = (grip - arc.center).normalized()
+        let squareness = AngleMath.degrees(fromRadians: acos(min(1, abs(stem.x * radial.x + stem.y * radial.y))))
+        return squareness <= GameRules.clipSquarenessDegrees
     }
 
     // MARK: Connections
@@ -449,16 +462,17 @@ struct Board: Equatable, Sendable {
         return gap.contains(angle, margin: clipHalfAngle)
     }
 
-    /// Whether a possible connection holds right now: a clip square sitting on its ring's arc (on the
-    /// circle, outside the gap), or a sliding piece inside its holder.
+    /// Whether a possible connection holds right now: a clip square sitting squarely on its ring's
+    /// arc (on the circle, stem pointing at the ring's centre, outside the gap), or a sliding piece
+    /// inside its holder. The squareness matters once the clip's piece has been turned a little:
+    /// the square may still cross the circle, but askew, and gripping then would lock both pieces.
     func isHolding(_ connection: Connection) -> Bool {
         guard let owner = piece(connection.owner) else { return false }
         guard let clipIndex = connection.clipIndex else {
             return Self.isInHolder(owner)
         }
         guard let ring = piece(connection.ring), let arc = ring.worldRingArc() else { return false }
-        let grip = owner.worldGripPoint(clipIndex: clipIndex)
-        guard abs(grip.distance(to: arc.center) - arc.radius) <= GameRules.clipHoldTolerance else { return false }
+        guard clipSitsOnRing(owner: owner, clipIndex: clipIndex, ringID: ring.id, squarely: true) else { return false }
         return !isReleased(connection)
     }
 

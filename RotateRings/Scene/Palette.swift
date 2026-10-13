@@ -53,6 +53,13 @@ enum Palette {
 }
 
 extension UIColor {
+    /// The same colour with its brightness reduced by `amount` (0...1).
+    func darker(by amount: CGFloat) -> UIColor {
+        var hue: CGFloat = 0, saturation: CGFloat = 0, brightness: CGFloat = 0, alpha: CGFloat = 1
+        guard getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha) else { return self }
+        return UIColor(hue: hue, saturation: saturation, brightness: max(0, brightness * (1 - amount)), alpha: alpha)
+    }
+
     /// Creates an opaque colour from a 0xRRGGBB value.
     convenience init(hex: UInt32) {
         self.init(

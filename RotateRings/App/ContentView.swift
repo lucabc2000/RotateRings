@@ -33,6 +33,9 @@ struct ContentView: View {
     @State private var feedbackNote: String?
     /// Where the full-screen game view and the board's area are on screen; together they tell the
     /// scene where to put the board.
+    /// Widest the board area and booster bar get, so an iPad shows them like a large phone.
+    static let maxChromeWidth: CGFloat = 560
+
     @State private var gameViewFrame = CGRect.zero
     @State private var boardAreaFrame = CGRect.zero
 
@@ -48,9 +51,14 @@ struct ContentView: View {
             gameView
 
             VStack(spacing: 12) {
+                // The header runs edge to edge like any iOS bar. On an iPad the board and the
+                // booster bar stay phone-sized and centred instead of stretching across the screen.
                 header
-                boardArea
-                boosterBar
+                VStack(spacing: 12) {
+                    boardArea
+                    boosterBar
+                }
+                .frame(maxWidth: Self.maxChromeWidth)
             }
             .padding(.horizontal, 16)
             .padding(.top, 8)
@@ -81,9 +89,12 @@ struct ContentView: View {
         .animation(.spring(duration: 0.35), value: model.isLevelComplete || model.isCampaignFinished)
         .onChange(of: model.reviewRequests) {
             Task {
-                // Let the completion card settle first, and skip it if the player has already moved on.
-                try? await Task.sleep(for: .seconds(1.2))
-                guard model.isLevelComplete else { return }
+                // Let the completion card land first (its spring takes about a third of a second), so
+                // the sheet does not fight the card's animation or hide the message. Ask even if the
+                // player has already tapped on: the sheet over the next level beats never asking. In
+                // development builds the system shows the sheet every time; in App Store builds it
+                // decides.
+                try? await Task.sleep(for: .seconds(0.5))
                 requestReview()
             }
         }
@@ -315,6 +326,7 @@ private struct OverlayCard<Content: View>: View {
     var body: some View {
         VStack(spacing: 18, content: content)
             .padding(32)
+            .frame(maxWidth: 440)
             .background(
                 RoundedRectangle(cornerRadius: 24)
                     .fill(Color(uiColor: Palette.card))

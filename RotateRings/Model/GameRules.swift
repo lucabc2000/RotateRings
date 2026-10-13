@@ -50,6 +50,10 @@ enum GameRules {
     /// How far a clip's grip point may stray from the gripped ring's circle before the ring is
     /// considered to be holding the clip owner back.
     static let clipHoldTolerance: Double = 2
+    /// How far, in degrees, a clip's stem may be off the radial line of the ring it grips and still
+    /// count as sitting on it. A clip whose piece has been turned a little sits on the circle but
+    /// askew; letting it grip again would lock the two pieces into each other.
+    static let clipSquarenessDegrees: Double = 7
 
     /// How close (in board units) a tap must be to a piece's stroke to select it.
     static let tapPickRadius: Double = 28

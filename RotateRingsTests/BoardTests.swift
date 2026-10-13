@@ -51,6 +51,39 @@ struct BoardTests {
         guard case .blocked = board.rotate("a", by: clockwiseStep) else { Issue.record("a should be pinned again"); return }
     }
 
+    /// After a clip has slipped off, its piece may be turned a little. The square then still crosses
+    /// the ring's circle but askew: the ring must not pass through it (a real ring would not go
+    /// through a tilted sleeve), and nothing may grip, or the two pieces lock into each other.
+    @Test func askewClipDoesNotGripAgain() {
+        // h holds a from above, so a stays once its own clips have been let go.
+        let x = Make.ring("x", at: .zero, gapCenterDegrees: 135)
+        let a = Make.ring("a", at: Point(0, 120), gapCenterDegrees: 180, clips: [
+            Make.downClip(grips: "x"),
+            Clip(stemStart: Point(50, 0), stemEnd: Point(70, 0), grips: "e"),
+        ])
+        let h = Make.ring("h", at: Point(0, 240), gapCenterDegrees: 90, clips: [Make.downClip(grips: "a")])
+        let e = Make.ring("e", at: Point(120, 120), gapCenterDegrees: 270)
+        let b = Make.ring("b", at: Point(120, 0), gapCenterDegrees: 0, clips: [Make.leftClip(grips: "x")])
+        var board = Board(pieces: [x, a, h, e, b])
+        let aOnX = Connection(owner: "a", clipIndex: 0, ring: "x")
+        guard case .moved = board.rotate("x", by: clockwiseStep) else { Issue.record("x should turn"); return }
+        #expect(!board.connections.contains(aOnX))
+        // e lets a go, then a is turned a few degrees: its clip still crosses x's circle, but askew.
+        guard case .moved = board.rotate("e", by: 2 * clockwiseStep) else { Issue.record("e should turn"); return }
+        _ = board.drag("a", by: deg(6))
+        _ = board.settle("a")
+        #expect(board.piece("a")?.rotation.isApproximately(deg(6)) == true)
+        // x cannot be threaded back through the tilted clip: the square is solid now.
+        guard case .blocked(let blocked) = board.rotate("x", by: -clockwiseStep) else { Issue.record("x should be stopped by the askew clip"); return }
+        #expect(blocked.reason == .collision(with: "a"))
+        #expect(!board.connections.contains(aOnX))
+        // a turns back the way it came, and then x goes back under the clip and is gripped again.
+        _ = board.drag("a", by: deg(-6))
+        _ = board.settle("a")
+        guard case .moved = board.rotate("x", by: -clockwiseStep) else { Issue.record("x should turn back now"); return }
+        #expect(board.connections.contains(aOnX))
+    }
+
     @Test func gripOnMissingPieceIsLoose() {
         let a = Make.ring("a", at: .zero, gapCenterDegrees: 0, clips: [Make.downClip(grips: "ghost")])
         var board = Board(pieces: [a])

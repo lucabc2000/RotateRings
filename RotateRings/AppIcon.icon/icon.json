@@ -1,27 +1,21 @@
 {
   "fill" : {
-    "linear-gradient" : [
-      "display-p3:0.14118,0.20784,0.47843,1.00000",
-      "display-p3:0.05098,0.07059,0.18824,1.00000"
-    ],
-    "orientation" : {
-      "start" : {
-        "x" : 0.5,
-        "y" : 1
-      },
-      "stop" : {
-        "x" : 0.5,
-        "y" : 0
-      }
-    }
+    "solid" : "display-p3:0.16471,0.18431,0.58431,1.00000"
   },
   "groups" : [
     {
       "layers" : [
         {
           "glass" : false,
-          "image-name" : "Frame 2 2.png",
-          "name" : "Frame 2 2"
+          "image-name" : "Mark 3.png",
+          "name" : "Mark 3",
+          "position" : {
+            "scale" : 1.15,
+            "translation-in-points" : [
+              18,
+              -26
+            ]
+          }
         }
       ],
       "shadow" : {
@@ -29,20 +23,7 @@
         "opacity" : 0.5
       },
       "translucency" : {
-        "enabled" : true,
-        "value" : 0.3
-      }
-    },
-    {
-      "layers" : [
-
-      ],
-      "shadow" : {
-        "kind" : "neutral",
-        "opacity" : 0.5
-      },
-      "translucency" : {
-        "enabled" : true,
+        "enabled" : false,
         "value" : 0.3
       }
     }
