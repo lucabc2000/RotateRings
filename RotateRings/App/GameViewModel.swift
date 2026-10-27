@@ -40,6 +40,9 @@ final class GameViewModel {
     private(set) var isLaserArmed = false
     /// The booster earned by completing the current level, shown on the completion card.
     private(set) var earnedBooster: Booster?
+    /// A short note above the boosters when a video cannot play yet. Clears itself.
+    private(set) var videoNote: String?
+    private var videoNoteTask: Task<Void, Never>?
 
     private let boosters: BoosterInventory
     private let reviews: ReviewPrompt
@@ -83,9 +86,11 @@ final class GameViewModel {
         isPreviewing ? 1 : boosters.count(of: booster)
     }
 
-    /// Lightning: strikes a random piece. Costs one lightning once it has struck.
+    /// Lightning: strikes a random piece. Costs one lightning once it has struck. With none left it
+    /// offers a video instead.
     func useLightning() {
-        guard let scene, !isLevelComplete, boosterCount(.lightning) > 0 else { return }
+        guard let scene, !isLevelComplete else { return }
+        guard boosterCount(.lightning) > 0 else { watchVideo(for: .lightning); return }
         isLaserArmed = false
         scene.isLaserArmed = false
         if scene.destroyRandomPiece(), !isPreviewing {
@@ -94,12 +99,43 @@ final class GameViewModel {
     }
 
     /// Laser: arms the scene so the next piece the player touches is vaporised. Tapping again disarms.
-    /// Costs one laser when it fires, not when it is armed.
+    /// Costs one laser when it fires, not when it is armed. With none left it offers a video instead.
     func toggleLaser() {
-        guard let scene, !isLevelComplete, isLaserArmed || boosterCount(.laser) > 0 else { return }
+        guard let scene, !isLevelComplete else { return }
+        guard isLaserArmed || boosterCount(.laser) > 0 else { watchVideo(for: .laser); return }
         isLaserArmed.toggle()
         scene.isLaserArmed = isLaserArmed
         SoundPlayer.shared.play(isLaserArmed ? .laserArm : .laserDisarm)
+    }
+
+    // MARK: Rewarded videos
+
+    /// The player tapped a booster they have none of, marked with a play badge: plays a rewarded video
+    /// straight away and adds one `booster` once it has been watched. Without a video ready, a note
+    /// says so and another load starts.
+    func watchVideo(for booster: Booster) {
+        guard !isPreviewing else { return }
+        let ads = RewardedAds.shared
+        guard ads.isReady else {
+            ads.load()
+            showVideoNote(ads.isLoading ? "The video is still loading. Try again in a moment." : "No video available right now.")
+            return
+        }
+        ads.show { [weak self] earned in
+            guard let self, earned else { return }
+            self.boosters.add(booster)
+            SoundPlayer.shared.play(.levelComplete)
+        }
+    }
+
+    private func showVideoNote(_ note: String) {
+        videoNoteTask?.cancel()
+        videoNote = note
+        videoNoteTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(2.5))
+            guard !Task.isCancelled else { return }
+            self?.videoNote = nil
+        }
     }
 
     /// Level to open at launch: the one the player was at when the game was last open, or level 1.

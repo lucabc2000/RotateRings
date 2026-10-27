@@ -11,8 +11,11 @@ import SwiftUI
 import UIKit
 
 struct LevelBrowserView: View {
-    /// Plays a level file in the real scene. The second argument is a title for the header.
+    /// Plays a level file in the real scene, outside the campaign. The second argument is a title for
+    /// the header.
     let onPlay: (LevelFile, String) -> Void
+    /// Moves the campaign to this level number, so completing it continues with the next.
+    let onPlayLevel: (Int) -> Void
 
     @Environment(\.dismiss) private var dismiss
     @State private var report: LevelReport?
@@ -36,7 +39,7 @@ struct LevelBrowserView: View {
                     .scrollContentBackground(.hidden)
                     .navigationDestination(for: Int.self) { number in
                         if let level = report.levels.first(where: { $0.number == number }) {
-                            LevelDetailView(level: level, candidates: candidates, onPlay: onPlay)
+                            LevelDetailView(level: level, candidates: candidates, onPlay: onPlay, onPlayLevel: onPlayLevel)
                         }
                     }
                 } else if let loadError {
@@ -125,7 +128,7 @@ private struct LevelRow: View {
 }
 
 #Preview("Browser") {
-    LevelBrowserView { _, _ in }
+    LevelBrowserView(onPlay: { _, _ in }, onPlayLevel: { _ in })
 }
 
 enum DifficultyText {

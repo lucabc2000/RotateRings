@@ -35,6 +35,15 @@ struct BoosterTests {
         #expect(inventory.count(of: .lightning) == 1)
     }
 
+    @Test func videoRewardAddsOneAfterRunningOut() {
+        let (inventory, _) = makeInventory()
+        inventory.spend(.laser)
+        inventory.add(.laser)
+        #expect(inventory.count(of: .laser) == 1)
+        #expect(inventory.spend(.laser))
+        #expect(inventory.count(of: .lightning) == 1)
+    }
+
     @Test func everyFifthLevelRewardsOneBoosterInTurns() {
         #expect(BoosterInventory.reward(forLevel: 4) == nil)
         #expect(BoosterInventory.reward(forLevel: 5) == .lightning)
