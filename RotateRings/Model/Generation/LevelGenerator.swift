@@ -62,7 +62,7 @@ struct GeneratedLevel {
 }
 
 enum LevelGenerator {
-    static let levelCount = 100
+    static let levelCount = 200
 
     static func candidateSeed(master: UInt64, level: Int, index: Int) -> UInt64 {
         var rng = SplitMix64(seed: master).derived(UInt64(level) &* 0x9E37_79B9).derived(UInt64(index) &+ 1)
@@ -79,6 +79,7 @@ enum LevelGenerator {
         case deadEnds(template: String, count: Int)
         case firstMove(template: String)
         case learningGoal(template: String)
+        case replayFails(template: String)
 
         var description: String {
             switch self {
@@ -90,6 +91,7 @@ enum LevelGenerator {
             case .deadEnds(let t, let count): return "\(t): \(count) dead-end moves"
             case .firstMove(let t): return "\(t): first move does not free a piece in one step"
             case .learningGoal(let t): return "\(t): new piece kind is not exercised"
+            case .replayFails(let t): return "\(t): solution does not replay on the real board"
             }
         }
     }
@@ -118,6 +120,10 @@ enum LevelGenerator {
         let solver = LevelSolver(board: board, config: config.solver)
         var result = solver.solve()
         guard result.isSolvable, let solution = result.solution else { throw Failure.unsolvable(template: draft.template) }
+        // The solver can disagree with the board in rare positions (a ring it lets leave is still
+        // touching a neighbour on the real board), so the solution must replay as the tests do.
+        var replayBoard = board
+        guard replayBoard.replay(solution) else { throw Failure.replayFails(template: draft.template) }
         result.metrics.freedom = solver.freedom(along: solution)
         result.metrics.setupMoves = solution.filter { $0.removed.isEmpty }.count
         if goal.isTutorial {

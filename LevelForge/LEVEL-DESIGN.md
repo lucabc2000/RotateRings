@@ -493,3 +493,121 @@ three, so these levels take longer to generate.
 Rendering: `PieceNode` draws one hub per arm and the bomb with a lit fuse; the explosion is
 `PowerUpEffects.addExplosion`. The level-file format gained `bomb` on a piece.
 
+## 12. Levels 101–150, first version (replaced, see §13)
+
+**Replaced.** The owner played this set through and found level 150 not clearly harder than 100,
+and everything "feels similar like all other levels": new grid outlines and more tails do not read
+as new. Kept here for what was learned. The third set of fifty, planned by `LevelForge/plan-chapter.py` (seed 30) so that the table for
+11–100 and `plan-curve.py` stay exactly as they were. Same rules as §10 and §11: one design per
+level, the candidate closest to the target wins, nothing ranked hard.
+
+**The curve.** The waves of §10 continue on a baseline from 67 to 76, peaks capped at 82. That is
+lower than the 72 that level 100 reached on paper, on purpose: the score clamps pieces at 28 and
+moves at 40, so the heaviest designs measure in the high 70s, and a curve above that only made the
+planner put light boards on peaks (a first draft pitched at 70–80 missed its targets by 9 points
+on average). What carries on rising is the share of levels with tails and the outlines, not the
+number. Level 101 is a warm-up for players coming back after an update; 150 is a peak after a
+lighter 149.
+
+**The designs.** Designs already used in 50–100 are scored with what they measured there (read
+from `levels-report.json`). New ones were measured with `compose` on four seeds each and recorded
+in `LevelForge/chapter-trial-scores.json`:
+
+- knots on the masks with cut corners and holes, which give new outlines: Cut web (`diamond`),
+  Stronghold (`final`), Sieve, Riddle and Gaps (Gaps with tails on 60 % of rings);
+- webs on Cut web, Sieve, Ports and Stronghold, none used before 101.
+
+Dropped after measuring: knots on Ports and Lace (score 46–48, too light here), knots with three
+clips per ring (`clips: 3`, none of four seeds solvable), and bombs on the new outlines (the
+builder rarely finds a ring that turns freely from the start, so almost no drafts).
+
+Also dropped, after the first generated set sagged at the end (tens averaging 66, 69, 71, 68,
+67): the column knot (18 pieces, measured 44–65 here, which put a 44 on level 149) and the smaller
+tight maze. The planner now reads measured scores from 50–150, so rerunning it re-plans from what
+the last run produced.
+
+**The planner's rules**, on top of §10's: each reuse of a design and of an outline costs a little
+(the first draft had the tall board thirteen times; a stiff penalty then priced the heaviest
+designs out of the peaks); every five to eight levels, on a dip, the board changes scene
+entirely (maze, cage board, tangle or ring figure); no three knots or three webs running, and webs
+cost a little extra, since in a web 40–50 % of the pieces can move and that reads easy (§7);
+tails get a small bonus, at the owner's request; bombs about one level in four, often two, only
+on the knot boards bombs have worked on before (field, tall, column, grand, twelve).
+
+**Result** (generated, solver-checked, every board looked at): mean distance from target 3.3,
+worst 15 (sieve knots with bars come out lighter than planned). Averages per ten levels: 66, 68,
+71, 71, 72. 24 knots, 20 webs, 6 changes of scene (three tight mazes, three workshops); tails on 38
+levels, bombs on 10 (two bombs on 3 of them). Ten outlines; the tall board 8 times. The webs on
+the masks with holes look alike: the holes barely show among 28 rings, so the outline variety is
+mostly in the knots.
+
+**Not verified by play**, like every set before it (§9). Worth trying first: 105 and 113 (the
+heaviest knots, 80), 124 and 131 (the heaviest webs), 119 and 146 (the sieve knots that measured
+light), and 150.
+
+## 13. Levels 101–200: boards without a grid
+
+After §12 the owner chose four new kinds of board, all built by one new builder
+(`FreeKnot.swift`, template `Compositions.freeKnot`), and asked for 101–150 to be redone with
+them and 151–200 added. He played six samples first and liked them "for the mix up".
+
+**Free-form knots** (template ids `free-…`, names "Wild knot"). Rings of mixed sizes grow out from
+a seed; each new ring sits a stem's length from one ring, or from two at once (solved for two
+stems along two lattice directions), which gives rings with two holders. Then they are wired like
+`Knot`: one ranking, clips downhill. Directions are not free: every contact on a ring must be a
+multiple of 45° from the others (§5), so placements run along eight directions turned by a random
+angle per board. Distances, sizes and the outline are free.
+
+What it took to make them solvable (each of these was the main failure at some point):
+
+- **Unlinked rings keep 34 apart** (`farClearance`), linked ones 18–22 (`stems`). A ring's own
+  clip or tail swings round it when it turns; at the 18 that `Tangle` uses, it caught on the
+  unlinked neighbour a few degrees into the turn.
+- **Each ring keeps three neighbouring lattice directions free** of links (`keepsGapRoom`), or no
+  gap fits beside its clips. The grid gets this for free (four sides, at most three links).
+- **Gap width** (`gapWidth`): a held ring that stays behind after a holder lets go (it has another
+  holder or clips of its own) needs a gap the holder's clip can swing out of. Only holders that are
+  themselves held count (a root just leaves), and only the easier of the two turns.
+  `sharedGapRequirement` covers both turns and asked for 140–150° on small rings, which never fit.
+- **Rings under radius 30 take one holder at most**; rings placed between two neighbours are 30+.
+- Boards with more than 60 connections are refused (the solver keeps them in one 64-bit word).
+
+**Gates** (`gate: true`, "Gates"): tails 30 long, which reach into the circle of a linked
+neighbour. The ring can only swing its tail past while that neighbour's gap faces it. Whether a
+gate is actually needed depends on the solution; the solver does not report it.
+
+**Giant ring** (`giant: R`): a closed ring at the centre that holds rings inside and outside;
+the knot grows inside it (with bars) and around it. Closed, so it only ever holds and leaves last.
+
+**Denser, zoomed-out boards** (`dense: true`, "Thicket"): the same builder on a 432×768 board
+(`BoardSize.large`) with 26–32 smaller rings. The level file carries its board size and the scene
+scales any board to the screen, so these draw at about 83 %. `LevelDraft`, `LevelTemplate.single`
+and `Motif.placed` now take a board; every other generator still uses the standard one.
+
+Measured (`compose`, eight seeds each, in `chapter-trial-scores.json`): on the standard board the
+free kinds score 26–38 (their rings do not pack as tightly as a grid's, 16–22 fit), so they serve
+as changes of scene; on the large board 50–63, alongside the heavy grid designs. Yields are low on
+the large board (one to three seeds in eight solve); the generator's 96 attempts per level cover it.
+
+**The plan** (`plan-chapter.py`, now for any fifty: `101 12` and `151 83`, both from the score
+snapshot in `chapter-measured-snapshot.json`, because replanning 101–150 changes the table the
+report's scores would otherwise be paired with). New rules: the free kinds count as one broad kind
+(no three running) and get a bonus, so about a quarter of the levels use them; the standard-board
+ones count as a change of scene; what the previous fifty used counts a quarter against the next.
+Planned: 101–150 has 11 boards without a grid, 151–200 has 11; tails on about 42 of every 50;
+bombs on 12–13.
+
+**The ceiling.** 151–200 does not rise on the score: the heaviest designs measure in the high 70s
+and the score clamps pieces at 28 and moves at 40. Tens average about 66–70 in both halves. What
+changes is the kind of board. If the owner finds 151–200 no harder than 101–150, the next step is
+not more of these but a different measure of difficulty, or new mechanics.
+
+**Solver and board can disagree.** In the first run, level 110 (a grid knot) had a solution the
+real board would not replay: the solver let a ring leave once its last clip was gone, but on the
+board it was still touching a neighbour and stayed, and the next move ran into it. Rare (one level
+in 200), but it would have shipped an unsolvable level. `LevelGenerator.attempt` now replays every
+candidate's solution on the board (`Failure.replayFails`) before accepting it. The underlying
+disagreement in the solver is not fixed.
+
+**Not verified by play** beyond the six samples.
+
