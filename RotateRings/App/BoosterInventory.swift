@@ -65,6 +65,11 @@ final class BoosterInventory {
         return true
     }
 
+    /// Adds one booster, the reward for watching a video.
+    func add(_ booster: Booster) {
+        set(booster, to: count(of: booster) + 1)
+    }
+
     /// The booster earned by completing `level`: one every `rewardInterval` levels, lightning and
     /// laser taking turns. Nil for all other levels.
     static func reward(forLevel level: Int) -> Booster? {

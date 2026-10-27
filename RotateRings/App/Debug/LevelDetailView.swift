@@ -12,6 +12,7 @@ struct LevelDetailView: View {
     let level: LevelReport.Level
     let candidates: CandidateStore?
     let onPlay: (LevelFile, String) -> Void
+    let onPlayLevel: (Int) -> Void
 
     @State private var chosenFile: LevelFile?
     private var swaps = LevelSwaps.shared
@@ -25,7 +26,8 @@ struct LevelDetailView: View {
                     candidate: level.chosen,
                     file: chosenFile,
                     isInUse: swaps.candidateID(for: level.number) == nil,
-                    onPlay: onPlay,
+                    // The level itself is played in the campaign, so finishing it moves on to the next.
+                    onPlay: { _, _ in onPlayLevel(level.number) },
                     onUse: { swaps.set(nil, for: level.number) }
                 )
 
@@ -68,7 +70,7 @@ struct LevelDetailView: View {
     let candidates = try? LevelLoader.loadCandidates(in: .main)
     return NavigationStack {
         if let level = report?.levels.first(where: { $0.number == 8 }) ?? report?.levels.first {
-            LevelDetailView(level: level, candidates: candidates) { _, _ in }
+            LevelDetailView(level: level, candidates: candidates, onPlay: { _, _ in }, onPlayLevel: { _ in })
         } else {
             Text("No report in bundle")
         }

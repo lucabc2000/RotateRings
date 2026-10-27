@@ -19,10 +19,10 @@ struct LevelTemplate {
     nonisolated(unsafe) static var debug: ((String) -> Void)?
 
     /// One motif in the middle of the board.
-    static func single(_ id: String, kinds: Set<PieceKind>, motif: @escaping (_ rng: inout SplitMix64) -> Motif?) -> LevelTemplate {
+    static func single(_ id: String, kinds: Set<PieceKind>, board: BoardSize = .standard, motif: @escaping (_ rng: inout SplitMix64) -> Motif?) -> LevelTemplate {
         LevelTemplate(id: id, kinds: kinds) { _, rng in
             guard let motif = motif(&rng) else { return nil }
-            var draft = LevelDraft(name: motif.name, template: id, pieces: motif.placed(at: ForgeRules.center))
+            var draft = LevelDraft(name: motif.name, template: id, pieces: motif.placed(at: board.center, board: board), board: board)
             draft.renumberIDs()
             return draft
         }

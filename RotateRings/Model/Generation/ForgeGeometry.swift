@@ -68,6 +68,21 @@ enum ForgeRules {
     static let stemRootClearanceDegrees = 8.0
 }
 
+/// The board a level is drawn on. The scene scales any board to the screen, so a bigger board with
+/// the same stroke width shows more, smaller pieces (a zoomed-out level).
+struct BoardSize: Equatable {
+    var width: Double
+    var height: Double
+
+    static let standard = BoardSize(width: ForgeRules.boardWidth, height: ForgeRules.boardHeight)
+    /// One fifth larger each way: on screen everything is drawn at about 83 %.
+    static let large = BoardSize(width: 432, height: 768)
+
+    var center: Point { Point(width / 2, height / 2) }
+    /// Half the room a motif centred on the board may take, inside the margins.
+    var halfExtent: Point { Point(width / 2 - ForgeRules.margin, height / 2 - ForgeRules.margin) }
+}
+
 func normalizedDegrees(_ degrees: Double) -> Double {
     var value = degrees.truncatingRemainder(dividingBy: 360)
     if value < 0 { value += 360 }

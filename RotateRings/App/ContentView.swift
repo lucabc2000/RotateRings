@@ -87,6 +87,10 @@ struct ContentView: View {
             }
         }
         .animation(.spring(duration: 0.35), value: model.isLevelComplete || model.isCampaignFinished)
+        .task {
+            // Consent where the law asks for it, then the first video starts loading.
+            await RewardedAds.shared.start()
+        }
         .onChange(of: model.reviewRequests) {
             Task {
                 // Let the completion card land first (its spring takes about a third of a second), so
@@ -105,10 +109,13 @@ struct ContentView: View {
         }
         #if DEBUG
         .fullScreenCover(isPresented: $isShowingBrowser) {
-            LevelBrowserView { file, title in
+            LevelBrowserView(onPlay: { file, title in
                 model.play(file, title: title)
                 isShowingBrowser = false
-            }
+            }, onPlayLevel: { number in
+                model.loadLevel(number)
+                isShowingBrowser = false
+            })
         }
         #endif
     }
@@ -207,16 +214,17 @@ struct ContentView: View {
     /// Lightning (random piece) and laser (pick a piece) boosters.
     private var boosterBar: some View {
         VStack(spacing: 6) {
-            Text(model.isLaserArmed ? "Tap a piece to aim the laser" : " ")
+            Text(model.isLaserArmed ? "Tap a piece to aim the laser" : model.videoNote ?? " ")
                 .font(.footnote.weight(.medium))
                 .foregroundStyle(Color(uiColor: Palette.textSecondary))
                 .animation(.easeInOut(duration: 0.15), value: model.isLaserArmed)
+                .animation(.easeInOut(duration: 0.15), value: model.videoNote)
             HStack(spacing: 24) {
-                BoosterButton(title: Booster.lightning.title, count: model.boosterCount(.lightning), isActive: false, action: model.useLightning) {
+                BoosterButton(title: Booster.lightning.title, count: model.boosterCount(.lightning), isActive: false, offersVideo: !model.isPreviewing, action: model.useLightning) {
                     LightningIcon()
                 }
                 .disabled(model.isLaserArmed)
-                BoosterButton(title: Booster.laser.title, count: model.boosterCount(.laser), isActive: model.isLaserArmed, action: model.toggleLaser) {
+                BoosterButton(title: Booster.laser.title, count: model.boosterCount(.laser), isActive: model.isLaserArmed, offersVideo: !model.isPreviewing, action: model.toggleLaser) {
                     LaserIcon()
                 }
             }
@@ -286,13 +294,8 @@ struct ContentView: View {
     private var earnedBoosterBadge: some View {
         if let booster = model.earnedBooster {
             HStack(spacing: 10) {
-                Group {
-                    switch booster {
-                    case .lightning: LightningIcon()
-                    case .laser: LaserIcon()
-                    }
-                }
-                .frame(width: 20, height: 20)
+                BoosterIcon(booster: booster)
+                    .frame(width: 20, height: 20)
                 Text("+1 \(booster.title)")
                     .font(.headline)
             }
@@ -368,11 +371,14 @@ private struct CardCircle: View {
 }
 
 /// A round booster button with a vector icon, a badge showing how many are left and a small caption.
-/// With none left the button is dimmed and does nothing.
+/// With none left the badge turns into a play symbol when a video can earn another; otherwise the
+/// button is dimmed and does nothing.
 private struct BoosterButton<Icon: View>: View {
     let title: String
     let count: Int
     let isActive: Bool
+    /// Tapping with none left plays a rewarded video.
+    let offersVideo: Bool
     let action: () -> Void
     @ViewBuilder let icon: () -> Icon
 
@@ -385,13 +391,20 @@ private struct BoosterButton<Icon: View>: View {
                     .frame(width: 60, height: 60)
                     .background(CardCircle(isActive: isActive))
                     .overlay(alignment: .topTrailing) {
-                        Text("\(count)")
-                            .font(.caption.weight(.bold))
-                            .monospacedDigit()
-                            .foregroundStyle(Color(uiColor: Palette.backgroundBottom))
-                            .frame(minWidth: 22, minHeight: 22)
-                            .background(Capsule().fill(Color(uiColor: Palette.pieceColor(named: count > 0 ? "yellow" : "coral"))))
-                            .offset(x: 4, y: -4)
+                        Group {
+                            if isVideoBadge {
+                                Image(systemName: "play.fill")
+                                    .font(.system(size: 9, weight: .bold))
+                            } else {
+                                Text("\(count)")
+                                    .font(.caption.weight(.bold))
+                                    .monospacedDigit()
+                            }
+                        }
+                        .foregroundStyle(Color(uiColor: Palette.backgroundBottom))
+                        .frame(minWidth: 22, minHeight: 22)
+                        .background(Capsule().fill(Color(uiColor: Palette.pieceColor(named: badgeColor))))
+                        .offset(x: 4, y: -4)
                     }
                     .scaleEffect(isActive ? 1.08 : 1)
                 Text(title)
@@ -400,17 +413,36 @@ private struct BoosterButton<Icon: View>: View {
             }
         }
         .buttonStyle(.plain)
-        .disabled(count == 0 && !isActive)
-        .opacity(count == 0 && !isActive ? 0.45 : 1)
+        .disabled(isEmpty && !offersVideo)
+        .opacity(isEmpty && !offersVideo ? 0.45 : 1)
         .animation(.spring(duration: 0.25), value: isActive)
         .animation(.spring(duration: 0.25), value: count)
-        .accessibilityLabel(title)
-        .accessibilityValue("\(count) left")
+        .accessibilityLabel(isVideoBadge ? "Watch an ad for one \(title)" : title)
+        .accessibilityValue(isVideoBadge ? "None left" : "\(count) left")
         .accessibilityAddTraits(isActive ? .isSelected : [])
+    }
+
+    private var isEmpty: Bool { count == 0 && !isActive }
+    private var isVideoBadge: Bool { isEmpty && offersVideo }
+    private var badgeColor: String {
+        if isVideoBadge { return "mint" }
+        return count > 0 ? "yellow" : "coral"
     }
 }
 
 // MARK: - Booster icons
+
+/// The icon of either booster.
+private struct BoosterIcon: View {
+    let booster: Booster
+
+    var body: some View {
+        switch booster {
+        case .lightning: LightningIcon()
+        case .laser: LaserIcon()
+        }
+    }
+}
 
 /// A simple lightning bolt, filled.
 private struct LightningIcon: View {

@@ -6,6 +6,10 @@
 	objectVersion = 110;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		9A1D0000000000000000A001 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 9A1D0000000000000000A002 /* GoogleMobileAds */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		912F81F0306E4EF800D2EB4E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -74,6 +78,7 @@
 		912F8192306E498800D2EB4E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				9A1D0000000000000000A001 /* GoogleMobileAds in Frameworks */,
 			);
 		};
 		912F81D9306E4EF800D2EB4E /* Frameworks */ = {
@@ -140,6 +145,9 @@
 				912F8197306E498800D2EB4E /* RotateRings */,
 			);
 			name = RotateRings;
+			packageProductDependencies = (
+				9A1D0000000000000000A002 /* GoogleMobileAds */,
+			);
 			productName = RotateRings;
 			productReference = 912F8195306E498800D2EB4E /* RotateRings.app */;
 			productType = "com.apple.product-type.application";
@@ -196,6 +204,9 @@
 			);
 			mainGroup = 912F818C306E498800D2EB4E;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				9A1D0000000000000000A003 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 912F8196306E498800D2EB4E /* Products */;
 			projectDirPath = "";
@@ -303,7 +314,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 6T946YUXZF;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RotateRings/Info.plist;
@@ -320,7 +331,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = Lumi.RotateRings;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -340,7 +352,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 6T946YUXZF;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RotateRings/Info.plist;
@@ -357,7 +369,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_BUNDLE_IDENTIFIER = Lumi.RotateRings;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -579,6 +592,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		9A1D0000000000000000A003 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 13.11.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		9A1D0000000000000000A002 /* GoogleMobileAds */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9A1D0000000000000000A003 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
+			productName = GoogleMobileAds;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 912F818D306E498800D2EB4E /* Project object */;
 	validationLevel = 1;

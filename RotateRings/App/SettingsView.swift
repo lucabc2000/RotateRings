@@ -13,6 +13,7 @@ struct SettingsView: View {
     var onOpenLevelBrowser: (() -> Void)? = nil
 
     @Bindable private var settings = GameSettings.shared
+    private let ads = RewardedAds.shared
     @Environment(\.dismiss) private var dismiss
 
     init(onRestart: @escaping () -> Void, onOpenLevelBrowser: (() -> Void)? = nil) {
@@ -22,11 +23,14 @@ struct SettingsView: View {
 
     #if DEBUG
     private let showsLevelBrowser = true
-    private let sheetHeight: CGFloat = 390
     #else
     private let showsLevelBrowser = false
-    private let sheetHeight: CGFloat = 320
     #endif
+
+    /// Tall enough for the rows on show: each extra row adds about 50 points.
+    private var sheetHeight: CGFloat {
+        320 + (showsLevelBrowser ? 70 : 0) + (ads.needsPrivacyOptions ? 50 : 0)
+    }
 
     var body: some View {
         VStack(spacing: 20) {
@@ -40,33 +44,23 @@ struct SettingsView: View {
                     .overlay(Color(uiColor: Palette.cardBorder))
                     .padding(.horizontal, 16)
                 settingRow("Haptics", systemImage: "iphone.radiowaves.left.and.right", isOn: $settings.isHapticsEnabled)
+                if ads.needsPrivacyOptions {
+                    Divider()
+                        .overlay(Color(uiColor: Palette.cardBorder))
+                        .padding(.horizontal, 16)
+                    // Required by Google where consent was asked: a way to change the ad choices.
+                    linkRow("Privacy choices", systemImage: "hand.raised.fill") {
+                        Task { await ads.presentPrivacyOptions() }
+                    }
+                }
                 if showsLevelBrowser, let onOpenLevelBrowser {
                     Divider()
                         .overlay(Color(uiColor: Palette.cardBorder))
                         .padding(.horizontal, 16)
-                    Button {
+                    linkRow("Level Browser", systemImage: "list.number") {
                         dismiss()
                         onOpenLevelBrowser()
-                    } label: {
-                        HStack {
-                            Label {
-                                Text("Level Browser")
-                                    .font(.body.weight(.medium))
-                                    .foregroundStyle(Color(uiColor: Palette.textPrimary))
-                            } icon: {
-                                Image(systemName: "list.number")
-                                    .foregroundStyle(Color(uiColor: Palette.icon))
-                                    .frame(width: 28)
-                            }
-                            Spacer()
-                            Image(systemName: "chevron.right")
-                                .font(.footnote.weight(.semibold))
-                                .foregroundStyle(Color(uiColor: Palette.textSecondary))
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 14)
                     }
-                    .buttonStyle(.plain)
                 }
             }
             .background(
@@ -101,6 +95,31 @@ struct SettingsView: View {
         .onChange(of: settings.isHapticsEnabled) { _, isOn in
             if isOn { UIImpactFeedbackGenerator(style: .medium).impactOccurred() }
         }
+    }
+
+    /// A row that opens something else, with a chevron.
+    private func linkRow(_ title: String, systemImage: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack {
+                Label {
+                    Text(title)
+                        .font(.body.weight(.medium))
+                        .foregroundStyle(Color(uiColor: Palette.textPrimary))
+                } icon: {
+                    Image(systemName: systemImage)
+                        .foregroundStyle(Color(uiColor: Palette.icon))
+                        .frame(width: 28)
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(Color(uiColor: Palette.textSecondary))
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 
     private func settingRow(_ title: String, systemImage: String, isOn: Binding<Bool>) -> some View {

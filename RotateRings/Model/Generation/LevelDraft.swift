@@ -12,11 +12,13 @@ struct LevelDraft {
     var name: String
     var template: String
     var pieces: [DraftPiece] = []
+    var board = BoardSize.standard
 
-    init(name: String, template: String, pieces: [DraftPiece] = []) {
+    init(name: String, template: String, pieces: [DraftPiece] = [], board: BoardSize = .standard) {
         self.name = name
         self.template = template
         self.pieces = pieces
+        self.board = board
     }
 
     func index(of id: String) -> Int? {
@@ -247,7 +249,7 @@ struct LevelDraft {
     }
 
     func levelFile(number: Int) -> LevelFile {
-        LevelFile(id: number, name: name, board: .init(width: ForgeRules.boardWidth, height: ForgeRules.boardHeight), pieces: pieces.map(\.spec))
+        LevelFile(id: number, name: name, board: .init(width: board.width, height: board.height), pieces: pieces.map(\.spec))
     }
 
     // MARK: Validation
@@ -292,8 +294,8 @@ struct LevelDraft {
             if let reason = board.blockingReason(for: piece, at: piece.movement) {
                 throw DraftError.startingCollision(piece.id, reason)
             }
-            let minX = ForgeRules.margin, maxX = ForgeRules.boardWidth - ForgeRules.margin
-            let minY = ForgeRules.margin, maxY = ForgeRules.boardHeight - ForgeRules.margin
+            let minX = ForgeRules.margin, maxX = self.board.width - ForgeRules.margin
+            let minY = ForgeRules.margin, maxY = self.board.height - ForgeRules.margin
             let pad = GameRules.strokeThickness / 2
             func inside(_ point: Point, _ reach: Double) -> Bool {
                 point.x - reach >= minX && point.x + reach <= maxX && point.y - reach >= minY && point.y + reach <= maxY

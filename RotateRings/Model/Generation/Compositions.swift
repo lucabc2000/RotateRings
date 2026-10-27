@@ -156,6 +156,36 @@ enum Compositions {
         return LevelTemplate.single(id, kinds: kinds) { rng in Knot.build(shape, options: options, rng: &rng) }
     }
 
+    // MARK: Free-form knots
+
+    /// A knot without a grid (`FreeKnot`). `gate` makes its tails long enough to reach into a
+    /// neighbour's circle; `giant` grows it inside and around one big closed ring; `dense` draws it
+    /// on the larger board with more, smaller rings.
+    static func freeKnot(rings: ClosedRange<Int>, holders: Int = 2, tails: Double = 0, gate: Bool = false, pokes: Int = 0,
+                         bombs: Int = 0, giant: Double? = nil, dense: Bool = false) -> LevelTemplate {
+        var options = FreeKnot.Options()
+        options.rings = rings
+        options.maxHolders = holders
+        options.tailShare = tails
+        options.gateTails = gate
+        options.pokes = pokes
+        options.bombs = bombs
+        options.giant = giant
+        if dense {
+            options.board = .large
+            options.radii = [22, 24, 26, 28, 30, 34]
+        }
+        let kind = giant != nil ? "giant" : dense ? "dense" : "free"
+        options.name = giant != nil ? "Giant ring" : dense ? "Thicket" : gate ? "Gates" : "Wild knot"
+        let id = "\(kind)-\(rings.lowerBound)-\(rings.upperBound)-\(holders)" + (tails > 0 ? (gate ? "-gates" : "-tails") : "")
+            + (pokes > 0 ? "-p\(pokes)" : "") + (bombs > 0 ? "-bomb\(bombs)" : "")
+        options.template = id
+        var kinds: Set<PieceKind> = [.cRing, .closedRing]
+        if tails > 0 { kinds.insert(.tailRing) }
+        if pokes > 0 { kinds.insert(.slideBar) }
+        return LevelTemplate.single(id, kinds: kinds, board: options.board) { rng in FreeKnot.build(options, rng: &rng) }
+    }
+
     // MARK: Grids
 
     /// Sliding bars only. Small mazes use wider lanes so they still fill the board. With `freeLimit`
@@ -249,7 +279,7 @@ enum Compositions {
     /// its target on the difficulty curve (`DifficultyCurve.targets`).
     static let hardLevels: Set<Int> = []
 
-    /// The design of each level from 11 to 100. The table is written by hand-tuned planning, not
+    /// The design of each level from 11 to 200. The table is written by hand-tuned planning, not
     /// by a formula: targets rise in uneven waves (LEVEL-DESIGN.md §10), and each level gets the
     /// design whose usual difficulty is closest to its target, never the same kind of board twice
     /// running and preferably not the same kind of difficulty either (finding a chain, things in
@@ -347,6 +377,108 @@ enum Compositions {
         case 98: return [knot("hubs-tall", holders: 3, bars: 2, uBars: 2)]
         case 99: return [knot("hubs-field", holders: 3, bombs: 1)]
         case 100: return [knot("hubs-tall", holders: 3, tails: 0.4)]
+        // 101-150: plan-chapter.py 101 12 (LEVEL-DESIGN.md §13).
+        case 101: return [freeKnot(rings: 26...32, holders: 3, tails: 0.5, gate: true, pokes: 2, dense: true)]
+        case 102: return [knot("hubs-final", holders: 3, uBars: 2)]
+        case 103: return [freeKnot(rings: 26...32, holders: 3, tails: 0.4, dense: true)]
+        case 104: return [knot("hubs-field", holders: 3, bars: 4, tails: 0.4, bombs: 2)]
+        case 105: return [freeKnot(rings: 26...32, holders: 3, tails: 0.5, gate: true, bombs: 1, dense: true)]
+        case 106: return [knot("hubs-gaps", holders: 3, bars: 2, tails: 0.4)]
+        case 107: return [freeKnot(rings: 18...22, holders: 3, tails: 0.4)]
+        case 108: return [knot("hubs-sieve", holders: 3, tails: 0.6)]
+        case 109: return [freeKnot(rings: 26...32, holders: 3, tails: 0.4, bombs: 2, dense: true)]
+        case 110: return [knot("hubs-tall", holders: 3, bars: 6, tails: 0.4, bombs: 2)]
+        case 111: return [freeKnot(rings: 18...24, holders: 3, tails: 0.4, pokes: 3, giant: 176, dense: true)]
+        case 112: return [knot("hubs-tall", holders: 3, tails: 0.4)]
+        case 113: return [freeKnot(rings: 26...32, holders: 3, tails: 0.4, dense: true)]
+        case 114: return [knot("hubs-tall", holders: 3, bars: 6, tails: 0.4, bombs: 2)]
+        case 115: return [hubWeb("hubs-final", clips: 3...4, holders: 3, bars: 2, tails: 0.85)]
+        case 116: return [maze(cols: 11, rows: 20, bars: 26, freeLimit: 3)]
+        case 117: return [knot("hubs-gaps", holders: 3, tails: 0.6)]
+        case 118: return [freeKnot(rings: 26...32, holders: 3, tails: 0.5, gate: true, pokes: 2, dense: true)]
+        case 119: return [knot("hubs-field", holders: 3, bombs: 1)]
+        case 120: return [hubWeb("hubs-riddle", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
+        case 121: return [cages(across: 3, down: 4, count: 6, border: 0, bars: 16, freeLimit: 3)]
+        case 122: return [knot("hubs-diamond", holders: 3, tails: 0.4)]
+        case 123: return [hubWeb("hubs-sieve", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
+        case 124: return [knot("hubs-field", holders: 3, bars: 4, tails: 0.4, bombs: 1)]
+        case 125: return [hubWeb("hubs-tall", clips: 3...4, holders: 3, tails: 0.85)]
+        case 126: return [knot("hubs-weave", holders: 3, tails: 0.4)]
+        case 127: return [hubWeb("hubs-lace", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
+        case 128: return [freeKnot(rings: 26...32, holders: 3, tails: 0.4, dense: true)]
+        case 129: return [knot("hubs-tall", holders: 3, tails: 0.4, bombs: 1)]
+        case 130: return [cages(across: 3, down: 4, count: 6, border: 0, bars: 16, freeLimit: 3)]
+        case 131: return [knot("hubs-gaps", holders: 3, bars: 2, tails: 0.4)]
+        case 132: return [hubWeb("hubs-riddle", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
+        case 133: return [knot("hubs-field", holders: 3, tails: 0.4, bombs: 2)]
+        case 134: return [freeKnot(rings: 26...32, holders: 3, tails: 0.5, gate: true, bombs: 1, dense: true)]
+        case 135: return [hubWeb("hubs-sieve", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
+        case 136: return [knot("hubs-tall", holders: 3, tails: 0.4, bombs: 1)]
+        case 137: return [hubWeb("hubs-final", clips: 3...4, holders: 3, bars: 2, tails: 0.85)]
+        case 138: return [maze(cols: 11, rows: 20, bars: 26, freeLimit: 3)]
+        case 139: return [knot("hubs-diamond", holders: 3, bars: 2, uBars: 1)]
+        case 140: return [knot("hubs-gaps", holders: 3, tails: 0.6)]
+        case 141: return [hubWeb("hubs-final", clips: 3...4, holders: 3, bars: 2, tails: 0.85)]
+        case 142: return [knot("hubs-gaps", holders: 3, bars: 2, tails: 0.4)]
+        case 143: return [hubWeb("hubs-tall", clips: 3...4, holders: 3, tails: 0.85)]
+        case 144: return [knot("hubs-field", holders: 3, tails: 0.4, bombs: 2)]
+        case 145: return [cages(across: 3, down: 4, count: 6, border: 0, bars: 16, freeLimit: 3)]
+        case 146: return [hubWeb("hubs-riddle", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
+        case 147: return [knot("hubs-tall", holders: 3, tails: 0.4, bombs: 2)]
+        case 148: return [freeKnot(rings: 26...32, holders: 3, tails: 0.4, dense: true)]
+        case 149: return [knot("hubs-sieve", holders: 3, bars: 2, tails: 0.4)]
+        case 150: return [hubWeb("hubs-final", clips: 3...4, holders: 3, bars: 2, tails: 0.85)]
+        // 151-200: plan-chapter.py 151 83 (LEVEL-DESIGN.md §13).
+        case 151: return [freeKnot(rings: 26...32, holders: 3, tails: 0.5, gate: true, pokes: 2, dense: true)]
+        case 152: return [knot("hubs-gaps", holders: 3, bars: 2, tails: 0.4)]
+        case 153: return [freeKnot(rings: 26...32, holders: 3, tails: 0.4, bombs: 2, dense: true)]
+        case 154: return [knot("hubs-sieve", holders: 3, tails: 0.6)]
+        case 155: return [freeKnot(rings: 26...32, holders: 3, tails: 0.5, gate: true, bombs: 1, dense: true)]
+        case 156: return [knot("hubs-tall", holders: 3, bars: 6, tails: 0.4, bombs: 1)]
+        case 157: return [freeKnot(rings: 18...22, holders: 3, tails: 0.4)]
+        case 158: return [knot("hubs-final", holders: 3, uBars: 2)]
+        case 159: return [freeKnot(rings: 18...24, holders: 3, tails: 0.4, pokes: 3, giant: 176, dense: true)]
+        case 160: return [knot("hubs-field", holders: 3, tails: 0.4, bombs: 2)]
+        case 161: return [freeKnot(rings: 26...32, holders: 3, tails: 0.4, dense: true)]
+        case 162: return [knot("hubs-diamond", holders: 3, bars: 2, uBars: 1)]
+        case 163: return [freeKnot(rings: 26...32, holders: 3, tails: 0.5, gate: true, bombs: 1, dense: true)]
+        case 164: return [hubWeb("hubs-riddle", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
+        case 165: return [knot("hubs-tall", holders: 3, tails: 0.4, bombs: 1)]
+        case 166: return [freeKnot(rings: 26...32, holders: 3, tails: 0.4, dense: true)]
+        case 167: return [hubWeb("hubs-final", clips: 3...4, holders: 3, bars: 2, tails: 0.85)]
+        case 168: return [maze(cols: 11, rows: 20, bars: 26, freeLimit: 3)]
+        case 169: return [knot("hubs-field", holders: 3, bars: 4, tails: 0.4, bombs: 1)]
+        case 170: return [hubWeb("hubs-lace", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
+        case 171: return [knot("hubs-gaps", holders: 3, tails: 0.6)]
+        case 172: return [freeKnot(rings: 26...32, holders: 3, tails: 0.5, gate: true, pokes: 2, dense: true)]
+        case 173: return [knot("hubs-tall", holders: 3, bars: 6, bombs: 1)]
+        case 174: return [hubWeb("hubs-sieve", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
+        case 175: return [knot("hubs-weave", holders: 3, tails: 0.4)]
+        case 176: return [knot("hubs-field", holders: 3, bombs: 2)]
+        case 177: return [hubWeb("hubs-final", clips: 3...4, holders: 3, bars: 2, tails: 0.85)]
+        case 178: return [cages(across: 3, down: 4, count: 6, border: 0, bars: 16, freeLimit: 3)]
+        case 179: return [knot("hubs-diamond", holders: 3, tails: 0.4)]
+        case 180: return [hubWeb("hubs-tall", clips: 3...4, holders: 3, tails: 0.85)]
+        case 181: return [knot("hubs-sieve", holders: 3, bars: 2, tails: 0.4)]
+        case 182: return [hubWeb("hubs-riddle", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
+        case 183: return [knot("hubs-field", holders: 3, tails: 0.4, bombs: 2)]
+        case 184: return [freeKnot(rings: 26...32, holders: 3, tails: 0.4, dense: true)]
+        case 185: return [knot("hubs-gaps", holders: 3, bars: 2, tails: 0.4)]
+        case 186: return [maze(cols: 11, rows: 20, bars: 26, freeLimit: 3)]
+        case 187: return [knot("hubs-weave", holders: 3, tails: 0.4)]
+        case 188: return [hubWeb("hubs-ports", clips: 3...4, holders: 3, bars: 2, tails: 0.85)]
+        case 189: return [knot("hubs-gaps", holders: 3, bars: 2, tails: 0.4)]
+        case 190: return [freeKnot(rings: 18...24, holders: 3, tails: 0.4, pokes: 3, giant: 176, dense: true)]
+        case 191: return [knot("hubs-tall", holders: 3, tails: 0.4, bombs: 1)]
+        case 192: return [hubWeb("hubs-lace", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
+        case 193: return [knot("hubs-sieve", holders: 3, bars: 2, tails: 0.4)]
+        case 194: return [cages(across: 3, down: 4, count: 6, border: 0, bars: 16, freeLimit: 3)]
+        case 195: return [knot("hubs-tall", holders: 3, tails: 0.4, bombs: 1)]
+        case 196: return [hubWeb("hubs-diamond", clips: 3...4, holders: 3, tails: 0.85)]
+        case 197: return [knot("hubs-gaps", holders: 3, bars: 2, tails: 0.4)]
+        case 198: return [hubWeb("hubs-lace", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
+        case 199: return [knot("hubs-final", holders: 3, tails: 0.4)]
+        case 200: return [hubWeb("hubs-tall", clips: 3...4, holders: 3, tails: 0.85)]
         default: return [knot("hubs-nine", holders: 2)]
         }
     }

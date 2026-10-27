@@ -73,11 +73,11 @@ struct Motif {
     /// origin (where its featured piece sits) goes to `center.x`, unless that would push the motif
     /// past the board margins, in which case it is shifted just enough to fit; `anchored: false`
     /// centres the bounds horizontally instead.
-    func placed(at center: Point, anchored: Bool = true) -> [DraftPiece] {
+    func placed(at center: Point, anchored: Bool = true, board: BoardSize = .standard) -> [DraftPiece] {
         let b = bounds
         var dx = anchored ? center.x : center.x - (b.minX + b.maxX) / 2
         if anchored {
-            let minX = ForgeRules.margin, maxX = ForgeRules.boardWidth - ForgeRules.margin
+            let minX = ForgeRules.margin, maxX = board.width - ForgeRules.margin
             if b.minX + dx < minX { dx = minX - b.minX }
             if b.maxX + dx > maxX { dx = maxX - b.maxX }
         }
