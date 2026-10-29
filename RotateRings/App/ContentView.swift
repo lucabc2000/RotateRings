@@ -7,8 +7,8 @@ import SwiftUI
 import SpriteKit
 import StoreKit
 
-/// Where the feedback button sends mail.
-private enum Feedback {
+/// Where the feedback buttons (end screen and settings) send mail.
+enum Feedback {
     static let address = "hello@lumisoftware.io"
 
     /// A `mailto:` link with the app's name in the subject.
@@ -115,6 +115,8 @@ struct ContentView: View {
             }, onPlayLevel: { number in
                 model.loadLevel(number)
                 isShowingBrowser = false
+            }, onSwitchSet: { bundle in
+                model.switchLevels(to: bundle)
             })
         }
         #endif

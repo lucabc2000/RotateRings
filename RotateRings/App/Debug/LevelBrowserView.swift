@@ -3,7 +3,8 @@
 //  RotateRings
 //
 //  Debug only. Lists every generated level with its solver metrics, opens a detail page with the
-//  runner-ups, and exports the reviewer's swaps for the generator.
+//  runner-ups, and exports the reviewer's swaps for the generator. Plays the shipped levels or
+//  another level set (`LevelSets`).
 //
 
 #if DEBUG
@@ -16,12 +17,15 @@ struct LevelBrowserView: View {
     let onPlay: (LevelFile, String) -> Void
     /// Moves the campaign to this level number, so completing it continues with the next.
     let onPlayLevel: (Int) -> Void
+    /// Plays the levels of another set from now on.
+    let onSwitchSet: (Bundle) -> Void
 
     @Environment(\.dismiss) private var dismiss
     @State private var report: LevelReport?
     @State private var candidates: CandidateStore?
     @State private var loadError: String?
     @State private var showExported = false
+    @State private var setName = LevelSets.current
     private var swaps = LevelSwaps.shared
 
     var body: some View {
@@ -51,11 +55,22 @@ struct LevelBrowserView: View {
                 }
             }
             .background(Color(uiColor: Palette.backgroundBottom).ignoresSafeArea())
-            .navigationTitle("Level Browser")
+            .navigationTitle(setName ?? "Level Browser")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Close") { dismiss() }
+                }
+                ToolbarItem(placement: .primaryAction) {
+                    Menu {
+                        Picker("Level set", selection: $setName) {
+                            Text("Shipped levels").tag(String?.none)
+                            ForEach(LevelSets.names, id: \.self) { Text($0).tag(Optional($0)) }
+                        }
+                        .pickerStyle(.menu)
+                    } label: {
+                        Label("Level set", systemImage: "square.stack.3d.up")
+                    }
                 }
                 ToolbarItem(placement: .primaryAction) {
                     Menu {
@@ -75,12 +90,20 @@ struct LevelBrowserView: View {
         }
         .preferredColorScheme(.dark)
         .task { load() }
+        .onChange(of: setName) {
+            LevelSets.current = setName
+            swaps.reload()
+            onSwitchSet(.levels)
+            load()
+        }
     }
 
     private func load() {
+        report = nil
+        loadError = nil
         do {
-            report = try LevelLoader.loadReport(in: .main)
-            candidates = try? LevelLoader.loadCandidates(in: .main)
+            report = try LevelLoader.loadReport(in: .levels)
+            candidates = try? LevelLoader.loadCandidates(in: .levels)
         } catch {
             loadError = "No generation report in the bundle. Run LevelForge generate first.\n\(error.localizedDescription)"
         }
@@ -109,7 +132,8 @@ private struct LevelRow: View {
                 Text(level.name)
                     .font(.body.weight(.semibold))
                     .foregroundStyle(Color(uiColor: Palette.textPrimary))
-                Text("\(level.chosen.template) · \(level.chosen.pieceCount) pieces" + (swapped ? " · swapped" : "") + (level.pinned ? " · pinned" : ""))
+                Text("\(level.chosen.template) · \(level.chosen.pieceCount) pieces" + (swapped ? " · swapped" : "") + (level.pinned ? " · pinned" : "")
+                     + (level.outOfBand == true ? " · out of band" : ""))
                     .font(.caption)
                     .foregroundStyle(Color(uiColor: Palette.textSecondary))
             }
@@ -128,12 +152,22 @@ private struct LevelRow: View {
 }
 
 #Preview("Browser") {
-    LevelBrowserView(onPlay: { _, _ in }, onPlayLevel: { _ in })
+    LevelBrowserView(onPlay: { _, _ in }, onPlayLevel: { _ in }, onSwitchSet: { _ in })
 }
 
 enum DifficultyText {
+    /// The quality difficulty with the tier when the report has them (the scale of the curve
+    /// targets), otherwise the legacy score.
     static func score(_ candidate: LevelReport.Candidate) -> String {
-        (candidate.metrics.isEstimate ? "≈" : "") + String(format: "%.0f", candidate.difficulty)
+        if let quality = candidate.quality {
+            return String(format: "%.0f", quality.difficulty) + " · " + tier(quality)
+        }
+        return (candidate.metrics.isEstimate ? "≈" : "") + String(format: "%.0f", candidate.difficulty)
+    }
+
+    /// "t2", or "unplanned" when no bot plans the level.
+    static func tier(_ quality: LevelQuality) -> String {
+        quality.unplanned ? "unplanned" : "t\(quality.tier)"
     }
 
     static func summary(_ metrics: SolverMetrics) -> String {

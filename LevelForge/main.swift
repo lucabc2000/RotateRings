@@ -11,7 +11,7 @@
 //    report [--dir DIR] [--levels 101-200]   Print the level table from RotateRings/Levels/levels-report.json (or
 //                                          DIR's), with the quality measurements when the report has them.
 //    generate [--levels 1-50] [--seed N] [--candidates N] [--state-cap N] [--jobs N] [--out DIR]
-//             [--no-quality] [--trap-rate]
+//             [--no-quality] [--trap-rate] [--selection FILE] [--milestone-finalists N] [--max-candidates N]
 //                                          Generate levels into RotateRings/Levels (honouring level-selection.json),
 //                                          or into DIR with --out, leaving the shipped files alone.
 //                                          With --keep-seeds the levels are rebuilt from the seeds in the shipped
@@ -30,9 +30,13 @@
 //                                          Contact sheets, one PNG per block of ten levels (default out
 //                                          LevelForge/sheets, git-ignored), from the shipped levels or DIR; with
 //                                          --candidates a row per level with its runner-ups.
-//    designs [--seeds 8] [--only TEXT] [--missing] [--retry-below N] [--out FILE]
+//    designs [--seeds 8] [--only TEXT] [--regex RE] [--missing] [--retry-below N] [--out FILE] [--sheet PNG]
 //                                          Measure every design of Compositions.catalogue over a few seeds (bots
-//                                          included) into LevelForge/design-quality.json for the planners.
+//                                          included) into LevelForge/design-quality.json for the planners; with
+//                                          --sheet also a contact sheet, one row of boards per design.
+//    pictures [--seeds 6] [--locks N] [--locks-for a,b] [--sheet PNG]
+//                                          The reward pictures (LevelForge/pictures.py): each as drawn, then
+//                                          boards built on it for a few seeds at its milestone level, measured.
 //    compose <template>... [--count N] [--out DIR] [--no-solve]
 //                                          Build curve designs by template id for a few seeds, solve them and
 //                                          write them to DIR (default /tmp) for a look. No id lists the ids.
@@ -193,6 +197,8 @@ func generateCommand(_ arguments: Arguments) throws {
     if let jobs = arguments.int("jobs") { config.jobs = max(1, jobs) }
     if arguments.options["no-quality"] != nil { config.quality = nil }
     if arguments.options["trap-rate"] != nil { config.quality?.measureTraps = true }
+    if let count = arguments.int("milestone-finalists") { config.quality?.peaks?.milestoneFinalists = count }
+    if let count = arguments.int("max-candidates") { config.maxCandidates = count }
     // Each design's usual tier, for predicting difficulty before the bots play (`LevelGenerator.score`).
     struct DesignTiers: Decodable { var template: String; var tiers: [Int] }
     if let data = try? Data(contentsOf: repoRoot.appendingPathComponent("LevelForge/design-quality.json")),
@@ -213,7 +219,9 @@ func generateCommand(_ arguments: Arguments) throws {
     let outDirectory = arguments.options["out"].map { URL(fileURLWithPath: $0, isDirectory: true) } ?? levelsDirectory
     try FileManager.default.createDirectory(at: outDirectory, withIntermediateDirectories: true)
 
-    let selectionURL = sideFileURL(LevelResources.selection)
+    // --selection FILE: pins from another file than RotateRings/Levels/level-selection.json, e.g. one
+    // kept next to a set that is not written into the app yet.
+    let selectionURL = arguments.options["selection"].map { URL(fileURLWithPath: $0) } ?? sideFileURL(LevelResources.selection)
     if FileManager.default.fileExists(atPath: selectionURL.path) {
         let selection = try read(LevelSelection.self, from: selectionURL)
         for (key, pin) in selection.pins {
@@ -501,7 +509,9 @@ func renderCommand(_ arguments: Arguments) throws {
     }
 
     let levels = arguments.levelRange("levels", default: 11...LevelGenerator.levelCount)
-    let blocks = Dictionary(grouping: levels) { ($0 - 1) / 10 }
+    // `--sheet NAME`: every level on one sheet, NAME.png, instead of a sheet per block of ten.
+    let single = arguments.options["sheet"]
+    let blocks = Dictionary(grouping: levels) { single == nil ? ($0 - 1) / 10 : 0 }
     for block in blocks.keys.sorted() {
         var rows: [[ContactSheet.Cell]] = []
         var cells: [ContactSheet.Cell] = []
@@ -525,8 +535,9 @@ func renderCommand(_ arguments: Arguments) throws {
         }
         guard !rows.isEmpty else { continue }
         let first = block * 10 + 1
-        let name = String(format: "sheet-%03d-%03d%@.png", first, first + 9, withCandidates ? "-candidates" : "")
-        try ContactSheet.write(rows: rows, title: "Levels \(first)–\(first + 9)  (\(directory.lastPathComponent))", to: out.appendingPathComponent(name))
+        let name = single.map { "\($0).png" } ?? String(format: "sheet-%03d-%03d%@.png", first, first + 9, withCandidates ? "-candidates" : "")
+        let title = single == nil ? "Levels \(first)–\(first + 9)" : "Levels " + blocks[block]!.sorted().map(String.init).joined(separator: ", ")
+        try ContactSheet.write(rows: rows, title: "\(title)  (\(directory.lastPathComponent))", to: out.appendingPathComponent(name))
         print("wrote \(out.appendingPathComponent(name).path)")
     }
 }
@@ -540,6 +551,9 @@ func designsCommand(_ arguments: Arguments) throws {
         var look: Look
         var locks: Int
         var seeds: Int
+        /// Seeds that gave a draft at all (nil in older measurements); the rest of the seeds that
+        /// did not end valid failed later: invalid, unsolvable, or not replaying.
+        var drafted: Int?
         var valid: Int
         var legacy: Double
         var difficulty: Double
@@ -556,14 +570,19 @@ func designsCommand(_ arguments: Arguments) throws {
     let master = arguments.uint64("seed") ?? 20_261_028
     let level = arguments.int("level") ?? 150
     var designs = Compositions.catalogue
+    if arguments.options["verbose"] != nil {
+        LevelTemplate.debug = { print("    \($0)") }
+    }
     if let only = arguments.options["only"] { designs = designs.filter { $0.expr.contains(only) } }
+    if let pattern = arguments.options["regex"] { designs = designs.filter { $0.expr.range(of: pattern, options: .regularExpression) != nil } }
     if arguments.options["missing"] != nil { designs = designs.filter { existing[$0.expr] == nil } }
     // Designs whose seeds are often unsolvable need more of them for a fair average.
     if let below = arguments.int("retry-below") { designs = designs.filter { (existing[$0.expr]?.valid ?? 0) < below } }
     print("measuring \(designs.count) design(s), \(seeds) seed(s) each")
     let jobs = designs.count * seeds
-    struct Sample { var legacy: Double; var quality: LevelQuality; var pieces: Int; var seconds: Double }
+    struct Sample { var legacy: Double; var quality: LevelQuality; var pieces: Int; var seconds: Double; var file: LevelFile }
     var samples = [Sample?](repeating: nil, count: jobs)
+    var drafted = [Bool](repeating: false, count: jobs)
     let lock = NSLock()
     DispatchQueue.concurrentPerform(iterations: jobs) { j in
         let design = designs[j / seeds]
@@ -574,6 +593,9 @@ func designsCommand(_ arguments: Arguments) throws {
         let seed = seedRNG.next() | 1
         var draftRNG = SplitMix64(seed: seed)
         guard var draft = design.template.build(level, &draftRNG) else { return }
+        lock.lock()
+        drafted[j] = true
+        lock.unlock()
         draft.assignColors(rng: &draftRNG)
         guard let board = try? draft.validate(number: level) else { return }
         let solver = LevelSolver(board: board)
@@ -587,29 +609,156 @@ func designsCommand(_ arguments: Arguments) throws {
         let legacy = DifficultyScore.score(metrics: result.metrics, pieceCount: file.pieces.count, distinctKinds: PieceKind.kinds(in: file).count)
         let quality = QualityMeasure.measure(board: board, solution: solution, minMoves: result.metrics.minMoves, seed: seed,
                                              config: QualityConfig(), solverConfig: SolverConfig())
-        let sample = Sample(legacy: legacy, quality: quality, pieces: file.pieces.count, seconds: Date().timeIntervalSince(started))
+        let sample = Sample(legacy: legacy, quality: quality, pieces: file.pieces.count, seconds: Date().timeIntervalSince(started), file: file)
         lock.lock()
         samples[j] = sample
         lock.unlock()
     }
     func mean(_ values: [Double]) -> Double { values.isEmpty ? 0 : (values.reduce(0, +) / Double(values.count) * 10).rounded() / 10 }
+    var sheetRows: [[ContactSheet.Cell]] = []
     for (d, design) in designs.enumerated() {
         let valid = samples[(d * seeds)..<((d + 1) * seeds)].compactMap { $0 }
+        let draftCount = drafted[(d * seeds)..<((d + 1) * seeds)].filter { $0 }.count
+        if !valid.isEmpty {
+            sheetRows.append(valid.prefix(ContactSheet.columns).enumerated().map { index, sample in
+                let q = sample.quality
+                return ContactSheet.Cell(file: sample.file, caption: [
+                    index == 0 ? String(design.expr.prefix(40)) : "",
+                    index == 0 ? "\(Look.of(template: design.template.id).rawValue) · drafted \(draftCount)/\(seeds) · valid \(valid.count)/\(seeds)" : "",
+                    String(format: "diff %.0f  int %.2f  T%d%@  %d pieces", q.difficulty, q.interest, q.tier, q.unplanned ? "u" : "", sample.pieces),
+                ])
+            })
+        }
         let tiers = (0...3).map { t in valid.filter { $0.quality.tier == t }.count }
         existing[design.expr] = Summary(template: design.template.id, look: Look.of(template: design.template.id), locks: design.locks,
-                                        seeds: seeds, valid: valid.count, legacy: mean(valid.map(\.legacy)),
+                                        seeds: seeds, drafted: draftCount, valid: valid.count, legacy: mean(valid.map(\.legacy)),
                                         difficulty: mean(valid.map(\.quality.difficulty)),
                                         interest: (mean(valid.map { $0.quality.interest * 100 }) / 100),
                                         tiers: tiers, unplannedShare: valid.isEmpty ? 0 : Double(valid.filter(\.quality.unplanned).count) / Double(valid.count),
                                         pieces: mean(valid.map { Double($0.pieces) }), seconds: mean(valid.map(\.seconds)))
         let s = existing[design.expr]!
-        print(String(format: "%-90@ %d/%d  diff %5.1f  int %.2f  tiers %@  legacy %.0f", design.expr, s.valid, seeds, s.difficulty, s.interest,
-                     tiers.map(String.init).joined(separator: "/"), s.legacy))
+        print(String(format: "%-90@ drafted %d valid %d/%d  diff %5.1f  int %.2f  tiers %@  legacy %.0f", design.expr, draftCount, s.valid, seeds,
+                     s.difficulty, s.interest, tiers.map(String.init).joined(separator: "/"), s.legacy))
+    }
+    // --sheet FILE: the first valid boards of each design, one row per design.
+    if let sheet = arguments.options["sheet"], !sheetRows.isEmpty {
+        let sheetURL = URL(fileURLWithPath: sheet)
+        try FileManager.default.createDirectory(at: sheetURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try ContactSheet.write(rows: sheetRows, title: "Designs" + (arguments.options["only"].map { " matching \($0)" } ?? ""), to: sheetURL)
+        print("wrote \(sheetURL.path)")
     }
     let encoder = JSONEncoder()
     encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
     try encoder.encode(existing).write(to: url)
     print("wrote \(url.path)")
+}
+
+/// The milestone pictures (`PictureLibrary`, LEVEL-DESIGN.md §15): one row per picture, first as
+/// drawn (every ring closed, nothing clipped), then the boards a few seeds build on it at the
+/// picture's milestone level, with how they measure against that level's target. Pictures that
+/// give no board are reported, never dropped.
+func picturesCommand(_ arguments: Arguments) throws {
+    let seeds = arguments.int("seeds") ?? 6
+    let sheet = URL(fileURLWithPath: arguments.options["sheet"] ?? repoRoot.appendingPathComponent("LevelForge/sheets/step6/pictures.png").path)
+    if arguments.options["verbose"] != nil { LevelTemplate.debug = { print("    \($0)") } }
+    // Every picture: those with a slot at their level, the others at level 100.
+    let slotted = PictureLibrary.milestones.sorted { $0.key < $1.key }
+    let milestones = slotted + PictureLibrary.all.keys.sorted().filter { name in !slotted.contains { $0.value == name } }.map { (100, $0) }
+    let locks = arguments.int("locks") ?? 0
+    // --locks-for a,b,c: one lock on those pictures only (as their reward levels use them).
+    let lockedPictures = Set((arguments.options["locks-for"] ?? "").split(separator: ",").map(String.init))
+    struct Built { var file: LevelFile; var quality: LevelQuality?; var failure: String? }
+    var built = [Built?](repeating: nil, count: milestones.count * seeds)
+    let lock = NSLock()
+    DispatchQueue.concurrentPerform(iterations: built.count) { j in
+        let (level, name) = milestones[j / seeds]
+        let template = Compositions.picture(name, locks: lockedPictures.contains(name) ? 1 : locks)
+        var rng = SplitMix64(seed: LevelGenerator.candidateSeed(master: 20_261_029, level: level, index: j % seeds))
+        var result: Built?
+        if var draft = template.build(level, &rng) {
+            draft.assignColors(rng: &rng)
+            let file = draft.levelFile(number: level)
+            if let board = try? draft.validate(number: level) {
+                let solver = LevelSolver(board: board)
+                let solved = solver.solve()
+                var replay = board
+                if let solution = solved.solution, replay.replay(solution) {
+                    let quality = QualityMeasure.measure(board: board, solution: solution, minMoves: solved.metrics.minMoves, seed: rng.next(),
+                                                         config: QualityConfig(), solverConfig: SolverConfig())
+                    result = Built(file: file, quality: quality)
+                } else {
+                    result = Built(file: file, failure: solved.solution == nil ? "unsolvable" : "replay fails")
+                }
+            } else {
+                result = Built(file: file, failure: "invalid")
+            }
+        }
+        lock.lock()
+        built[j] = result
+        lock.unlock()
+    }
+    var rows: [[ContactSheet.Cell]] = []
+    for (m, (level, name)) in milestones.enumerated() {
+        let picture = PictureLibrary.all[name]!
+        let board = picture.boardSize
+        var drawn = LevelDraft(name: picture.title, template: "picture", board: board)
+        for (i, ring) in picture.rings.enumerated() {
+            var piece = DraftPiece.closedRing("p\(i)", at: Point(ring.x, ring.y) + board.center, radius: ring.r)
+            piece.color = ring.color
+            drawn.pieces.append(piece)
+        }
+        // The bars as lines, roughly where the builder puts them.
+        for (i, bar) in (picture.bars ?? []).enumerated() {
+            let dir = Point(cos(bar.degrees * .pi / 180), sin(bar.degrees * .pi / 180))
+            func center(_ index: Int) -> Point { Point(picture.rings[index].x, picture.rings[index].y) + board.center }
+            var piece: DraftPiece
+            if let pair = bar.rings, pair.count == 2 {
+                let a = picture.rings[pair[0]], b = picture.rings[pair[1]]
+                let reach = max(a.r, b.r) + 26, start = min(a.r, b.r) - 10
+                piece = .uBar("b\(i)", at: (center(pair[0]) + center(pair[1])) * 0.5 + dir * reach, width: center(pair[0]).distance(to: center(pair[1])),
+                              from: -(reach - start), to: bar.length ?? 40, angleDegrees: bar.degrees)
+            } else if let index = bar.ring {
+                let start = picture.rings[index].r - 10
+                let end = bar.stop.map { center(index).distance(to: center($0)) - picture.rings[$0].r - 43 } ?? start + (bar.length ?? 60)
+                piece = .slideBar("b\(i)", at: center(index) + dir * start, from: 0, to: end - start, angleDegrees: bar.degrees)
+            } else { continue }
+            piece.color = bar.color
+            drawn.pieces.append(piece)
+        }
+        drawn.keepColors = true
+        var colorRNG = SplitMix64(seed: 1)
+        drawn.assignColors(rng: &colorRNG)
+        let target = DifficultyCurve.target(level: level)
+        var row = [ContactSheet.Cell(file: drawn.levelFile(number: level), caption: [
+            "\(level)  \(picture.title)", "as drawn: \(picture.rings.count) rings, \((picture.bars ?? []).count) bar(s)",
+            target.map { String(format: "level target %.0f", $0) } ?? ""])]
+        let results = built[(m * seeds)..<((m + 1) * seeds)]
+        let good = results.compactMap { $0 }.filter { $0.failure == nil }
+        var failures: [String: Int] = [:]
+        for result in results { failures[result?.failure ?? (result == nil ? "no draft" : "ok"), default: 0] += 1 }
+        failures["ok"] = nil
+        for result in good.prefix(ContactSheet.columns - 1) {
+            let q = result.quality!
+            row.append(ContactSheet.Cell(file: result.file, caption: ["", "\(result.file.pieces.count) pieces",
+                String(format: "diff %.0f  int %.2f  T%d%@", q.difficulty, q.interest, q.tier, q.unplanned ? "u" : "")]))
+        }
+        rows.append(row)
+        let diffs = good.compactMap { $0.quality?.difficulty }
+        let interests = good.compactMap { $0.quality?.interest }
+        print(String(format: "%3d %-16@ rings %2d  valid %d/%d  diff %@  interest %@  target %@  %@", level, picture.title, picture.rings.count, good.count, seeds,
+                     diffs.isEmpty ? "-" : String(format: "%.0f–%.0f", diffs.min()!, diffs.max()!),
+                     interests.isEmpty ? "-" : String(format: "%.2f (best %.2f)", interests.reduce(0, +) / Double(interests.count), interests.max()!),
+                     target.map { String(format: "%.0f", $0) } ?? "-", failures.map { "\($0.key) \($0.value)" }.sorted().joined(separator: ", ")))
+    }
+    try FileManager.default.createDirectory(at: sheet.deletingLastPathComponent(), withIntermediateDirectories: true)
+    try ContactSheet.write(rows: rows, title: "Milestone pictures: as drawn, then built", to: sheet)
+    print("wrote \(sheet.path)")
+    // The pictures alone, five to a row, to judge them as pictures.
+    let drawn = rows.map { $0[0] }
+    let drawnURL = sheet.deletingPathExtension().appendingPathExtension("drawn.png")
+    try ContactSheet.write(rows: stride(from: 0, to: drawn.count, by: ContactSheet.columns).map { Array(drawn[$0..<min($0 + ContactSheet.columns, drawn.count)]) },
+                           title: "Milestone pictures as drawn", to: drawnURL)
+    print("wrote \(drawnURL.path)")
 }
 
 /// Plays a level file greedily and, when that gets stuck, says what blocks each remaining piece.
@@ -666,6 +815,7 @@ do {
     case "bots": try botsCommand(arguments)
     case "render": try renderCommand(arguments)
     case "designs": try designsCommand(arguments)
+    case "pictures": try picturesCommand(arguments)
     default:
         print("usage: LevelForge solve <level.json>... | report | generate [--levels 1-50] [--seed N] [--candidates N] [--state-cap N] [--jobs N] [--out DIR] | compose <template>... [--count N] [--out DIR]")
     }

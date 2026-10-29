@@ -111,9 +111,9 @@ struct SolverTests {
 
     /// Every drag the solver offers must be one the real board accepts, landing exactly where the
     /// solver says. Walks real boards, never rebuilt from solver states, breadth first on levels with
-    /// sliding bars, where a push stops at whatever spot the board's sampling finds. These levels had
-    /// the most refused drags when the solver kept bar offsets in half units.
-    @Test(arguments: [6, 16, 27, 48, 66, 93, 104, 178])
+    /// sliding bars, where a push stops at whatever spot the board's sampling finds. Levels with
+    /// sliding bars; 29, 83 and 149 have the most of them (19–22).
+    @Test(arguments: [6, 16, 29, 66, 83, 93, 149, 178])
     func solverMovesAreAcceptedByTheBoard(number: Int) throws {
         var start = try LevelLoader.load(level: number, in: appBundle).makeBoard()
         start.removeUnconnectedPieces()

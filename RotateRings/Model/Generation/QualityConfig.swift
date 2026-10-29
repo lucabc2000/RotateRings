@@ -42,6 +42,20 @@ struct QualityConfig: Codable, Equatable, Sendable {
     /// are within the band (or the budget runs out); the winner's rivals become the runner-ups.
     var finalists = 4
 
+    /// Peaks that want a board only the 2-deep bot plans, and milestone levels
+    /// (`DifficultyCurve.peaks`, `DifficultyCurve.milestones`).
+    struct Peaks: Codable, Equatable, Sendable {
+        /// Tier a peak's board should reach, planned (not `unplanned`). Finalists that reach it win
+        /// over those that do not, in or out of the band.
+        var tier = 2
+        /// Candidates measured on top of the finalists at a peak where none of them reaches `tier`.
+        var extraFinalists = 4
+        /// Candidates measured at a milestone; all of them stay as runner-ups for the owner to pick.
+        var milestoneFinalists = 8
+    }
+    /// Optional so that reports written before it existed still read; nil means the defaults.
+    var peaks: Peaks? = Peaks()
+
     // MARK: Scores
 
     /// interest = insightWeight · insightGap + opennessWeight · (1 − forcedShare) + trapWeight · trapRate

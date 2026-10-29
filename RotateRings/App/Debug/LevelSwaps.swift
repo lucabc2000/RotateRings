@@ -3,7 +3,8 @@
 //  RotateRings
 //
 //  Debug only. Remembers which runner-up the reviewer wants for a level, plays it in place of the
-//  generated level, and exports the choice as `level-selection.json` for the generator.
+//  generated level, and exports the choice as `level-selection.json` for the generator. Each level
+//  set (`LevelSets`) keeps its own swaps.
 //
 
 #if DEBUG
@@ -14,14 +15,25 @@ import Observation
 @Observable
 final class LevelSwaps {
     static let shared = LevelSwaps()
-    private static let key = "levelSwaps"
+    private static var key: String {
+        LevelSets.current.map { "levelSwaps.\($0)" } ?? "levelSwaps"
+    }
 
     /// Level number → candidate id.
     private(set) var swaps: [Int: String]
 
     private init() {
-        let raw = UserDefaults.standard.dictionary(forKey: Self.key) as? [String: String] ?? [:]
-        swaps = Dictionary(uniqueKeysWithValues: raw.compactMap { key, value in Int(key).map { ($0, value) } })
+        swaps = Self.stored()
+    }
+
+    /// Picks up the swaps of the level set now in use.
+    func reload() {
+        swaps = Self.stored()
+    }
+
+    private static func stored() -> [Int: String] {
+        let raw = UserDefaults.standard.dictionary(forKey: key) as? [String: String] ?? [:]
+        return Dictionary(uniqueKeysWithValues: raw.compactMap { key, value in Int(key).map { ($0, value) } })
     }
 
     func candidateID(for level: Int) -> String? {

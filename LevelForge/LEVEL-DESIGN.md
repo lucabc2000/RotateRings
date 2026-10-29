@@ -976,3 +976,244 @@ kept their design and were rebuilt from their seeds, 181 were generated afresh).
 - **Locks**: 21 levels, the introduction at level 30 (one lock on the 3×3 knot, interest 0.88).
 - **Difficulty is lower than before on every chapter**, because the targets now follow what the
   boards measure rather than the legacy score; it still climbs chapter by chapter.
+
+### Tier-2 peaks and milestones
+
+The low peaks of Step 1 came from webs being either tier 1 (32–38) or tier 2 (50 and up): the
+finalists, picked by predicted difficulty, were often all of the lighter kind, and where a tier-2
+board was among them it lost to a tier-1 board a few points closer to the target. Three rules, all
+settings in `QualityConfig.Peaks`:
+
+- **Planner** (`planlib.TIER2`, `TIER2_FROM`): a peak with a target of 38 or more gets a design whose
+  boards are usually tier 2 — Heart, Grand, Column or Ports with 3–4 clips, or Arch with 2–3. Lower
+  peaks keep the other designs (a tier-2 board measures 40 and up). Those designs are grid fields
+  and outlined webs, so the level before such a peak may not use the second of those two families
+  in a row, or the peak would have neither left. The planner writes these peaks into
+  `DifficultyCurve.peaks`.
+- **Generator**: at those peaks, finalists that are tier 2 and planned win over the others, in or
+  out of the band; when none of the four is, four more are measured.
+- **Milestones** 50, 100, 150 and 200 (`DifficultyCurve.milestones`) measure eight finalists and keep
+  all of them as runner-ups, for the owner to pick in the Level Browser.
+
+The 2–3-clip and 3–4-clip versions of a web used to share one template id, so the generator averaged
+their usual tier; ids now carry the clip range (`hubs-heart-c34-tails`).
+
+Re-planned (targets unchanged; 66 levels changed design, no spacing violations) and regenerated into
+`LevelForge/sets/peaks` from a copy of the Step 1 set: the 89 levels whose design or target changed,
+every tier-2 peak, the milestones and every web (79 minutes); the other 101 levels are identical to
+Step 1 by construction. Sheets in `LevelForge/sheets/peaks/`, the milestones with all candidates in
+`sheet-*-candidates.png`.
+
+| | Step 1 | peaks |
+|---|---|---|
+| tier-2 peaks reaching tier 2 | 13 of 28 | 26 of 28 (131 and 169, Arch 2–3, stayed tier 1) |
+| out of band | 43 | 47 (the new ones are tier-2 boards 6–11 above their peak's target) |
+| difficulty, mean 11–100 / 101–150 / 151–200 | 22.4 / 31.3 / 32.9 | 22.8 / 33.3 / 35.2 |
+| interest, mean | 0.54 / 0.63 / 0.69 | 0.54 / 0.58 / 0.64 |
+| unplanned levels | 0 | 1 (162, a knot off-peak) |
+
+Tier-2 boards are less interesting by the measure (0.46–0.97 at the peaks, against about 0.95 for
+the tier-1 webs they replaced): the insight gap is smaller when the 1-deep bot already plans part of
+the board.
+
+### Level sets: playing a generated set without touching the shipped files
+
+`LevelForge/install-set.sh DIR [NAME] [--device NAME]` copies a `generate --out` folder into a debug
+build's Documents/LevelSets (levels the set lacks come from the shipped files). The Level Browser's
+level-set menu switches between the shipped levels and the installed sets (`LevelSets`,
+`Bundle.levels`); runner-up swaps are kept per set, so "Copy level-selection.json" gives the pins of
+the set on screen. Release builds read only the bundle. Sets live in `LevelForge/sets/`
+(git-ignored): `step1`, `step3-sample`, `peaks`.
+
+### Step 2: symmetry
+
+`mirror: true` on `knot(…)` and `freeKnot(…)` builds the board in mirror pairs about the vertical axis
+(`Knot.Options.mirror`, `FreeKnot.Options.mirror`); `mirrorColors` (on by default) gives a ring its
+image's colour where the two do not touch. Everything without `mirror` is drawn with the same random
+numbers as before: levels 56, 58 and 61 regenerate byte for byte.
+
+- **Knot**: the mask's left half is reflected onto the right; holes, U-bars, the ranking (images score
+  alike, the origin on the axis), links (a link and its image, or neither), closed rings, gaps, bars,
+  bombs and tails come in pairs. On the axis only what is its own image: a gap, tail or bomb straight
+  up or down, a bar along the axis. A ring linked to its own image is the one asymmetry left (the
+  clip sits on the axis, owned by one of them). Not with locks; on the diagonal lattice only for
+  masks of odd width.
+- **FreeKnot**: every ring is placed with its image and every link with its image's. The lattice must
+  map onto itself (turned by a multiple of 22.5°), but turned by 22.5° it has no vertical, so nothing
+  can sit on the axis and every board fell apart into two mirror halves (the same puzzle twice):
+  mirrored free-form knots use the unturned lattice, and a board whose rings do not all hang
+  together is thrown away. Spots are tried outwards until one fits with its image.
+- **RingNet** figures were already mirrored (all of them), but they are trees: tier 0, difficulty 5–13,
+  interest about 0.33, always valid. They suit dips and changes of scene, where the plan already uses
+  them (9 levels); they cannot carry harder levels.
+
+Failure rates, 8 seeds per design at level 150 (`forge designs`, which now records `drafted`):
+
+| | drafted | valid | difficulty | interest |
+|---|---|---|---|---|
+| 43 knot designs, plain | 95 % | 41 % | 24.3 | 0.44 |
+| the same, mirrored | 83 % | 37 % | 24.0 | 0.45 |
+| 12 free-form designs, plain | 47 % | 26 % | | |
+| the same, mirrored (final rules) | 20 % | 10 % | 10–39 | 0.33–0.45 |
+
+Mirrored knots cost little. Mirrored free-form knots are fragile — a third as many valid boards — so
+they need more seeds per level; the generator's 16-candidate budget usually finds one. Mirrored free
+knots count as `figure` in the look families, mirrored grid knots keep their grid family. Sheets:
+`sheets/step2/mirror-knots.png`, `free-knots.png`, `free-knots-mirror.png`.
+
+### Step 3: a shape for free-form boards
+
+`freeKnot(…, silhouette: "…")` grows the knot only inside an outline (`Silhouette`, data in
+`Silhouettes.swift`: circles, polygons and thick lines that add room, others that cut it away, in
+half board widths so a shape keeps its proportions). A ring must lie wholly inside; each new ring goes
+where the outline is emptiest (fewest rings within 110), so the knot fills it. Shapes: circle, donut,
+S curve, crescent, heart, diamond, arch; adding one is one entry in `Silhouette.all`.
+`anchors: 1 or 2` places large rings (radius 46–58) first, near the middle, and grows around them.
+
+8 seeds at level 150 (`sheets/step3/silhouettes.png`):
+
+- Valid often: circle (7/8), diamond (5–8/8, also mirrored), S curve and circle on the large board
+  (6–7/8), heart (2/8, mirrored 5/8), donut on the large board (5/8), one anchor without an outline
+  (5/8). Mostly failing: arch and crescent on the standard board (their bands are about one ring wide)
+  and two anchors in a symmetric outline.
+- All of them are **light**: difficulty 5–18, mostly tier 0 (a ring in an outline has fewer
+  neighbours, so fewer holders). They are scenes and dips, not peaks. They count as the family
+  `shaped`; mirrored free knots without an outline as `figure`.
+- Ring counts had to come down to what an outline holds: 7–12 on the standard board, 10–16 on the
+  large one, 6–10 mirrored.
+
+### Step 4: holes with intent
+
+`knot(…, holes: "…")` (`Knot.HolePattern`) picks the cells left empty for bars: `sieve` (a staggered
+lattice), `center`, `diagonal` stripes, `cross`, `checker` band, `frame`, `mirror` (pairs), `mask`
+(the mask's own `o` cells) and `random` (the old scatter, kept as an option). Every cell of the pattern
+stays empty, at most a quarter of the board, so the holes read as a shape; up to `bars` of them get a
+bar, the rest are plain holes. The default is `mask` on masks with their own holes (Sieve, Gaps,
+Riddle, Lace, Ports, Stronghold) and `sieve` elsewhere; designs without bars are drawn exactly as
+before. 27 new designs (every pattern on Field and Tall field, mirrored ones, three on the big
+rings): valid 2–8 of 8 seeds, about as often as the random holes; `center` gives the heaviest boards
+(28–36), `cross` and `diagonal` the lightest. Every knot design with bars was measured again, since
+its holes changed. Sheets: `sheets/step4/hole-patterns.png`, `knots-with-bars.png`.
+
+### Step 5: small levels
+
+`BoardSize.small` is 288 × 512, a fifth smaller each way: the app fits every board to the screen
+keeping its proportions (`GameScene.layoutCamera`), so a small board is drawn at 125 % and eight to
+twelve pieces fill the screen. `small: true` on `knot`, `hubWeb` and `freeKnot` uses it, with three
+small masks (Little nine, Little twelve, Little gem). The family is `small`.
+
+The planners put a small board on the level right after a peak, every 8 to 12 levels from level 15
+(`planlib.SMALL_FROM`, `SMALL_EVERY`), choosing the most interesting small design with 8–12 pieces;
+small designs appear nowhere else. The generator lets interest decide on those levels
+(`DifficultyCurve.breathers`): every finalist competes, in or out of the band.
+
+8 seeds each (`sheets/step5/small.png`): the small webs are the best breathers — 8/8 valid,
+interest 0.73, difficulty 25–27, nine or twelve pieces; the small knots are valid 6–8/8 but plain
+(interest 0.24–0.42, difficulty 4–23); small free knots 2–5/8; a small heart and a small anchored
+circle never fit.
+
+### The plan with Steps 2–5 (dry run)
+
+The three planners run with every new design measured (`plan-curve.py 7`, `plan-chapter.py 101 30`,
+`plan-chapter.py 151 31`) give: 6–8 families per block of ten (was 5–8), no family twice within three
+levels, 14 small breathers (15, 27, 38, 49, 63, 76, 88, 106, 132, 143, 154, 164, 178, 194), 22 mirrored
+boards, 6 silhouettes and 6 hole patterns chosen by the existing rules, and all 28 tier-2 peaks. The
+tables were put back to the peaks plan afterwards (the milestone pins refer to it); running the
+planners again gives the same plan for Step 7.
+
+### Step 6: pictures on reward levels
+
+A picture (`Picture`) fixes rings — where, how big, closed or not, which way the gap would rather
+face, the part's colour — and bars that draw its lines. `FreeKnot` builds the puzzle on it: rings
+that nearly touch are snapped a stem apart (as drawn, 18–22) on the unturned lattice and may be
+clipped; a ring whose neighbours leave no room for a gap is closed (it only holds, never next to
+another closed ring); a ring with one neighbour is held by it; the seed picks the ranking, which pairs
+are clipped, gaps, tails and bombs. Every ring must end up clipped and every bar must fit, or the
+board is thrown away: a picture never loses a part.
+
+- **Bars as lines**: a bar pokes into a ring's gap and runs `length` out, or reaches to a second ring
+  whose arc keeps it from sliding out until that ring has gone (the tree's trunk, the key's shaft, the
+  anchor's shaft, the lighthouse's ground line). A U-bar sits in two rings' gaps at once (the padlock's
+  shackle). A picture may allow three clips on a ring (`clips`), for a ring between three single
+  neighbours.
+- **Colour by part** (tree crown mint, trunk yellow; house roof coral, walls sky, door yellow). Colour is
+  only drawn, never read by the rules, so `LevelDraft.keepColors` keeps a picture's colours and
+  touching parts may share one.
+- **A lock** (`picture(…, locks: 1)`): a ring with two or three neighbours, preferably ones gripped
+  elsewhere too, made closed. Measured over 8 seeds it changes nothing that can be measured —
+  difficulty 3–7 and interest about 0.3 with or without it — and it makes House and Padlock
+  unsolvable, so only Key, Snail, Lighthouse, Anchor and Crown carry one.
+
+Nine pictures kept (Key, House, Lighthouse, Padlock, Crown, Anchor, Planet and moon, Tree, Snail),
+drawn in `LevelForge/pictures.py`; the reward levels 20, 40, 60, 80, 120, 140, 160 and 180 take eight
+of them (Planet, with no lines, left out), as breathers: the most interesting board wins. Picture
+boards stay light — difficulty 3–7, tier 0, interest 0.2–0.36 — because a picture is mostly chains of
+rings that come off in order. Reward levels stay short: at most about ten pieces (Crown was cut from
+twelve rings to ten, a jewel straight on each end of the band; Tree and House have eleven). Valid
+seeds out of 8: Crown 8, Snail 8, Key 7, Lighthouse 5, House and Anchor 4, Padlock 3, Tree 1 (its trunk makes most boards unsolvable; the generator's 16 candidates
+still find one). Sheets: `sheets/step6/pictures.drawn.png` (as drawn, with colours and lines) and
+`pictures.png` (as built, as in the game).
+
+### Step 7: the plan
+
+The planners (`plan-curve.py 7`, `plan-chapter.py 101 30`, `plan-chapter.py 151 31`) with everything
+above, and:
+
+- **Chapter ends** 50, 100, 150, 200 keep the designs of the owner's pinned boards
+  (`planlib.MILESTONES`; the pins in `LevelForge/sets/step7/level-selection.json`, passed with
+  `generate --selection`), and no level within three of one shares its family or is another web
+  (`planlib.near_milestone`): hub, outlined and small webs all read as one there. The TIER2 designs
+  are webs, so a peak in those windows is an ordinary peak, not a tier-2 one (147 and 153 now).
+- **Reward levels** 20, 40, …, 180 (not 100) take a picture (`planlib.PICTURE_SLOTS`); small breathers
+  keep four levels away from them and never fall on a peak.
+- **Mirrored free-form knots** at most one in twenty levels.
+- **Tier-2 peak targets** aim at what tier-2 boards measure (`planlib.tier2_target`): 45 at level 60
+  rising to 52 at 200, never below the curve's own target.
+- **Looking ahead** for tier-2 peaks: the two levels before one leave it a family it may use, counting
+  a chapter end's family within three levels as taken.
+- Bombs go where Swift wants the argument (`planlib.with_bombs`).
+
+The milestone picks (from 16 measured candidates each, `generate --milestone-finalists 16`):
+
+| level | board | difficulty | interest | why |
+|---|---|---|---|---|
+| 50 | Gem web, seed …1441 | 48.3, tier 2 | 0.49 | the most interesting tier-2 board below 100's |
+| 100 | Column web, seed …8209 | 49.0, tier 2 | 0.82 | the most interesting tier-2 board above 50's |
+| 150 | Arch web, seed …7647 | 52.3, tier 2 | 0.53 | the lightest of the tier-2 boards, all of them above every tier-2 board at 200 |
+| 200 | Ports web, seed …5637 | 53.5, tier 2 | 0.64 | the hardest milestone: of 64 candidates (`generate --max-candidates 64 --milestone-finalists 64`), the hardest planned tier-2 board with interest ≥ 0.6 |
+
+Difficulty rises 48.3 → 49.0 → 52.3 → 53.5. Of the first 16 candidates at 200 none passed 150's
+52.3 with interest ≥ 0.6, so 200 measured 64.
+
+### Step 7: the set
+
+`generate --levels 11-200 --jobs 6 --selection LevelForge/sets/step7/level-selection.json --out
+LevelForge/sets/step7` took 1 h 52 min (6716 s of generation). The shipped levels, measured the same
+way, against the set:
+
+| | shipped | step7 |
+|---|---|---|
+| families per block of ten | 4.7 (3–6) | 7.6 (6–9) |
+| same family within two levels | 99 | 0 |
+| difficulty 11–100 / 101–150 / 151–200 | 29.2 / 38.6 / 38.6 | 22.9 / 31.2 / 33.3 |
+| interest 11–100 / 101–150 / 151–200 | 0.43 / 0.45 / 0.43 | 0.52 / 0.54 / 0.58 |
+| planned tier-2 boards | 32 | 30 |
+| unplanned boards | 17 | 1 |
+| out of band (±6 of the new targets) | 133 | 47 |
+
+The shipped difficulty is higher mostly through its unplanned boards (tier 3 scores high). Of the 47
+out of band, 11 are breathers (interest decides there), 10 are above the band and 26 below, most of
+those in 151–200 where the targets climb past what the non-peak designs measure. 25 of the 26 tier-2
+peaks are tier 2; 193 (Arch) came out tier 1 at 39.8. The four chapter ends kept their pins.
+
+Afterwards, only those levels regenerated (`generate --levels …` into the set): the webs beside the
+chapter ends (98, 103, 147, 148, 153, 198) re-planned by the rule above against their neighbours, Crown
+(180) at ten pieces, and 200 re-pinned. 147 (Column knot, two locks) measures 45.7, under 150; 198 (a
+mirrored weave) is a dip at 17.7 before the finale. 103 is pinned to its most interesting board (the dense heart
+outline, 22.5, interest 0.69; the only non-web design there that usually reaches 0.5): the band's
+own pick measured interest 0.17, the lowest in the set.
+
+Written to `RotateRings/Levels` (the game is not live yet, so nothing else is pinned): levels 11–200
+from the set, the report and candidates with levels 1–10 kept as they were, and the set's pins
+(50, 100, 103, 150, 200) as `level-selection.json`, so regenerating keeps them.
+`LevelForge/curve.py` draws the curve (`LevelForge/sheets/step7/curve.svg`).

@@ -13,6 +13,12 @@ struct LevelDraft {
     var template: String
     var pieces: [DraftPiece] = []
     var board = BoardSize.standard
+    /// Give mirror images (left to right about the board's centre) the same colour where they do
+    /// not touch.
+    var mirrorColors = false
+    /// Keep the colours the pieces were drawn with (a picture coloured by part). Colour is only
+    /// drawn, never read by the rules, so touching pieces may share one there.
+    var keepColors = false
 
     init(name: String, template: String, pieces: [DraftPiece] = [], board: BoardSize = .standard) {
         self.name = name
@@ -220,6 +226,7 @@ struct LevelDraft {
     /// Colours pieces so that no piece shares a colour with a piece it touches: clip partners,
     /// concentric rings and close neighbours.
     mutating func assignColors(rng: inout SplitMix64) {
+        if keepColors && pieces.allSatisfy({ $0.color != nil }) { return }
         var neighbors = [Set<Int>](repeating: [], count: pieces.count)
         for (i, piece) in pieces.enumerated() {
             for clip in piece.clips {
@@ -239,9 +246,16 @@ struct LevelDraft {
         var palette = ForgeRules.colors
         palette.shuffle(using: &rng)
         var assigned = [String?](repeating: nil, count: pieces.count)
+        func image(of i: Int) -> Int? {
+            pieces.indices.first { j in
+                j != i && pieces[j].kind == pieces[i].kind && abs(pieces[j].position.x - (board.width - pieces[i].position.x)) < 0.5
+                    && abs(pieces[j].position.y - pieces[i].position.y) < 0.5
+            }
+        }
         for i in pieces.indices {
             let used = Set(neighbors[i].compactMap { assigned[$0] })
-            let color = palette.first { !used.contains($0) } ?? palette[i % palette.count]
+            let mirrored = mirrorColors ? image(of: i).flatMap { assigned[$0] }.flatMap { used.contains($0) ? nil : $0 } : nil
+            let color = mirrored ?? palette.first { !used.contains($0) } ?? palette[i % palette.count]
             assigned[i] = color
             pieces[i].color = color
             palette.append(palette.removeFirst())

@@ -21,8 +21,10 @@ enum Look: String, Codable, CaseIterable, Sendable {
     case freeform
     /// Sliding bars in lanes: mazes, cages, workshops (`GridWorld`).
     case barMaze
-    /// Symmetric ring figures and weaves (`RingNet`), the bullseye.
+    /// Symmetric ring figures and weaves (`RingNet`), the bullseye, mirrored free-form knots.
     case figure
+    /// Free-form knots grown inside an outline (`Silhouette`): a heart, an arch, an S curve.
+    case shaped
     /// A web of closed hubs on a rectangle (`HubWeb`): a grid field with a checkerboard of hubs.
     case hub
     /// A web with an outline of its own (gem, cross, arch, …).
@@ -42,6 +44,7 @@ enum Look: String, Codable, CaseIterable, Sendable {
 
     static func of(template id: String) -> Look {
         let parts = id.split(separator: "-")
+        if parts.contains("small") { return .small }
         let kind = parts.first.map(String.init) ?? id
         let mask = parts.count > 1 ? "\(kind)-\(parts[1])" : kind
         switch kind {
@@ -51,9 +54,13 @@ enum Look: String, Codable, CaseIterable, Sendable {
         case "knot":
             if mask == "knot-weave" || mask == "knot-kite" { return .diagonal }
             return parts.contains { $0.hasPrefix("u") && Int($0.dropFirst()) != nil } ? .gridBars : .gridField
-        case "free", "dense", "tangle": return .freeform
+        case "free", "dense":
+            if parts.contains("sil") { return .shaped }
+            return parts.contains("mirror") ? .figure : .freeform
+        case "tangle": return .freeform
         case "giant", "planet", "sun": return .giant
         case "maze", "cages": return .barMaze
+        case "picture": return .picture
         case "figure", "weave", "bullseye": return .figure
         default: return .figure
         }

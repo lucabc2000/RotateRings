@@ -204,8 +204,10 @@ enum LevelGenerator {
             }
             guard !goal.isTutorial, let target = goal.targetDifficulty, candidates.count >= 4 else { return false }
             if let quality = config.quality {
-                // Enough finalists within the band to choose the most interesting of them.
-                return candidates.filter { abs(score(of: $0, config: config) - target) <= quality.band }.count >= quality.finalists
+                // Enough finalists within the band to choose the most interesting of them, and at
+                // peaks and milestones enough for the extra ones too.
+                return candidates.filter { abs(score(of: $0, config: config) - target) <= quality.band }.count
+                    >= candidatesWanted(level: level, quality: quality)
             }
             // Close enough for the curve, with runner-ups to spare.
             return candidates.contains { abs($0.difficulty - target) <= tolerance(for: $0, target: target) }
@@ -243,7 +245,7 @@ enum LevelGenerator {
             if DifficultyCurve.onQualityScale {
                 candidates.sort { (abs(score(of: $0, config: config) - target), $0.seed) < (abs(score(of: $1, config: config) - target), $1.seed) }
             }
-            return chooseByInterest(candidates, target: target, quality: quality, config: config)
+            return chooseByInterest(candidates, level: level, target: target, quality: quality, config: config)
         }
         let chosen: Candidate
         if let pinned {
@@ -258,21 +260,50 @@ enum LevelGenerator {
         return GeneratedLevel(chosen: measured[0], runnerUps: Array(measured.dropFirst()), pinned: pinned != nil, targetDifficulty: goal.targetDifficulty)
     }
 
+    /// Candidates the search wants within the band before it stops: the finalists, at a peak also
+    /// the extra ones it may need, at a milestone all the owner gets to choose from.
+    private static func candidatesWanted(level: Int, quality: QualityConfig) -> Int {
+        let peaks = quality.peaks ?? QualityConfig.Peaks()
+        if DifficultyCurve.milestones.contains(level) { return peaks.milestoneFinalists }
+        if DifficultyCurve.peaks.contains(level) { return quality.finalists + peaks.extraFinalists }
+        return quality.finalists
+    }
+
     /// Curve levels: the finalists are the candidates closest to the target (`rank`), and only they
     /// are measured. Those within the band compete on interest, rounded to 0.01 so that near ties
     /// go to a level the owner-release strategy cannot clear by itself, then to fewer pieces. With
     /// no finalist in the band the closest one wins and the level is marked out of band.
-    private static func chooseByInterest(_ ranked: [Candidate], target: Double, quality: QualityConfig,
+    ///
+    /// At a small breather (`DifficultyCurve.breathers`) the most interesting finalist wins, in or out
+    /// of the band.
+    ///
+    /// At a peak (`DifficultyCurve.peaks`) only finalists that reach the peak's tier compete, when
+    /// there are any; if none of the first finalists does, more candidates are measured. A milestone
+    /// measures more finalists, and all of them stay as runner-ups.
+    private static func chooseByInterest(_ ranked: [Candidate], level: Int, target: Double, quality: QualityConfig,
                                          config: GeneratorConfig) -> GeneratedLevel? {
         guard !ranked.isEmpty else { return nil }
-        var finalists = measureQuality(Array(ranked.prefix(quality.finalists)), config: config)
-        let inBand = finalists.filter { abs(score(of: $0, config: config) - target) <= quality.band }
+        let peaks = quality.peaks ?? QualityConfig.Peaks()
+        let isPeak = DifficultyCurve.peaks.contains(level)
+        let count = DifficultyCurve.milestones.contains(level) ? peaks.milestoneFinalists : quality.finalists
+        var finalists = measureQuality(Array(ranked.prefix(count)), config: config)
+        func reachesTier(_ c: Candidate) -> Bool {
+            c.quality.map { $0.tier >= peaks.tier && !$0.unplanned } == true
+        }
+        if isPeak, !finalists.contains(where: reachesTier) {
+            finalists += measureQuality(Array(ranked.dropFirst(finalists.count).prefix(peaks.extraFinalists)), config: config)
+        }
+        let pool = isPeak && finalists.contains(where: reachesTier) ? finalists.filter(reachesTier) : finalists
+        let inBand = pool.filter { abs(score(of: $0, config: config) - target) <= quality.band }
         let outOfBand = inBand.isEmpty
-        if !outOfBand {
-            func key(_ c: Candidate) -> (Double, Int, Int, UInt64) {
-                (-((c.quality?.interest ?? 0) * 100).rounded(), c.quality?.strategySolved == true ? 1 : 0, c.file.pieces.count, c.seed)
-            }
-            let best = inBand.min { key($0) < key($1) }!
+        func key(_ c: Candidate) -> (Double, Int, Int, UInt64) {
+            (-((c.quality?.interest ?? 0) * 100).rounded(), c.quality?.strategySolved == true ? 1 : 0, c.file.pieces.count, c.seed)
+        }
+        // A small breather is there to be enjoyed, not to hit its target: every finalist competes.
+        let contenders = DifficultyCurve.breathers.contains(level) ? pool : inBand
+        // Out of band, the closest in ranking order (the pool keeps it).
+        let best = contenders.isEmpty ? pool[0] : contenders.min { key($0) < key($1) }!
+        if best.seed != finalists[0].seed {
             finalists.removeAll { $0.seed == best.seed }
             finalists.insert(best, at: 0)
         }

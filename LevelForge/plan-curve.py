@@ -29,15 +29,21 @@ def extra(d, level, peak, dip):
     return k
 
 
+targets = [round(max(10, min(64, 12 + 18 * (i / (count - 1)) ** 0.9 + offs[i]))) for i in range(count)]
+# Tier-2 peaks aim at what tier-2 boards measure.
+targets = [max(t, planlib.tier2_target(FIRST + i)) if planlib.wants_tier2(offs[i], t, FIRST + i) else t for i, t in enumerate(targets)]
+planner.tier2_peaks = {FIRST + i for i in range(count) if planlib.wants_tier2(offs[i], targets[i], FIRST + i)}
 plan, fields = [], 0
 for i, level in enumerate(range(FIRST, LAST + 1)):
-    base = 12 + 18 * (i / (count - 1)) ** 0.9
-    target = round(max(10, min(64, base + offs[i])))
+    target = targets[i]
     looks, left, counts = planlib.block_state(plan, level, FIRST)
-    d = planner.choose(level, target, offs[i], looks, left, fields, 0.4 * count, extra, counts)
+    before_tier2 = i + 1 < count and planlib.wants_tier2(offs[i + 1], targets[i + 1], level + 1)
+    d = planner.choose(level, target, offs[i], looks, left, fields, 0.4 * count, extra, counts, before_tier2)
     fields += d['spacing'] == 'gridField'
     expr, bombs = planner.add_bombs(level, d, 26)
-    plan.append(dict(level=level, target=target, offset=offs[i], expr=expr, look=d['look'], exp=d['exp'], bombs=bombs))
+    plan.append(dict(level=level, target=target, offset=offs[i], expr=expr, look=d['look'], exp=d['exp'], bombs=bombs,
+                     peak=planlib.wants_tier2(offs[i], target, level) and level not in planlib.PICTURE_SLOTS,
+                     breather=d['look'] in ('small', 'picture')))
 
 planlib.print_plan(plan)
 if '--apply' in sys.argv:
