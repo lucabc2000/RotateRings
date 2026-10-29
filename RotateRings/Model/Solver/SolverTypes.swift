@@ -8,12 +8,14 @@
 
 import Foundation
 
-/// Tunables for `LevelSolver`.
+/// Tunables for `LevelSolver`. Every limit counts work, never time, so a level solves the same way
+/// on any machine and with any number of parallel jobs. (Reports written before October 2026 also
+/// carry a `timeCap`; decoding ignores it.)
 struct SolverConfig: Codable, Equatable, Sendable {
     /// Exact search stops expanding once this many distinct states exist; the rest is estimated.
-    var stateCap = 120_000
-    /// Wall-clock limit for the exact search, in seconds.
-    var timeCap: TimeInterval = 8
+    /// 30,000 is about what the old four-second limit reached on 30-ring boards (12–42k), and above
+    /// every board that has ever been solved exactly (at most 15k).
+    var stateCap = 30_000
     /// Expansion budget of the best-first search that finds a solution when the exact search gave up.
     var boundedExpansions = 4_000
 
@@ -53,12 +55,13 @@ struct SolverMetrics: Codable, Equatable, Sendable {
     var branching: Double
     /// True when every reachable state was visited, which makes all counts exact.
     var fullyExplored: Bool
-    /// True when the state cap or time cap was hit and the numbers come from a bounded search.
+    /// True when the state cap was hit and the numbers come from a bounded search.
     var isEstimate: Bool
     /// Unused since dead ends are measured on the explored graph; kept so older reports still decode.
     var playouts: Int?
-    /// Seconds spent solving.
-    var elapsed: Double
+    /// Seconds spent solving. Printed by the tool, never written to a file (see `CodingKeys`), so
+    /// that reruns produce identical reports.
+    var elapsed: Double = 0
     /// Share of the pieces on the board that can make progress (release a clip or leave), summed
     /// over the steps of the solution. Low means the player has to hunt for the few pieces that are
     /// free. Filled in by the generator; nil in older reports.
@@ -68,6 +71,11 @@ struct SolverMetrics: Codable, Equatable, Sendable {
     /// every drag removes a piece has none, and plays easy however few pieces are free.
     /// Filled in by the generator; nil in older reports.
     var setupMoves: Int? = nil
+
+    private enum CodingKeys: String, CodingKey {
+        case minMoves, reachableStates, solvableStates, deadEndStates, deadEndMoves, totalMoves, deadEndRate
+        case branching, fullyExplored, isEstimate, playouts, freedom, setupMoves
+    }
 }
 
 struct SolverResult: Equatable, Sendable {

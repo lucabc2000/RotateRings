@@ -34,6 +34,8 @@ enum HubWeb {
         var bars = 0
         /// Share of rings that get a tail (see the tail planning in `build`).
         var tailShare = 0.0
+        /// The board the web is drawn on; outlines five rings wide need `.large`.
+        var board = BoardSize.standard
         var name = "Web"
         var template = "web"
     }
@@ -261,8 +263,8 @@ enum HubWeb {
         let longTail = shape.stem - 4
         let stub = shape.stem - GameRules.strokeThickness - 1
         let extent = sites.reduce(Point(0, 0)) { Point(max($0.x, abs(position($1).x)), max($0.y, abs(position($1).y))) }
-        let room = Point(max(extent.x + shape.radius, ForgeRules.boardWidth / 2 - ForgeRules.margin - GameRules.strokeThickness),
-                         max(extent.y + shape.radius, ForgeRules.boardHeight / 2 - ForgeRules.margin - GameRules.strokeThickness))
+        let room = Point(max(extent.x + shape.radius, options.board.width / 2 - ForgeRules.margin - GameRules.strokeThickness),
+                         max(extent.y + shape.radius, options.board.height / 2 - ForgeRules.margin - GameRules.strokeThickness))
         func staysInside(_ ring: Cell, _ tail: Tail) -> Bool {
             let angle = AngleMath.radians(fromDegrees: Double(tail.position) * ForgeRules.gridDegrees)
             let tip = position(ring) + Point(cos(angle), sin(angle)) * (shape.radius + (tail.long ? longTail : stub))
@@ -319,8 +321,8 @@ enum HubWeb {
         draft.pieces += bars.map(\.piece)
 
         let motif = Motif(name: options.name, template: options.template, pieces: draft.pieces)
-        guard motif.width <= ForgeRules.boardWidth - 2 * ForgeRules.margin,
-              motif.height <= ForgeRules.boardHeight - 2 * ForgeRules.margin else {
+        guard motif.width <= options.board.width - 2 * ForgeRules.margin,
+              motif.height <= options.board.height - 2 * ForgeRules.margin else {
             LevelTemplate.debug?("\(options.template): \(Int(motif.width))×\(Int(motif.height)) does not fit the board")
             return nil
         }

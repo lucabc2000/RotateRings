@@ -19,16 +19,43 @@ import Foundation
 
 final class LevelSolver {
 
+    /// A position. Two states are the same position when their rotations, connections and bar
+    /// offsets on the `slideScale` grid agree; the exact offsets travel along, so the board rebuilt
+    /// from a state is the very board its moves came from.
     struct State: Hashable {
         /// Per start piece: rotation step 0..<8 (0 for sliding bars), or `removed`.
         var values: [UInt8]
-        /// Per start piece: slide offset in half units (0 for turning pieces).
-        var slides: [Int16]
+        /// Per start piece: slide offset in `slideScale`ths of a unit (0 for turning pieces).
+        var slides: [Int32]
         /// Bit i set when connection i is active.
         var connections: UInt64
+        /// Per start piece: the exact slide offset (0 for turning pieces). Not part of the identity.
+        var offsets: [Double]
+
+        static func == (a: State, b: State) -> Bool {
+            a.values == b.values && a.slides == b.slides && a.connections == b.connections
+        }
+
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(values)
+            hasher.combine(slides)
+            hasher.combine(connections)
+        }
+
+        /// The same position with the same exact offsets.
+        func isExactly(_ other: State) -> Bool {
+            self == other && offsets == other.offsets
+        }
     }
 
     static let removed: UInt8 = 0xFF
+    /// Bar offsets that agree to 1/4096 of a unit count as the same position. A push stops wherever
+    /// the board's sampling finds the last free spot, and the board samples a push from wherever the
+    /// bar starts, so a bar rebuilt even slightly off can step over a thin edge the real one
+    /// catches: half units let the board refuse 3,933 of the solver's drags on the shipped levels.
+    /// The state therefore keeps the exact offsets and uses this grid only to tell positions apart
+    /// (LEVEL-DESIGN.md §14).
+    static let slideScale = 4096.0
     private static let rotationSteps = 8
 
     let config: SolverConfig
@@ -58,7 +85,8 @@ final class LevelSolver {
         let piece: Int
         let value: UInt8
         let neighborhood: [UInt8]
-        let neighborSlides: [Int16]
+        /// Exact neighbour offsets: a sweep is only reused for the very same bar positions.
+        let neighborOffsets: [Double]
         let bits: UInt64
     }
     private var sweepCache: [SweepKey: (plus: Int, minus: Int)] = [:]
@@ -124,8 +152,9 @@ final class LevelSolver {
             if let bit = bitOf[connection] { startBits |= 1 << UInt64(bit) }
         }
         start = State(values: [UInt8](repeating: 0, count: pieces.count),
-                      slides: pieces.map { Int16(($0.offset * 2).rounded()) },
-                      connections: startBits)
+                      slides: pieces.map { Self.slideValue($0.offset) },
+                      connections: startBits,
+                      offsets: pieces.map { $0.motion == .slide ? $0.offset : 0 })
     }
 
     // MARK: Piece classification
@@ -206,14 +235,20 @@ final class LevelSolver {
         state.values.allSatisfy { $0 == Self.removed }
     }
 
+    private static func slideValue(_ offset: Double) -> Int32 {
+        Int32(clamping: Int((offset * slideScale).rounded()))
+    }
+
     func encode(_ board: Board) -> State {
         var values = [UInt8](repeating: Self.removed, count: pieces.count)
-        var slides = [Int16](repeating: 0, count: pieces.count)
+        var slides = [Int32](repeating: 0, count: pieces.count)
+        var offsets = [Double](repeating: 0, count: pieces.count)
         for piece in board.pieces {
             guard let i = indexOf[piece.id] else { continue }
             if piece.motion == .slide {
                 values[i] = 0
-                slides[i] = Int16(clamping: Int((piece.offset * 2).rounded()))
+                slides[i] = Self.slideValue(piece.offset)
+                offsets[i] = piece.offset
             } else {
                 let k = Int(((piece.rotation - piece.baseRotation) / GameRules.rotationStep).rounded())
                 values[i] = UInt8(((k % Self.rotationSteps) + Self.rotationSteps) % Self.rotationSteps)
@@ -223,7 +258,7 @@ final class LevelSolver {
         for connection in board.connections {
             if let bit = bitOf[connection] { bits |= 1 << UInt64(bit) }
         }
-        return State(values: values, slides: slides, connections: bits)
+        return State(values: values, slides: slides, connections: bits, offsets: offsets)
     }
 
     func board(for state: State) -> Board {
@@ -232,7 +267,7 @@ final class LevelSolver {
         for (i, piece) in pieces.enumerated() where state.values[i] != Self.removed {
             var copy = piece
             if copy.motion == .slide {
-                copy.offset = Double(state.slides[i]) / 2
+                copy.offset = state.offsets[i]
             } else {
                 copy.rotation = copy.baseRotation + Double(state.values[i]) * GameRules.rotationStep
             }
@@ -289,7 +324,7 @@ final class LevelSolver {
     private func freeSteps(of i: Int, in board: Board, state: State) -> (plus: Int, minus: Int) {
         let key = SweepKey(piece: i, value: state.values[i],
                            neighborhood: neighbors[i].map { state.values[$0] },
-                           neighborSlides: neighbors[i].map { state.slides[$0] },
+                           neighborOffsets: neighbors[i].map { state.offsets[$0] },
                            bits: state.connections & relevantBits[i])
         if let cached = sweepCache[key] { return cached }
         let id = pieces[i].id
@@ -380,9 +415,16 @@ final class LevelSolver {
     /// A chain where only one piece is ever free scores low, a board where everything can go at
     /// once scores 1.
     func freedom(along solution: [SolverMove]) -> Double {
+        let steps = openness(along: solution)
+        let present = steps.reduce(0) { $0 + $1.present }
+        return present == 0 ? 1 : Double(steps.reduce(0) { $0 + $1.free }) / Double(present)
+    }
+
+    /// Per step of `solution`: the pieces that have a move which releases a connection or takes a
+    /// piece off the board (the test `freedom` uses), and the pieces on the board.
+    func openness(along solution: [SolverMove]) -> [(free: Int, present: Int)] {
         var state = start
-        var free = 0
-        var present = 0
+        var steps: [(free: Int, present: Int)] = []
         for move in solution {
             let remaining = state.values.filter { $0 != Self.removed }.count
             guard remaining > 0 else { break }
@@ -391,13 +433,12 @@ final class LevelSolver {
             where !candidate.removed.isEmpty || child.connections.nonzeroBitCount < state.connections.nonzeroBitCount {
                 productive.insert(candidate.piece)
             }
-            free += productive.count
-            present += remaining
+            steps.append((productive.count, remaining))
             var board = board(for: state)
             guard case .moved = board.move(move.piece, by: move.delta) else { break }
             state = encode(board)
         }
-        return present == 0 ? 1 : Double(free) / Double(present)
+        return steps
     }
 
     private func heuristic(_ state: State) -> Int {
@@ -411,16 +452,26 @@ final class LevelSolver {
     /// Solves the level. Independent components are solved one by one and combined; a single
     /// component is explored exhaustively when it fits the caps, otherwise estimated.
     func solve() -> SolverResult {
-        let groups = Self.components(of: initialBoard)
-        guard groups.count > 1 else { return solveComponent() }
-        var parts: [SolverResult] = []
-        for group in groups {
+        let boards = Self.componentBoards(of: initialBoard)
+        guard boards.count > 1 else { return solveComponent() }
+        return Self.combine(boards.map { LevelSolver(board: $0, config: config).solveComponent() })
+    }
+
+    /// One board per independent component (`components(of:)`), each with its own connections.
+    static func componentBoards(of board: Board) -> [Board] {
+        components(of: board).map { group in
             let members = Set(group)
-            let sub = Board(restoring: initialBoard.pieces.filter { members.contains($0.id) },
-                            connections: initialBoard.connections.filter { members.contains($0.owner) })
-            parts.append(LevelSolver(board: sub, config: config).solveComponent())
+            return Board(restoring: board.pieces.filter { members.contains($0.id) },
+                         connections: board.connections.filter { members.contains($0.owner) })
         }
-        return Self.combine(parts)
+    }
+
+    /// Whether `ownerPlayout` clears every component on its own, without the best-first fallback:
+    /// the level gives way to a fixed strategy, whatever the exhaustive search found.
+    static func strategySolves(_ board: Board, config: SolverConfig = SolverConfig()) -> Bool {
+        var board = board
+        board.removeUnconnectedPieces()
+        return componentBoards(of: board).allSatisfy { LevelSolver(board: $0, config: config).ownerPlayout() != nil }
     }
 
     /// Metrics of a product of independent puzzles. A product state is solvable when every part is;
@@ -479,7 +530,7 @@ final class LevelSolver {
         var head = 0
 
         while head < states.count {
-            if states.count >= config.stateCap || (head & 127 == 0 && Date().timeIntervalSince(clock) > config.timeCap) {
+            if states.count >= config.stateCap {
                 complete = false
                 break
             }

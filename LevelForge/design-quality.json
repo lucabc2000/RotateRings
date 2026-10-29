@@ -1,0 +1,2871 @@
+{
+  "bullseye(lock: lock)" : {
+    "difficulty" : 6.3,
+    "interest" : 0.285,
+    "legacy" : 19.8,
+    "locks" : 0,
+    "look" : "figure",
+    "pieces" : 11.5,
+    "seconds" : 2.5,
+    "seeds" : 8,
+    "template" : "bullseye",
+    "tiers" : [
+      8,
+      0,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 8
+  },
+  "cages(across: 2, down: 3, count: 3, lanes: 2, border: 1, bars: 8, freeLimit: 3)" : {
+    "difficulty" : 7.1,
+    "interest" : 0.321,
+    "legacy" : 27.3,
+    "locks" : 0,
+    "look" : "barMaze",
+    "pieces" : 13.7,
+    "seconds" : 13.5,
+    "seeds" : 8,
+    "template" : "cages-2x3-3-tight",
+    "tiers" : [
+      7,
+      0,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 7
+  },
+  "cages(across: 3, down: 3, count: 4, border: 0, bars: 13, freeLimit: 3)" : {
+    "difficulty" : 10.9,
+    "interest" : 0.289,
+    "legacy" : 47.9,
+    "locks" : 0,
+    "look" : "barMaze",
+    "pieces" : 20.3,
+    "seconds" : 12.7,
+    "seeds" : 8,
+    "template" : "cages-3x3-4-tight",
+    "tiers" : [
+      6,
+      0,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 6
+  },
+  "cages(across: 3, down: 4, count: 5, border: 0, bars: 15, freeLimit: 3)" : {
+    "difficulty" : 12.4,
+    "interest" : 0.293,
+    "legacy" : 54.5,
+    "locks" : 0,
+    "look" : "barMaze",
+    "pieces" : 23.6,
+    "seconds" : 9.4,
+    "seeds" : 8,
+    "template" : "cages-3x4-5-tight",
+    "tiers" : [
+      5,
+      0,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 5
+  },
+  "cages(across: 3, down: 4, count: 6, border: 0, bars: 16, freeLimit: 3)" : {
+    "difficulty" : 13.2,
+    "interest" : 0.35200000000000004,
+    "legacy" : 57.9,
+    "locks" : 0,
+    "look" : "barMaze",
+    "pieces" : 25.8,
+    "seconds" : 11,
+    "seeds" : 8,
+    "template" : "cages-3x4-6-tight",
+    "tiers" : [
+      5,
+      0,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 5
+  },
+  "freeKnot(rings: 12...16, holders: 3, tails: 0.3, pokes: 3, giant: 146)" : {
+    "difficulty" : 8.7,
+    "interest" : 0.34700000000000003,
+    "legacy" : 24.6,
+    "locks" : 0,
+    "look" : "giant",
+    "pieces" : 15.8,
+    "seconds" : 5.1,
+    "seeds" : 8,
+    "template" : "giant-12-16-3-tails-p3",
+    "tiers" : [
+      5,
+      0,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 5
+  },
+  "freeKnot(rings: 18...22, holders: 3, tails: 0.4)" : {
+    "difficulty" : 11.4,
+    "interest" : 0.385,
+    "legacy" : 33.6,
+    "locks" : 0,
+    "look" : "freeform",
+    "pieces" : 17.7,
+    "seconds" : 3.8,
+    "seeds" : 32,
+    "template" : "free-18-22-3-tails",
+    "tiers" : [
+      6,
+      1,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 7
+  },
+  "freeKnot(rings: 18...22, holders: 3, tails: 0.4, gate: true, bombs: 1)" : {
+    "difficulty" : 16.4,
+    "interest" : 0.35100000000000003,
+    "legacy" : 37.2,
+    "locks" : 0,
+    "look" : "freeform",
+    "pieces" : 18,
+    "seconds" : 7.9,
+    "seeds" : 32,
+    "template" : "free-18-22-3-gates-bomb1",
+    "tiers" : [
+      2,
+      2,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 4
+  },
+  "freeKnot(rings: 18...22, holders: 3, tails: 0.4, pokes: 2)" : {
+    "difficulty" : 10.3,
+    "interest" : 0.34700000000000003,
+    "legacy" : 40.4,
+    "locks" : 0,
+    "look" : "freeform",
+    "pieces" : 20.5,
+    "seconds" : 6.2,
+    "seeds" : 8,
+    "template" : "free-18-22-3-tails-p2",
+    "tiers" : [
+      4,
+      0,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 4
+  },
+  "freeKnot(rings: 18...22, holders: 3, tails: 0.5, gate: true)" : {
+    "difficulty" : 13.5,
+    "interest" : 0.4,
+    "legacy" : 33.4,
+    "locks" : 0,
+    "look" : "freeform",
+    "pieces" : 17.5,
+    "seconds" : 6.8,
+    "seeds" : 32,
+    "template" : "free-18-22-3-gates",
+    "tiers" : [
+      4,
+      2,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 6
+  },
+  "freeKnot(rings: 18...24, holders: 3, tails: 0.4, pokes: 3, giant: 176, dense: true)" : {
+    "difficulty" : 19.3,
+    "interest" : 0.39,
+    "legacy" : 46.1,
+    "locks" : 0,
+    "look" : "giant",
+    "pieces" : 25.2,
+    "seconds" : 7.6,
+    "seeds" : 8,
+    "template" : "giant-18-24-3-tails-p3",
+    "tiers" : [
+      3,
+      2,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 5
+  },
+  "freeKnot(rings: 26...32, holders: 3, tails: 0.4, bombs: 2, dense: true)" : {
+    "difficulty" : 16.1,
+    "interest" : 0.374,
+    "legacy" : 50.9,
+    "locks" : 0,
+    "look" : "freeform",
+    "pieces" : 27.1,
+    "seconds" : 5.7,
+    "seeds" : 32,
+    "template" : "dense-26-32-3-tails-bomb2",
+    "tiers" : [
+      7,
+      2,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 9
+  },
+  "freeKnot(rings: 26...32, holders: 3, tails: 0.4, dense: true)" : {
+    "difficulty" : 17.8,
+    "interest" : 0.375,
+    "legacy" : 55.3,
+    "locks" : 0,
+    "look" : "freeform",
+    "pieces" : 27.5,
+    "seconds" : 5.5,
+    "seeds" : 8,
+    "template" : "dense-26-32-3-tails",
+    "tiers" : [
+      3,
+      1,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 4
+  },
+  "freeKnot(rings: 26...32, holders: 3, tails: 0.5, gate: true, bombs: 1, dense: true)" : {
+    "difficulty" : 18.3,
+    "interest" : 0.33399999999999996,
+    "legacy" : 55,
+    "locks" : 0,
+    "look" : "freeform",
+    "pieces" : 26.3,
+    "seconds" : 5.2,
+    "seeds" : 32,
+    "template" : "dense-26-32-3-gates-bomb1",
+    "tiers" : [
+      3,
+      1,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 4
+  },
+  "freeKnot(rings: 26...32, holders: 3, tails: 0.5, gate: true, dense: true)" : {
+    "difficulty" : 20.3,
+    "interest" : 0.353,
+    "legacy" : 51.8,
+    "locks" : 0,
+    "look" : "freeform",
+    "pieces" : 26.3,
+    "seconds" : 5.4,
+    "seeds" : 32,
+    "template" : "dense-26-32-3-gates",
+    "tiers" : [
+      2,
+      2,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 4
+  },
+  "freeKnot(rings: 26...32, holders: 3, tails: 0.5, gate: true, pokes: 2, dense: true)" : {
+    "difficulty" : 17.8,
+    "interest" : 0.377,
+    "legacy" : 55.8,
+    "locks" : 0,
+    "look" : "freeform",
+    "pieces" : 27.5,
+    "seconds" : 6.6,
+    "seeds" : 32,
+    "template" : "dense-26-32-3-gates-p2",
+    "tiers" : [
+      3,
+      1,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 4
+  },
+  "hubWeb(\"hubs-arch\", clips: 2...3, holders: 3, tails: 0.85)" : {
+    "difficulty" : 52,
+    "interest" : 0.602,
+    "legacy" : 73.8,
+    "locks" : 0,
+    "look" : "hubShape",
+    "pieces" : 29,
+    "seconds" : 23,
+    "seeds" : 8,
+    "template" : "hubs-arch-tails",
+    "tiers" : [
+      0,
+      2,
+      5,
+      1
+    ],
+    "unplannedShare" : 0.125,
+    "valid" : 8
+  },
+  "hubWeb(\"hubs-arch\", clips: 3...4, holders: 3, tails: 0.85)" : {
+    "difficulty" : 63.4,
+    "interest" : 0.496,
+    "legacy" : 76,
+    "locks" : 0,
+    "look" : "hubShape",
+    "pieces" : 29,
+    "seconds" : 44.9,
+    "seeds" : 8,
+    "template" : "hubs-arch-tails",
+    "tiers" : [
+      0,
+      1,
+      3,
+      4
+    ],
+    "unplannedShare" : 0.5,
+    "valid" : 8
+  },
+  "hubWeb(\"hubs-column\", clips: 3...4, holders: 3, tails: 0.85)" : {
+    "difficulty" : 50.4,
+    "interest" : 0.754,
+    "legacy" : 45.9,
+    "locks" : 0,
+    "look" : "hub",
+    "pieces" : 18,
+    "seconds" : 9.7,
+    "seeds" : 8,
+    "template" : "hubs-column-tails",
+    "tiers" : [
+      0,
+      0,
+      7,
+      1
+    ],
+    "unplannedShare" : 0.125,
+    "valid" : 8
+  },
+  "hubWeb(\"hubs-cross\", clips: 2...3, holders: 3, tails: 0.85)" : {
+    "difficulty" : 54.1,
+    "interest" : 0.584,
+    "legacy" : 70.3,
+    "locks" : 0,
+    "look" : "hubShape",
+    "pieces" : 27,
+    "seconds" : 46.9,
+    "seeds" : 8,
+    "template" : "hubs-cross-tails",
+    "tiers" : [
+      0,
+      2,
+      3,
+      3
+    ],
+    "unplannedShare" : 0.375,
+    "valid" : 8
+  },
+  "hubWeb(\"hubs-cross\", clips: 3...4, holders: 3, tails: 0.85)" : {
+    "difficulty" : 64.4,
+    "interest" : 0.525,
+    "legacy" : 73.8,
+    "locks" : 0,
+    "look" : "hubShape",
+    "pieces" : 26.8,
+    "seconds" : 114.9,
+    "seeds" : 8,
+    "template" : "hubs-cross-tails",
+    "tiers" : [
+      0,
+      0,
+      3,
+      5
+    ],
+    "unplannedShare" : 0.625,
+    "valid" : 8
+  },
+  "hubWeb(\"hubs-diamond\", clips: 3...4, holders: 3, tails: 0.85)" : {
+    "difficulty" : 61.7,
+    "interest" : 0.446,
+    "legacy" : 64.4,
+    "locks" : 0,
+    "look" : "hub",
+    "pieces" : 24,
+    "seconds" : 65.4,
+    "seeds" : 8,
+    "template" : "hubs-diamond-tails",
+    "tiers" : [
+      0,
+      0,
+      3,
+      5
+    ],
+    "unplannedShare" : 0.625,
+    "valid" : 8
+  },
+  "hubWeb(\"hubs-field\", clips: 2...3, holders: 3, tails: 0.85)" : {
+    "difficulty" : 34.8,
+    "interest" : 0.9570000000000001,
+    "legacy" : 63.7,
+    "locks" : 0,
+    "look" : "hub",
+    "pieces" : 24,
+    "seconds" : 12.9,
+    "seeds" : 8,
+    "template" : "hubs-field-tails",
+    "tiers" : [
+      0,
+      8,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 8
+  },
+  "hubWeb(\"hubs-field\", clips: 3...4, holders: 3, tails: 0.85)" : {
+    "difficulty" : 60.7,
+    "interest" : 0.53,
+    "legacy" : 65.8,
+    "locks" : 0,
+    "look" : "hub",
+    "pieces" : 24,
+    "seconds" : 99.1,
+    "seeds" : 8,
+    "template" : "hubs-field-tails",
+    "tiers" : [
+      0,
+      0,
+      4,
+      4
+    ],
+    "unplannedShare" : 0.5,
+    "valid" : 8
+  },
+  "hubWeb(\"hubs-final\", clips: 3...4, holders: 3, bars: 2, tails: 0.85)" : {
+    "difficulty" : 61.2,
+    "interest" : 0.595,
+    "legacy" : 75,
+    "locks" : 0,
+    "look" : "hub",
+    "pieces" : 28,
+    "seconds" : 54.3,
+    "seeds" : 8,
+    "template" : "hubs-final-tails",
+    "tiers" : [
+      0,
+      1,
+      3,
+      4
+    ],
+    "unplannedShare" : 0.5,
+    "valid" : 8
+  },
+  "hubWeb(\"hubs-frame\", clips: 2...3, holders: 3, tails: 0.85)" : {
+    "difficulty" : 44.2,
+    "interest" : 0.855,
+    "legacy" : 71.3,
+    "locks" : 0,
+    "look" : "hubShape",
+    "pieces" : 30,
+    "seconds" : 30.9,
+    "seeds" : 8,
+    "template" : "hubs-frame-tails",
+    "tiers" : [
+      0,
+      6,
+      1,
+      1
+    ],
+    "unplannedShare" : 0.125,
+    "valid" : 8
+  },
+  "hubWeb(\"hubs-frame\", clips: 3...4, holders: 3, tails: 0.85)" : {
+    "difficulty" : 59.4,
+    "interest" : 0.629,
+    "legacy" : 74.1,
+    "locks" : 0,
+    "look" : "hubShape",
+    "pieces" : 30,
+    "seconds" : 139.5,
+    "seeds" : 8,
+    "template" : "hubs-frame-tails",
+    "tiers" : [
+      0,
+      2,
+      3,
+      3
+    ],
+    "unplannedShare" : 0.375,
+    "valid" : 8
+  },
+  "hubWeb(\"hubs-gaps\", clips: 3...4, holders: 3, bars: 4, tails: 0.85)" : {
+    "difficulty" : 62,
+    "interest" : 0.513,
+    "legacy" : 69.8,
+    "locks" : 0,
+    "look" : "hub",
+    "pieces" : 28,
+    "seconds" : 80.1,
+    "seeds" : 8,
+    "template" : "hubs-gaps-tails",
+    "tiers" : [
+      0,
+      0,
+      4,
+      4
+    ],
+    "unplannedShare" : 0.5,
+    "valid" : 8
+  },
+  "hubWeb(\"hubs-gem\", clips: 2...3, holders: 3, tails: 0.85)" : {
+    "difficulty" : 35.9,
+    "interest" : 0.88,
+    "legacy" : 58.5,
+    "locks" : 0,
+    "look" : "hubShape",
+    "pieces" : 22.5,
+    "seconds" : 8.3,
+    "seeds" : 8,
+    "template" : "hubs-gem-tails",
+    "tiers" : [
+      0,
+      7,
+      1,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 8
+  },
+  "hubWeb(\"hubs-gem\", clips: 3...4, holders: 3, tails: 0.85)" : {
+    "difficulty" : 55.7,
+    "interest" : 0.475,
+    "legacy" : 57.3,
+    "locks" : 0,
+    "look" : "hubShape",
+    "pieces" : 22.3,
+    "seconds" : 83,
+    "seeds" : 8,
+    "template" : "hubs-gem-tails",
+    "tiers" : [
+      0,
+      1,
+      3,
+      4
+    ],
+    "unplannedShare" : 0.5,
+    "valid" : 8
+  },
+  "hubWeb(\"hubs-grand\", clips: 3...4, holders: 3, tails: 0.85)" : {
+    "difficulty" : 44.1,
+    "interest" : 0.6859999999999999,
+    "legacy" : 37.6,
+    "locks" : 0,
+    "look" : "hub",
+    "pieces" : 15,
+    "seconds" : 8.2,
+    "seeds" : 8,
+    "template" : "hubs-grand-tails",
+    "tiers" : [
+      0,
+      1,
+      7,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 8
+  },
+  "hubWeb(\"hubs-heart\", clips: 2...3, holders: 3, tails: 0.85)" : {
+    "difficulty" : 41.8,
+    "interest" : 0.7170000000000001,
+    "legacy" : 59.7,
+    "locks" : 0,
+    "look" : "hubShape",
+    "pieces" : 22.9,
+    "seconds" : 9.5,
+    "seeds" : 8,
+    "template" : "hubs-heart-tails",
+    "tiers" : [
+      0,
+      4,
+      4,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 8
+  },
+  "hubWeb(\"hubs-heart\", clips: 3...4, holders: 3, tails: 0.85)" : {
+    "difficulty" : 46.5,
+    "interest" : 0.623,
+    "legacy" : 58.5,
+    "locks" : 0,
+    "look" : "hubShape",
+    "pieces" : 22.4,
+    "seconds" : 10,
+    "seeds" : 8,
+    "template" : "hubs-heart-tails",
+    "tiers" : [
+      0,
+      2,
+      6,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 8
+  },
+  "hubWeb(\"hubs-hourglass\", clips: 2...3, holders: 3, tails: 0.85)" : {
+    "difficulty" : 43.5,
+    "interest" : 0.746,
+    "legacy" : 67,
+    "locks" : 0,
+    "look" : "hubShape",
+    "pieces" : 27,
+    "seconds" : 8.8,
+    "seeds" : 8,
+    "template" : "hubs-hourglass-tails",
+    "tiers" : [
+      0,
+      4,
+      4,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 8
+  },
+  "hubWeb(\"hubs-hourglass\", clips: 3...4, holders: 3, tails: 0.85)" : {
+    "difficulty" : 53.9,
+    "interest" : 0.5670000000000001,
+    "legacy" : 66.6,
+    "locks" : 0,
+    "look" : "hubShape",
+    "pieces" : 26.3,
+    "seconds" : 13.5,
+    "seeds" : 8,
+    "template" : "hubs-hourglass-tails",
+    "tiers" : [
+      0,
+      1,
+      6,
+      1
+    ],
+    "unplannedShare" : 0.125,
+    "valid" : 8
+  },
+  "hubWeb(\"hubs-kite\", clips: 3...4, holders: 3, tails: 0.85)" : {
+    "difficulty" : 52.3,
+    "interest" : 0.526,
+    "legacy" : 45.6,
+    "locks" : 0,
+    "look" : "diagonal",
+    "pieces" : 18.9,
+    "seconds" : 31.7,
+    "seeds" : 8,
+    "template" : "hubs-kite-tails",
+    "tiers" : [
+      0,
+      1,
+      3,
+      4
+    ],
+    "unplannedShare" : 0.5,
+    "valid" : 8
+  },
+  "hubWeb(\"hubs-lace\", clips: 3...4, holders: 3, bars: 4, tails: 0.85)" : {
+    "difficulty" : 57.9,
+    "interest" : 0.598,
+    "legacy" : 69,
+    "locks" : 0,
+    "look" : "hub",
+    "pieces" : 27.6,
+    "seconds" : 24.9,
+    "seeds" : 8,
+    "template" : "hubs-lace-tails",
+    "tiers" : [
+      0,
+      1,
+      4,
+      3
+    ],
+    "unplannedShare" : 0.375,
+    "valid" : 8
+  },
+  "hubWeb(\"hubs-nine\", clips: 2...3, holders: 2, tails: 0.85)" : {
+    "difficulty" : 27,
+    "interest" : 0.667,
+    "legacy" : 19.3,
+    "locks" : 0,
+    "look" : "hub",
+    "pieces" : 8.9,
+    "seconds" : 2.1,
+    "seeds" : 8,
+    "template" : "hubs-nine-tails",
+    "tiers" : [
+      1,
+      5,
+      2,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 8
+  },
+  "hubWeb(\"hubs-ports\", clips: 3...4, holders: 3, bars: 2, tails: 0.85)" : {
+    "difficulty" : 51.8,
+    "interest" : 0.591,
+    "legacy" : 57.2,
+    "locks" : 0,
+    "look" : "hub",
+    "pieces" : 24,
+    "seconds" : 13.3,
+    "seeds" : 8,
+    "template" : "hubs-ports-tails",
+    "tiers" : [
+      0,
+      1,
+      6,
+      1
+    ],
+    "unplannedShare" : 0.125,
+    "valid" : 8
+  },
+  "hubWeb(\"hubs-riddle\", clips: 3...4, holders: 3, bars: 4, tails: 0.85)" : {
+    "difficulty" : 60,
+    "interest" : 0.493,
+    "legacy" : 70,
+    "locks" : 0,
+    "look" : "hub",
+    "pieces" : 28,
+    "seconds" : 52.1,
+    "seeds" : 8,
+    "template" : "hubs-riddle-tails",
+    "tiers" : [
+      0,
+      0,
+      5,
+      3
+    ],
+    "unplannedShare" : 0.375,
+    "valid" : 8
+  },
+  "hubWeb(\"hubs-sieve\", clips: 3...4, holders: 3, bars: 4, tails: 0.85)" : {
+    "difficulty" : 64.8,
+    "interest" : 0.467,
+    "legacy" : 71.6,
+    "locks" : 0,
+    "look" : "hub",
+    "pieces" : 28,
+    "seconds" : 98.4,
+    "seeds" : 8,
+    "template" : "hubs-sieve-tails",
+    "tiers" : [
+      0,
+      1,
+      1,
+      6
+    ],
+    "unplannedShare" : 0.75,
+    "valid" : 8
+  },
+  "hubWeb(\"hubs-tall\", clips: 2...3, holders: 3, tails: 0.85)" : {
+    "difficulty" : 43.8,
+    "interest" : 0.8109999999999999,
+    "legacy" : 73.5,
+    "locks" : 0,
+    "look" : "hub",
+    "pieces" : 28,
+    "seconds" : 15.2,
+    "seeds" : 8,
+    "template" : "hubs-tall-tails",
+    "tiers" : [
+      0,
+      5,
+      3,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 8
+  },
+  "hubWeb(\"hubs-tall\", clips: 3...4, holders: 3, tails: 0.85)" : {
+    "difficulty" : 63.2,
+    "interest" : 0.599,
+    "legacy" : 78.5,
+    "locks" : 0,
+    "look" : "hub",
+    "pieces" : 28,
+    "seconds" : 91.1,
+    "seeds" : 8,
+    "template" : "hubs-tall-tails",
+    "tiers" : [
+      0,
+      1,
+      3,
+      4
+    ],
+    "unplannedShare" : 0.5,
+    "valid" : 8
+  },
+  "hubWeb(\"hubs-twelve\", clips: 2...3, holders: 2, tails: 0.85)" : {
+    "difficulty" : 28.6,
+    "interest" : 0.737,
+    "legacy" : 27.9,
+    "locks" : 0,
+    "look" : "hub",
+    "pieces" : 11.5,
+    "seconds" : 3.1,
+    "seeds" : 8,
+    "template" : "hubs-twelve-tails",
+    "tiers" : [
+      0,
+      7,
+      1,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 8
+  },
+  "hubWeb(\"hubs-weave\", clips: 3...4, holders: 3, tails: 0.85)" : {
+    "difficulty" : 45.6,
+    "interest" : 0.622,
+    "legacy" : 54.4,
+    "locks" : 0,
+    "look" : "diagonal",
+    "pieces" : 21.4,
+    "seconds" : 8.8,
+    "seeds" : 8,
+    "template" : "hubs-weave-tails",
+    "tiers" : [
+      0,
+      2,
+      6,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 8
+  },
+  "knot(\"hubs-column\", holders: 3)" : {
+    "difficulty" : 32.9,
+    "interest" : 0.713,
+    "legacy" : 50.1,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 18,
+    "seconds" : 8.6,
+    "seeds" : 32,
+    "template" : "knot-column-32",
+    "tiers" : [
+      0,
+      5,
+      1,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 6
+  },
+  "knot(\"hubs-column\", holders: 3, bars: 1, uBars: 1)" : {
+    "difficulty" : 29.8,
+    "interest" : 0.715,
+    "legacy" : 41.4,
+    "locks" : 0,
+    "look" : "gridBars",
+    "pieces" : 16.6,
+    "seconds" : 8.9,
+    "seeds" : 32,
+    "template" : "knot-column-32-b1-u1",
+    "tiers" : [
+      0,
+      11,
+      1,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 12
+  },
+  "knot(\"hubs-column\", holders: 3, bars: 3)" : {
+    "difficulty" : 23.7,
+    "interest" : 0.496,
+    "legacy" : 40.5,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 17.6,
+    "seconds" : 8.6,
+    "seeds" : 32,
+    "template" : "knot-column-32-b3",
+    "tiers" : [
+      4,
+      9,
+      1,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 14
+  },
+  "knot(\"hubs-column\", holders: 3, bars: 3, tails: 0.4)" : {
+    "difficulty" : 30.4,
+    "interest" : 0.521,
+    "legacy" : 42,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 17.9,
+    "seconds" : 8.7,
+    "seeds" : 32,
+    "template" : "knot-column-32-b3-tails",
+    "tiers" : [
+      0,
+      6,
+      1,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 7
+  },
+  "knot(\"hubs-column\", holders: 3, locks: 1)" : {
+    "difficulty" : 38.1,
+    "interest" : 0.86,
+    "legacy" : 57.2,
+    "locks" : 1,
+    "look" : "gridField",
+    "pieces" : 18,
+    "seconds" : 12.8,
+    "seeds" : 32,
+    "template" : "knot-column-32-lock1",
+    "tiers" : [
+      0,
+      2,
+      1,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 3
+  },
+  "knot(\"hubs-column\", holders: 3, locks: 2)" : {
+    "difficulty" : 41.4,
+    "interest" : 0.629,
+    "legacy" : 52.6,
+    "locks" : 2,
+    "look" : "gridField",
+    "pieces" : 18,
+    "seconds" : 10.2,
+    "seeds" : 32,
+    "template" : "knot-column-32-lock2",
+    "tiers" : [
+      0,
+      2,
+      3,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 5
+  },
+  "knot(\"hubs-column\", holders: 3, locks: 3)" : {
+    "difficulty" : 28.2,
+    "interest" : 0.591,
+    "legacy" : 39.9,
+    "locks" : 3,
+    "look" : "gridField",
+    "pieces" : 18,
+    "seconds" : 5,
+    "seeds" : 32,
+    "template" : "knot-column-32-lock3",
+    "tiers" : [
+      0,
+      2,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 2
+  },
+  "knot(\"hubs-column\", holders: 3, tails: 0.4)" : {
+    "difficulty" : 30.9,
+    "interest" : 0.927,
+    "legacy" : 49.4,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 18,
+    "seconds" : 7.1,
+    "seeds" : 8,
+    "template" : "knot-column-32-tails",
+    "tiers" : [
+      0,
+      3,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 3
+  },
+  "knot(\"hubs-column\", holders: 3, tails: 0.4, locks: 1)" : {
+    "difficulty" : 38.6,
+    "interest" : 0.7170000000000001,
+    "legacy" : 49.8,
+    "locks" : 1,
+    "look" : "gridField",
+    "pieces" : 18,
+    "seconds" : 9.1,
+    "seeds" : 32,
+    "template" : "knot-column-32-tails-lock1",
+    "tiers" : [
+      0,
+      3,
+      2,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 5
+  },
+  "knot(\"hubs-column\", holders: 3, tails: 0.4, locks: 2)" : {
+    "difficulty" : 36.7,
+    "interest" : 0.6940000000000001,
+    "legacy" : 45,
+    "locks" : 2,
+    "look" : "gridField",
+    "pieces" : 18,
+    "seconds" : 6,
+    "seeds" : 32,
+    "template" : "knot-column-32-tails-lock2",
+    "tiers" : [
+      0,
+      3,
+      2,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 5
+  },
+  "knot(\"hubs-column\", holders: 3, tails: 0.4, locks: 3)" : {
+    "difficulty" : 38.9,
+    "interest" : 0.6940000000000001,
+    "legacy" : 48.4,
+    "locks" : 3,
+    "look" : "gridField",
+    "pieces" : 17.8,
+    "seconds" : 9.8,
+    "seeds" : 32,
+    "template" : "knot-column-32-tails-lock3",
+    "tiers" : [
+      0,
+      2,
+      2,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 4
+  },
+  "knot(\"hubs-diamond\", holders: 3, bars: 2, uBars: 1)" : {
+    "difficulty" : 19.6,
+    "interest" : 0.349,
+    "legacy" : 49,
+    "locks" : 0,
+    "look" : "gridBars",
+    "pieces" : 22.4,
+    "seconds" : 8.8,
+    "seeds" : 8,
+    "template" : "knot-diamond-32-b2-u1",
+    "tiers" : [
+      4,
+      0,
+      1,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 5
+  },
+  "knot(\"hubs-diamond\", holders: 3, tails: 0.4)" : {
+    "difficulty" : 22.6,
+    "interest" : 0.358,
+    "legacy" : 58.7,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 24,
+    "seconds" : 8.5,
+    "seeds" : 8,
+    "template" : "knot-diamond-32-tails",
+    "tiers" : [
+      2,
+      1,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 3
+  },
+  "knot(\"hubs-field\", holders: 3)" : {
+    "difficulty" : 35.4,
+    "interest" : 0.434,
+    "legacy" : 63.9,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 24,
+    "seconds" : 10.3,
+    "seeds" : 32,
+    "template" : "knot-field-32",
+    "tiers" : [
+      0,
+      10,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 10
+  },
+  "knot(\"hubs-field\", holders: 3, bars: 2, uBars: 1)" : {
+    "difficulty" : 25.2,
+    "interest" : 0.365,
+    "legacy" : 54.8,
+    "locks" : 0,
+    "look" : "gridBars",
+    "pieces" : 22.7,
+    "seconds" : 10.9,
+    "seeds" : 32,
+    "template" : "knot-field-32-b2-u1",
+    "tiers" : [
+      5,
+      7,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 12
+  },
+  "knot(\"hubs-field\", holders: 3, bars: 4)" : {
+    "difficulty" : 22.3,
+    "interest" : 0.353,
+    "legacy" : 54.7,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 23.2,
+    "seconds" : 9.5,
+    "seeds" : 8,
+    "template" : "knot-field-32-b4",
+    "tiers" : [
+      3,
+      2,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 5
+  },
+  "knot(\"hubs-field\", holders: 3, bars: 4, tails: 0.4)" : {
+    "difficulty" : 23.8,
+    "interest" : 0.37200000000000005,
+    "legacy" : 55.9,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 23,
+    "seconds" : 9.1,
+    "seeds" : 8,
+    "template" : "knot-field-32-b4-tails",
+    "tiers" : [
+      3,
+      0,
+      1,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 4
+  },
+  "knot(\"hubs-field\", holders: 3, locks: 1)" : {
+    "difficulty" : 33.4,
+    "interest" : 0.47200000000000003,
+    "legacy" : 61,
+    "locks" : 1,
+    "look" : "gridField",
+    "pieces" : 24,
+    "seconds" : 8.2,
+    "seeds" : 8,
+    "template" : "knot-field-32-lock1",
+    "tiers" : [
+      0,
+      4,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 4
+  },
+  "knot(\"hubs-field\", holders: 3, locks: 2)" : {
+    "difficulty" : 30.6,
+    "interest" : 0.39299999999999996,
+    "legacy" : 59.4,
+    "locks" : 2,
+    "look" : "gridField",
+    "pieces" : 24,
+    "seconds" : 9,
+    "seeds" : 8,
+    "template" : "knot-field-32-lock2",
+    "tiers" : [
+      1,
+      5,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 6
+  },
+  "knot(\"hubs-field\", holders: 3, locks: 3)" : {
+    "difficulty" : 34.8,
+    "interest" : 0.44,
+    "legacy" : 64.6,
+    "locks" : 3,
+    "look" : "gridField",
+    "pieces" : 23.8,
+    "seconds" : 8.8,
+    "seeds" : 8,
+    "template" : "knot-field-32-lock3",
+    "tiers" : [
+      0,
+      4,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 4
+  },
+  "knot(\"hubs-field\", holders: 3, tails: 0.4)" : {
+    "difficulty" : 39.2,
+    "interest" : 0.44299999999999995,
+    "legacy" : 66.4,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 24,
+    "seconds" : 12.1,
+    "seeds" : 8,
+    "template" : "knot-field-32-tails",
+    "tiers" : [
+      1,
+      2,
+      3,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 6
+  },
+  "knot(\"hubs-field\", holders: 3, tails: 0.4, locks: 1)" : {
+    "difficulty" : 39.8,
+    "interest" : 0.434,
+    "legacy" : 66,
+    "locks" : 1,
+    "look" : "gridField",
+    "pieces" : 24,
+    "seconds" : 10.4,
+    "seeds" : 8,
+    "template" : "knot-field-32-tails-lock1",
+    "tiers" : [
+      0,
+      2,
+      1,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 3
+  },
+  "knot(\"hubs-field\", holders: 3, tails: 0.4, locks: 2)" : {
+    "difficulty" : 34.3,
+    "interest" : 0.42100000000000004,
+    "legacy" : 64.9,
+    "locks" : 2,
+    "look" : "gridField",
+    "pieces" : 23.9,
+    "seconds" : 10,
+    "seeds" : 32,
+    "template" : "knot-field-32-tails-lock2",
+    "tiers" : [
+      1,
+      11,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 12
+  },
+  "knot(\"hubs-field\", holders: 3, tails: 0.4, locks: 3)" : {
+    "difficulty" : 24,
+    "interest" : 0.36200000000000004,
+    "legacy" : 57.2,
+    "locks" : 3,
+    "look" : "gridField",
+    "pieces" : 24,
+    "seconds" : 8,
+    "seeds" : 8,
+    "template" : "knot-field-32-tails-lock3",
+    "tiers" : [
+      3,
+      4,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 7
+  },
+  "knot(\"hubs-field\", holders: 3, uBars: 2)" : {
+    "difficulty" : 26.7,
+    "interest" : 0.38799999999999996,
+    "legacy" : 58.9,
+    "locks" : 0,
+    "look" : "gridBars",
+    "pieces" : 21.3,
+    "seconds" : 13.1,
+    "seeds" : 32,
+    "template" : "knot-field-32-u2",
+    "tiers" : [
+      4,
+      8,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 12
+  },
+  "knot(\"hubs-final\", holders: 3, bars: 4, tails: 0.4)" : {
+    "difficulty" : 23.3,
+    "interest" : 0.34299999999999997,
+    "legacy" : 58.9,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 25.7,
+    "seconds" : 8.4,
+    "seeds" : 8,
+    "template" : "knot-final-32-b4-tails",
+    "tiers" : [
+      4,
+      3,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 7
+  },
+  "knot(\"hubs-final\", holders: 3, tails: 0.4)" : {
+    "difficulty" : 27,
+    "interest" : 0.36700000000000005,
+    "legacy" : 64.2,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 25.8,
+    "seconds" : 8.7,
+    "seeds" : 8,
+    "template" : "knot-final-32-tails",
+    "tiers" : [
+      3,
+      2,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 5
+  },
+  "knot(\"hubs-final\", holders: 3, tails: 0.4, locks: 1)" : {
+    "difficulty" : 31.2,
+    "interest" : 0.406,
+    "legacy" : 66.9,
+    "locks" : 1,
+    "look" : "gridField",
+    "pieces" : 26,
+    "seconds" : 10.5,
+    "seeds" : 8,
+    "template" : "knot-final-32-tails-lock1",
+    "tiers" : [
+      1,
+      4,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 5
+  },
+  "knot(\"hubs-final\", holders: 3, tails: 0.4, locks: 2)" : {
+    "difficulty" : 41.3,
+    "interest" : 0.52,
+    "legacy" : 65.6,
+    "locks" : 2,
+    "look" : "gridField",
+    "pieces" : 25.7,
+    "seconds" : 7.6,
+    "seeds" : 8,
+    "template" : "knot-final-32-tails-lock2",
+    "tiers" : [
+      0,
+      2,
+      1,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 3
+  },
+  "knot(\"hubs-final\", holders: 3, tails: 0.4, locks: 3)" : {
+    "difficulty" : 30.5,
+    "interest" : 0.39,
+    "legacy" : 62.6,
+    "locks" : 3,
+    "look" : "gridField",
+    "pieces" : 25.9,
+    "seconds" : 9.5,
+    "seeds" : 32,
+    "template" : "knot-final-32-tails-lock3",
+    "tiers" : [
+      6,
+      7,
+      0,
+      1
+    ],
+    "unplannedShare" : 0.07142857142857142,
+    "valid" : 14
+  },
+  "knot(\"hubs-final\", holders: 3, uBars: 2)" : {
+    "difficulty" : 25.4,
+    "interest" : 0.36,
+    "legacy" : 58.6,
+    "locks" : 0,
+    "look" : "gridBars",
+    "pieces" : 23.3,
+    "seconds" : 10.4,
+    "seeds" : 8,
+    "template" : "knot-final-32-u2",
+    "tiers" : [
+      1,
+      2,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 3
+  },
+  "knot(\"hubs-gaps\", holders: 3, bars: 2, tails: 0.4)" : {
+    "difficulty" : 23.9,
+    "interest" : 0.306,
+    "legacy" : 61.2,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 25,
+    "seconds" : 8,
+    "seeds" : 8,
+    "template" : "knot-gaps-32-b2-tails",
+    "tiers" : [
+      2,
+      1,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 3
+  },
+  "knot(\"hubs-gaps\", holders: 3, tails: 0.6)" : {
+    "difficulty" : 32.4,
+    "interest" : 0.44299999999999995,
+    "legacy" : 65.8,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 25,
+    "seconds" : 8,
+    "seeds" : 8,
+    "template" : "knot-gaps-32-tails",
+    "tiers" : [
+      1,
+      2,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 3
+  },
+  "knot(\"hubs-gaps\", holders: 3, tails: 0.6, locks: 1)" : {
+    "difficulty" : 29.4,
+    "interest" : 0.377,
+    "legacy" : 63.2,
+    "locks" : 1,
+    "look" : "gridField",
+    "pieces" : 25,
+    "seconds" : 8.3,
+    "seeds" : 8,
+    "template" : "knot-gaps-32-tails-lock1",
+    "tiers" : [
+      1,
+      3,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 4
+  },
+  "knot(\"hubs-gaps\", holders: 3, tails: 0.6, locks: 2)" : {
+    "difficulty" : 22.3,
+    "interest" : 0.355,
+    "legacy" : 58.2,
+    "locks" : 2,
+    "look" : "gridField",
+    "pieces" : 24.9,
+    "seconds" : 8.7,
+    "seeds" : 32,
+    "template" : "knot-gaps-32-tails-lock2",
+    "tiers" : [
+      6,
+      4,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 10
+  },
+  "knot(\"hubs-gaps\", holders: 3, tails: 0.6, locks: 3)" : {
+    "difficulty" : 35.1,
+    "interest" : 0.433,
+    "legacy" : 66.2,
+    "locks" : 3,
+    "look" : "gridField",
+    "pieces" : 25,
+    "seconds" : 9,
+    "seeds" : 32,
+    "template" : "knot-gaps-32-tails-lock3",
+    "tiers" : [
+      0,
+      6,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 6
+  },
+  "knot(\"hubs-grand\", holders: 2)" : {
+    "difficulty" : 26.6,
+    "interest" : 0.657,
+    "legacy" : 35.3,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 14.6,
+    "seconds" : 6.6,
+    "seeds" : 8,
+    "template" : "knot-grand-22",
+    "tiers" : [
+      1,
+      3,
+      1,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 5
+  },
+  "knot(\"hubs-grand\", holders: 2, bars: 1, uBars: 1)" : {
+    "difficulty" : 21.7,
+    "interest" : 0.537,
+    "legacy" : 32.8,
+    "locks" : 0,
+    "look" : "gridBars",
+    "pieces" : 13.6,
+    "seconds" : 12.2,
+    "seeds" : 32,
+    "template" : "knot-grand-22-b1-u1",
+    "tiers" : [
+      2,
+      8,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 10
+  },
+  "knot(\"hubs-grand\", holders: 2, bars: 3)" : {
+    "difficulty" : 20.7,
+    "interest" : 0.384,
+    "legacy" : 30.8,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 14.8,
+    "seconds" : 8,
+    "seeds" : 8,
+    "template" : "knot-grand-22-b3",
+    "tiers" : [
+      1,
+      3,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 4
+  },
+  "knot(\"hubs-grand\", holders: 2, bars: 3, tails: 0.4)" : {
+    "difficulty" : 21.7,
+    "interest" : 0.441,
+    "legacy" : 32.9,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 14.3,
+    "seconds" : 8.2,
+    "seeds" : 8,
+    "template" : "knot-grand-22-b3-tails",
+    "tiers" : [
+      1,
+      3,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 4
+  },
+  "knot(\"hubs-grand\", holders: 2, locks: 1)" : {
+    "difficulty" : 27.7,
+    "interest" : 0.6409999999999999,
+    "legacy" : 33,
+    "locks" : 1,
+    "look" : "gridField",
+    "pieces" : 14.8,
+    "seconds" : 5.5,
+    "seeds" : 8,
+    "template" : "knot-grand-22-lock1",
+    "tiers" : [
+      1,
+      4,
+      1,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 6
+  },
+  "knot(\"hubs-grand\", holders: 2, locks: 2)" : {
+    "difficulty" : 19.5,
+    "interest" : 0.46299999999999997,
+    "legacy" : 30,
+    "locks" : 2,
+    "look" : "gridField",
+    "pieces" : 15,
+    "seconds" : 4.7,
+    "seeds" : 8,
+    "template" : "knot-grand-22-lock2",
+    "tiers" : [
+      1,
+      2,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 3
+  },
+  "knot(\"hubs-grand\", holders: 2, locks: 3)" : {
+    "difficulty" : 26.5,
+    "interest" : 0.653,
+    "legacy" : 33.5,
+    "locks" : 3,
+    "look" : "gridField",
+    "pieces" : 15,
+    "seconds" : 6,
+    "seeds" : 32,
+    "template" : "knot-grand-22-lock3",
+    "tiers" : [
+      0,
+      4,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 4
+  },
+  "knot(\"hubs-grand\", holders: 2, tails: 0.4)" : {
+    "difficulty" : 32.1,
+    "interest" : 0.667,
+    "legacy" : 41.5,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 14.9,
+    "seconds" : 8,
+    "seeds" : 32,
+    "template" : "knot-grand-22-tails",
+    "tiers" : [
+      0,
+      5,
+      2,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 7
+  },
+  "knot(\"hubs-grand\", holders: 2, tails: 0.4, locks: 1)" : {
+    "difficulty" : 32.8,
+    "interest" : 0.636,
+    "legacy" : 36.7,
+    "locks" : 1,
+    "look" : "gridField",
+    "pieces" : 15,
+    "seconds" : 8.3,
+    "seeds" : 32,
+    "template" : "knot-grand-22-tails-lock1",
+    "tiers" : [
+      0,
+      5,
+      3,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 8
+  },
+  "knot(\"hubs-grand\", holders: 2, tails: 0.4, locks: 2)" : {
+    "difficulty" : 30.5,
+    "interest" : 0.7609999999999999,
+    "legacy" : 38.7,
+    "locks" : 2,
+    "look" : "gridField",
+    "pieces" : 15,
+    "seconds" : 7.7,
+    "seeds" : 32,
+    "template" : "knot-grand-22-tails-lock2",
+    "tiers" : [
+      0,
+      3,
+      1,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 4
+  },
+  "knot(\"hubs-grand\", holders: 2, tails: 0.4, locks: 3)" : {
+    "difficulty" : 20.9,
+    "interest" : 0.478,
+    "legacy" : 27.4,
+    "locks" : 3,
+    "look" : "gridField",
+    "pieces" : 15,
+    "seconds" : 4.7,
+    "seeds" : 32,
+    "template" : "knot-grand-22-tails-lock3",
+    "tiers" : [
+      1,
+      2,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 3
+  },
+  "knot(\"hubs-kite\", holders: 2, tails: 0.3)" : {
+    "difficulty" : 10,
+    "interest" : 0.332,
+    "legacy" : 37.6,
+    "locks" : 0,
+    "look" : "diagonal",
+    "pieces" : 18.2,
+    "seconds" : 7.7,
+    "seeds" : 8,
+    "template" : "knot-kite-22-tails",
+    "tiers" : [
+      5,
+      0,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 5
+  },
+  "knot(\"hubs-nine\", holders: 2)" : {
+    "difficulty" : 22.6,
+    "interest" : 0.622,
+    "legacy" : 20.6,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 9,
+    "seconds" : 4.9,
+    "seeds" : 8,
+    "template" : "knot-nine-22",
+    "tiers" : [
+      0,
+      7,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 7
+  },
+  "knot(\"hubs-nine\", holders: 2, bars: 1)" : {
+    "difficulty" : 19,
+    "interest" : 0.442,
+    "legacy" : 18.5,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 8.8,
+    "seconds" : 9.3,
+    "seeds" : 8,
+    "template" : "knot-nine-22-b1",
+    "tiers" : [
+      1,
+      5,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 6
+  },
+  "knot(\"hubs-nine\", holders: 2, bars: 1, tails: 0.4)" : {
+    "difficulty" : 22.2,
+    "interest" : 0.552,
+    "legacy" : 20,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 9,
+    "seconds" : 6.5,
+    "seeds" : 8,
+    "template" : "knot-nine-22-b1-tails",
+    "tiers" : [
+      0,
+      3,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 3
+  },
+  "knot(\"hubs-nine\", holders: 2, locks: 1)" : {
+    "difficulty" : 23.1,
+    "interest" : 0.632,
+    "legacy" : 22.1,
+    "locks" : 1,
+    "look" : "gridField",
+    "pieces" : 9,
+    "seconds" : 3.8,
+    "seeds" : 8,
+    "template" : "knot-nine-22-lock1",
+    "tiers" : [
+      0,
+      4,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 4
+  },
+  "knot(\"hubs-nine\", holders: 2, tails: 0.4)" : {
+    "difficulty" : 16.7,
+    "interest" : 0.268,
+    "legacy" : 19.4,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 9,
+    "seconds" : 2.3,
+    "seeds" : 8,
+    "template" : "knot-nine-22-tails",
+    "tiers" : [
+      1,
+      2,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 3
+  },
+  "knot(\"hubs-riddle\", holders: 3, bars: 3)" : {
+    "difficulty" : 17.2,
+    "interest" : 0.324,
+    "legacy" : 53.4,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 23,
+    "seconds" : 9.7,
+    "seeds" : 8,
+    "template" : "knot-riddle-32-b3",
+    "tiers" : [
+      4,
+      1,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 5
+  },
+  "knot(\"hubs-riddle\", holders: 3, tails: 0.6)" : {
+    "difficulty" : 20.4,
+    "interest" : 0.337,
+    "legacy" : 56.5,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 23.9,
+    "seconds" : 9.7,
+    "seeds" : 32,
+    "template" : "knot-riddle-32-tails",
+    "tiers" : [
+      7,
+      3,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 10
+  },
+  "knot(\"hubs-sieve\", holders: 3, bars: 2, tails: 0.4)" : {
+    "difficulty" : 22.4,
+    "interest" : 0.366,
+    "legacy" : 53.7,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 23.5,
+    "seconds" : 9.1,
+    "seeds" : 8,
+    "template" : "knot-sieve-32-b2-tails",
+    "tiers" : [
+      2,
+      2,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 4
+  },
+  "knot(\"hubs-sieve\", holders: 3, tails: 0.6)" : {
+    "difficulty" : 19.7,
+    "interest" : 0.355,
+    "legacy" : 53.4,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 23.8,
+    "seconds" : 6.9,
+    "seeds" : 8,
+    "template" : "knot-sieve-32-tails",
+    "tiers" : [
+      3,
+      1,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 4
+  },
+  "knot(\"hubs-sieve\", holders: 3, tails: 0.6, locks: 1)" : {
+    "difficulty" : 22.3,
+    "interest" : 0.353,
+    "legacy" : 55,
+    "locks" : 1,
+    "look" : "gridField",
+    "pieces" : 23.7,
+    "seconds" : 9.1,
+    "seeds" : 32,
+    "template" : "knot-sieve-32-tails-lock1",
+    "tiers" : [
+      6,
+      5,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 11
+  },
+  "knot(\"hubs-sieve\", holders: 3, tails: 0.6, locks: 2)" : {
+    "difficulty" : 18.3,
+    "interest" : 0.353,
+    "legacy" : 52.1,
+    "locks" : 2,
+    "look" : "gridField",
+    "pieces" : 23.5,
+    "seconds" : 7.5,
+    "seeds" : 8,
+    "template" : "knot-sieve-32-tails-lock2",
+    "tiers" : [
+      3,
+      1,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 4
+  },
+  "knot(\"hubs-sieve\", holders: 3, tails: 0.6, locks: 3)" : {
+    "difficulty" : 20.6,
+    "interest" : 0.355,
+    "legacy" : 54.2,
+    "locks" : 3,
+    "look" : "gridField",
+    "pieces" : 24,
+    "seconds" : 9.9,
+    "seeds" : 32,
+    "template" : "knot-sieve-32-tails-lock3",
+    "tiers" : [
+      7,
+      3,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 10
+  },
+  "knot(\"hubs-tall\", holders: 3)" : {
+    "difficulty" : 32.6,
+    "interest" : 0.387,
+    "legacy" : 70.4,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 27.9,
+    "seconds" : 12.3,
+    "seeds" : 32,
+    "template" : "knot-tall-32",
+    "tiers" : [
+      3,
+      5,
+      1,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 9
+  },
+  "knot(\"hubs-tall\", holders: 3, bars: 2, uBars: 2)" : {
+    "difficulty" : 33.8,
+    "interest" : 0.359,
+    "legacy" : 67.1,
+    "locks" : 0,
+    "look" : "gridBars",
+    "pieces" : 25.3,
+    "seconds" : 13.3,
+    "seeds" : 32,
+    "template" : "knot-tall-32-b2-u2",
+    "tiers" : [
+      1,
+      8,
+      1,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 10
+  },
+  "knot(\"hubs-tall\", holders: 3, bars: 6)" : {
+    "difficulty" : 23.8,
+    "interest" : 0.39399999999999996,
+    "legacy" : 65.6,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 27.6,
+    "seconds" : 11.1,
+    "seeds" : 8,
+    "template" : "knot-tall-32-b6",
+    "tiers" : [
+      3,
+      2,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 5
+  },
+  "knot(\"hubs-tall\", holders: 3, bars: 6, tails: 0.4)" : {
+    "difficulty" : 20.3,
+    "interest" : 0.36700000000000005,
+    "legacy" : 60.8,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 27.2,
+    "seconds" : 10.7,
+    "seeds" : 32,
+    "template" : "knot-tall-32-b6-tails",
+    "tiers" : [
+      11,
+      2,
+      1,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 14
+  },
+  "knot(\"hubs-tall\", holders: 3, locks: 1)" : {
+    "difficulty" : 41,
+    "interest" : 0.396,
+    "legacy" : 69.1,
+    "locks" : 1,
+    "look" : "gridField",
+    "pieces" : 28,
+    "seconds" : 11.7,
+    "seeds" : 8,
+    "template" : "knot-tall-32-lock1",
+    "tiers" : [
+      0,
+      3,
+      1,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 4
+  },
+  "knot(\"hubs-tall\", holders: 3, locks: 2)" : {
+    "difficulty" : 38.6,
+    "interest" : 0.469,
+    "legacy" : 78.1,
+    "locks" : 2,
+    "look" : "gridField",
+    "pieces" : 28,
+    "seconds" : 10.5,
+    "seeds" : 8,
+    "template" : "knot-tall-32-lock2",
+    "tiers" : [
+      0,
+      4,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 4
+  },
+  "knot(\"hubs-tall\", holders: 3, locks: 3)" : {
+    "difficulty" : 30.5,
+    "interest" : 0.39299999999999996,
+    "legacy" : 67.8,
+    "locks" : 3,
+    "look" : "gridField",
+    "pieces" : 28,
+    "seconds" : 10.5,
+    "seeds" : 32,
+    "template" : "knot-tall-32-lock3",
+    "tiers" : [
+      4,
+      8,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 12
+  },
+  "knot(\"hubs-tall\", holders: 3, tails: 0.4)" : {
+    "difficulty" : 34.3,
+    "interest" : 0.401,
+    "legacy" : 71.8,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 28,
+    "seconds" : 10.6,
+    "seeds" : 32,
+    "template" : "knot-tall-32-tails",
+    "tiers" : [
+      2,
+      6,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 8
+  },
+  "knot(\"hubs-tall\", holders: 3, tails: 0.4, locks: 1)" : {
+    "difficulty" : 37.7,
+    "interest" : 0.501,
+    "legacy" : 75.5,
+    "locks" : 1,
+    "look" : "gridField",
+    "pieces" : 27.7,
+    "seconds" : 11.2,
+    "seeds" : 8,
+    "template" : "knot-tall-32-tails-lock1",
+    "tiers" : [
+      0,
+      3,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 3
+  },
+  "knot(\"hubs-tall\", holders: 3, tails: 0.4, locks: 2)" : {
+    "difficulty" : 37.2,
+    "interest" : 0.441,
+    "legacy" : 72.8,
+    "locks" : 2,
+    "look" : "gridField",
+    "pieces" : 28,
+    "seconds" : 10.6,
+    "seeds" : 32,
+    "template" : "knot-tall-32-tails-lock2",
+    "tiers" : [
+      2,
+      8,
+      2,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 12
+  },
+  "knot(\"hubs-tall\", holders: 3, tails: 0.4, locks: 3)" : {
+    "difficulty" : 36.6,
+    "interest" : 0.42700000000000005,
+    "legacy" : 72,
+    "locks" : 3,
+    "look" : "gridField",
+    "pieces" : 28,
+    "seconds" : 10.6,
+    "seeds" : 32,
+    "template" : "knot-tall-32-tails-lock3",
+    "tiers" : [
+      2,
+      13,
+      1,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 16
+  },
+  "knot(\"hubs-twelve\", holders: 2)" : {
+    "difficulty" : 30.4,
+    "interest" : 0.619,
+    "legacy" : 32.7,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 12,
+    "seconds" : 7.9,
+    "seeds" : 32,
+    "template" : "knot-twelve-22",
+    "tiers" : [
+      0,
+      6,
+      3,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 9
+  },
+  "knot(\"hubs-twelve\", holders: 2, bars: 2)" : {
+    "difficulty" : 20,
+    "interest" : 0.381,
+    "legacy" : 29.2,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 12,
+    "seconds" : 7.5,
+    "seeds" : 8,
+    "template" : "knot-twelve-22-b2",
+    "tiers" : [
+      1,
+      3,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 4
+  },
+  "knot(\"hubs-twelve\", holders: 2, bars: 2, tails: 0.4)" : {
+    "difficulty" : 25.7,
+    "interest" : 0.359,
+    "legacy" : 28.6,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 11.8,
+    "seconds" : 10.7,
+    "seeds" : 32,
+    "template" : "knot-twelve-22-b2-tails",
+    "tiers" : [
+      2,
+      6,
+      4,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 12
+  },
+  "knot(\"hubs-twelve\", holders: 2, locks: 1)" : {
+    "difficulty" : 27.6,
+    "interest" : 0.6459999999999999,
+    "legacy" : 28.1,
+    "locks" : 1,
+    "look" : "gridField",
+    "pieces" : 12,
+    "seconds" : 6.8,
+    "seeds" : 8,
+    "template" : "knot-twelve-22-lock1",
+    "tiers" : [
+      0,
+      5,
+      1,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 6
+  },
+  "knot(\"hubs-twelve\", holders: 2, locks: 2)" : {
+    "difficulty" : 29.1,
+    "interest" : 0.679,
+    "legacy" : 26.3,
+    "locks" : 2,
+    "look" : "gridField",
+    "pieces" : 12,
+    "seconds" : 7.2,
+    "seeds" : 8,
+    "template" : "knot-twelve-22-lock2",
+    "tiers" : [
+      0,
+      2,
+      1,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 3
+  },
+  "knot(\"hubs-twelve\", holders: 2, locks: 3)" : {
+    "difficulty" : 14.3,
+    "interest" : 0.397,
+    "legacy" : 18.9,
+    "locks" : 3,
+    "look" : "gridField",
+    "pieces" : 12,
+    "seconds" : 5.1,
+    "seeds" : 32,
+    "template" : "knot-twelve-22-lock3",
+    "tiers" : [
+      3,
+      2,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 5
+  },
+  "knot(\"hubs-twelve\", holders: 2, tails: 0.4)" : {
+    "difficulty" : 26.8,
+    "interest" : 0.503,
+    "legacy" : 29.9,
+    "locks" : 0,
+    "look" : "gridField",
+    "pieces" : 11.8,
+    "seconds" : 8.4,
+    "seeds" : 32,
+    "template" : "knot-twelve-22-tails",
+    "tiers" : [
+      1,
+      7,
+      3,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 11
+  },
+  "knot(\"hubs-twelve\", holders: 2, tails: 0.4, locks: 1)" : {
+    "difficulty" : 25.5,
+    "interest" : 0.7,
+    "legacy" : 31.8,
+    "locks" : 1,
+    "look" : "gridField",
+    "pieces" : 12,
+    "seconds" : 7.5,
+    "seeds" : 8,
+    "template" : "knot-twelve-22-tails-lock1",
+    "tiers" : [
+      0,
+      4,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 4
+  },
+  "knot(\"hubs-twelve\", holders: 2, tails: 0.4, locks: 2)" : {
+    "difficulty" : 20.8,
+    "interest" : 0.639,
+    "legacy" : 25.1,
+    "locks" : 2,
+    "look" : "gridField",
+    "pieces" : 12,
+    "seconds" : 6.3,
+    "seeds" : 8,
+    "template" : "knot-twelve-22-tails-lock2",
+    "tiers" : [
+      1,
+      4,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 5
+  },
+  "knot(\"hubs-twelve\", holders: 2, tails: 0.4, locks: 3)" : {
+    "difficulty" : 19.4,
+    "interest" : 0.687,
+    "legacy" : 24.8,
+    "locks" : 3,
+    "look" : "gridField",
+    "pieces" : 12,
+    "seconds" : 6.7,
+    "seeds" : 32,
+    "template" : "knot-twelve-22-tails-lock3",
+    "tiers" : [
+      1,
+      2,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 3
+  },
+  "knot(\"hubs-twelve\", holders: 2, uBars: 1)" : {
+    "difficulty" : 27.8,
+    "interest" : 0.363,
+    "legacy" : 23.7,
+    "locks" : 0,
+    "look" : "gridBars",
+    "pieces" : 10.7,
+    "seconds" : 9.2,
+    "seeds" : 8,
+    "template" : "knot-twelve-22-u1",
+    "tiers" : [
+      0,
+      2,
+      1,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 3
+  },
+  "knot(\"hubs-weave\", holders: 3, tails: 0.4)" : {
+    "difficulty" : 20.7,
+    "interest" : 0.32299999999999995,
+    "legacy" : 52,
+    "locks" : 0,
+    "look" : "diagonal",
+    "pieces" : 21.6,
+    "seconds" : 12.8,
+    "seeds" : 32,
+    "template" : "knot-weave-32-tails",
+    "tiers" : [
+      6,
+      6,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 12
+  },
+  "maze(cols: 10, rows: 14, bars: 17, freeLimit: 2)" : {
+    "difficulty" : 9.3,
+    "interest" : 0.24600000000000002,
+    "legacy" : 35.1,
+    "locks" : 0,
+    "look" : "barMaze",
+    "pieces" : 14,
+    "seconds" : 9.3,
+    "seeds" : 8,
+    "template" : "maze-10x14-tight",
+    "tiers" : [
+      3,
+      0,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 3
+  },
+  "maze(cols: 11, rows: 15, bars: 19, freeLimit: 3)" : {
+    "difficulty" : 10.8,
+    "interest" : 0.28800000000000003,
+    "legacy" : 37.3,
+    "locks" : 0,
+    "look" : "barMaze",
+    "pieces" : 16.1,
+    "seconds" : 7.7,
+    "seeds" : 8,
+    "template" : "maze-11x15-tight",
+    "tiers" : [
+      7,
+      0,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 7
+  },
+  "maze(cols: 11, rows: 16, bars: 21, freeLimit: 3)" : {
+    "difficulty" : 12.7,
+    "interest" : 0.282,
+    "legacy" : 47,
+    "locks" : 0,
+    "look" : "barMaze",
+    "pieces" : 19,
+    "seconds" : 7.3,
+    "seeds" : 8,
+    "template" : "maze-11x16-tight",
+    "tiers" : [
+      5,
+      0,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 5
+  },
+  "maze(cols: 11, rows: 18, bars: 23, freeLimit: 3)" : {
+    "difficulty" : 14.3,
+    "interest" : 0.309,
+    "legacy" : 53,
+    "locks" : 0,
+    "look" : "barMaze",
+    "pieces" : 21.5,
+    "seconds" : 8.9,
+    "seeds" : 8,
+    "template" : "maze-11x18-tight",
+    "tiers" : [
+      6,
+      0,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 6
+  },
+  "maze(cols: 11, rows: 20, bars: 26, freeLimit: 3)" : {
+    "difficulty" : 15,
+    "interest" : 0.327,
+    "legacy" : 55.1,
+    "locks" : 0,
+    "look" : "barMaze",
+    "pieces" : 22.5,
+    "seconds" : 10.1,
+    "seeds" : 8,
+    "template" : "maze-11x20-tight",
+    "tiers" : [
+      6,
+      0,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 6
+  },
+  "maze(cols: 8, rows: 10, bars: 11, freeLimit: 2)" : {
+    "difficulty" : 6.4,
+    "interest" : 0.298,
+    "legacy" : 18.5,
+    "locks" : 0,
+    "look" : "barMaze",
+    "pieces" : 9.5,
+    "seconds" : 12.7,
+    "seeds" : 8,
+    "template" : "maze-8x10-tight",
+    "tiers" : [
+      4,
+      0,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 4
+  },
+  "maze(cols: 9, rows: 12, bars: 14, freeLimit: 2)" : {
+    "difficulty" : 7.3,
+    "interest" : 0.273,
+    "legacy" : 25.1,
+    "locks" : 0,
+    "look" : "barMaze",
+    "pieces" : 11,
+    "seconds" : 10.5,
+    "seeds" : 8,
+    "template" : "maze-9x12-tight",
+    "tiers" : [
+      4,
+      0,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 4
+  },
+  "net(\"figure-block\", lock: lock)" : {
+    "difficulty" : 5.3,
+    "interest" : 0.26899999999999996,
+    "legacy" : 15.6,
+    "locks" : 0,
+    "look" : "figure",
+    "pieces" : 9,
+    "seconds" : 1.9,
+    "seeds" : 8,
+    "template" : "figure-block",
+    "tiers" : [
+      8,
+      0,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 8
+  },
+  "net(\"weave-butterfly\", lock: lock)" : {
+    "difficulty" : 9.3,
+    "interest" : 0.34299999999999997,
+    "legacy" : 27.5,
+    "locks" : 0,
+    "look" : "figure",
+    "pieces" : 16,
+    "seconds" : 4.1,
+    "seeds" : 8,
+    "template" : "weave-butterfly",
+    "tiers" : [
+      8,
+      0,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 8
+  },
+  "net(\"weave-crystal\", lock: lock, crossClips: 1, tails: 3)" : {
+    "difficulty" : 10.1,
+    "interest" : 0.33399999999999996,
+    "legacy" : 42.1,
+    "locks" : 0,
+    "look" : "figure",
+    "pieces" : 19,
+    "seconds" : 6.8,
+    "seeds" : 8,
+    "template" : "weave-crystal-tails",
+    "tiers" : [
+      8,
+      0,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 8
+  },
+  "net(\"weave-diamond\", lock: lock)" : {
+    "difficulty" : 4.7,
+    "interest" : 0.32899999999999996,
+    "legacy" : 6.3,
+    "locks" : 0,
+    "look" : "figure",
+    "pieces" : 9,
+    "seconds" : 6.1,
+    "seeds" : 8,
+    "template" : "weave-diamond",
+    "tiers" : [
+      8,
+      0,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 8
+  },
+  "net(\"weave-kite\", lock: lock, crossClips: 1)" : {
+    "difficulty" : 7.4,
+    "interest" : 0.34700000000000003,
+    "legacy" : 20.3,
+    "locks" : 0,
+    "look" : "figure",
+    "pieces" : 14,
+    "seconds" : 4.8,
+    "seeds" : 8,
+    "template" : "weave-kite",
+    "tiers" : [
+      8,
+      0,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 8
+  },
+  "net(\"weave-lantern\", lock: lock, bars: 1, tails: 3)" : {
+    "difficulty" : 9.9,
+    "interest" : 0.327,
+    "legacy" : 38.1,
+    "locks" : 0,
+    "look" : "figure",
+    "pieces" : 18.5,
+    "seconds" : 6.3,
+    "seeds" : 8,
+    "template" : "weave-lantern-tails",
+    "tiers" : [
+      8,
+      0,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 8
+  },
+  "net(\"weave-tapestry\", lock: lock, crossClips: 2, tails: 4)" : {
+    "difficulty" : 12.8,
+    "interest" : 0.358,
+    "legacy" : 45.9,
+    "locks" : 0,
+    "look" : "figure",
+    "pieces" : 23,
+    "seconds" : 6.5,
+    "seeds" : 8,
+    "template" : "weave-tapestry-tails",
+    "tiers" : [
+      8,
+      0,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 8
+  },
+  "sun(lock: lock)" : {
+    "difficulty" : 9.3,
+    "interest" : 0.34299999999999997,
+    "legacy" : 21.5,
+    "locks" : 0,
+    "look" : "giant",
+    "pieces" : 15,
+    "seconds" : 6.4,
+    "seeds" : 8,
+    "template" : "sun",
+    "tiers" : [
+      8,
+      0,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 8
+  },
+  "sunAndMoons(lock: lock)" : {
+    "difficulty" : 10.7,
+    "interest" : 0.366,
+    "legacy" : 28.8,
+    "locks" : 0,
+    "look" : "giant",
+    "pieces" : 19,
+    "seconds" : 5.5,
+    "seeds" : 8,
+    "template" : "sun-moons",
+    "tiers" : [
+      8,
+      0,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 8
+  },
+  "tangle(rings: 11...14, pokes: 1, latches: 1, lock: lock)" : {
+    "difficulty" : 8.1,
+    "interest" : 0.23800000000000002,
+    "legacy" : 28.4,
+    "locks" : 0,
+    "look" : "freeform",
+    "pieces" : 13.2,
+    "seconds" : 4.2,
+    "seeds" : 8,
+    "template" : "tangle-11-14-locked",
+    "tiers" : [
+      5,
+      0,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 5
+  },
+  "tangle(rings: 13...16, pokes: 2, latches: 2, chain: 0.7, lock: lock)" : {
+    "difficulty" : 9.1,
+    "interest" : 0.21899999999999997,
+    "legacy" : 35,
+    "locks" : 0,
+    "look" : "freeform",
+    "pieces" : 15,
+    "seconds" : 6.3,
+    "seeds" : 8,
+    "template" : "tangle-13-16-locked",
+    "tiers" : [
+      3,
+      0,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 3
+  },
+  "tangle(rings: 15...18, pokes: 2, latches: 1, hubs: 3, lock: lock)" : {
+    "difficulty" : 9.8,
+    "interest" : 0.349,
+    "legacy" : 25.8,
+    "locks" : 0,
+    "look" : "freeform",
+    "pieces" : 17.9,
+    "seconds" : 3.3,
+    "seeds" : 8,
+    "template" : "tangle-15-18-locked-3hubs",
+    "tiers" : [
+      8,
+      0,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 8
+  },
+  "tangle(rings: 17...21, pokes: 3, latches: 2, chain: 0.75, lock: lock)" : {
+    "difficulty" : 11.9,
+    "interest" : 0.3,
+    "legacy" : 42.2,
+    "locks" : 0,
+    "look" : "freeform",
+    "pieces" : 18.9,
+    "seconds" : 6.8,
+    "seeds" : 32,
+    "template" : "tangle-17-21-locked",
+    "tiers" : [
+      9,
+      0,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 9
+  },
+  "tangle(rings: 8...10, pokes: 1, lock: lock)" : {
+    "difficulty" : 6,
+    "interest" : 0.17300000000000001,
+    "legacy" : 22.9,
+    "locks" : 0,
+    "look" : "freeform",
+    "pieces" : 10,
+    "seconds" : 1.5,
+    "seeds" : 8,
+    "template" : "tangle-8-10-locked",
+    "tiers" : [
+      8,
+      0,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 8
+  },
+  "tangle(rings: 9...12, pokes: 1, latches: 1, planet: true, lock: lock)" : {
+    "difficulty" : 6.7,
+    "interest" : 0.272,
+    "legacy" : 15.1,
+    "locks" : 0,
+    "look" : "giant",
+    "pieces" : 11.2,
+    "seconds" : 4.9,
+    "seeds" : 8,
+    "template" : "planet-9-12-locked",
+    "tiers" : [
+      5,
+      0,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 5
+  },
+  "tangle(rings: 9...12, pokes: 2, latches: 2, planet: true, chain: 0.7, lock: lock)" : {
+    "difficulty" : 7,
+    "interest" : 0.302,
+    "legacy" : 15.9,
+    "locks" : 0,
+    "look" : "giant",
+    "pieces" : 11.6,
+    "seconds" : 5.7,
+    "seeds" : 8,
+    "template" : "planet-9-12-locked",
+    "tiers" : [
+      5,
+      0,
+      0,
+      0
+    ],
+    "unplannedShare" : 0,
+    "valid" : 5
+  }
+}

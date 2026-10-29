@@ -74,8 +74,9 @@ Builders (all under `Model/Generation`):
 
 Selection: for a normal level the candidate closest to the difficulty curve wins
 (`DifficultyCurve`, `DifficultyScore`). For a hard level, eight candidates are built (twelve past
-level 50) and the one with the most `setupMoves` wins, then the lowest `freedom`. Seeds are deterministic (`candidateSeed`), but solver metrics
-depend on an 8-second time cap, so a rerun can pick a different candidate when two are close.
+level 50) and the one with the most `setupMoves` wins, then the lowest `freedom`. Generation is
+deterministic: the same seeds and settings give byte-identical files on any machine and with any
+`--jobs` (§14).
 
 ## 4. Workflow
 
@@ -88,16 +89,18 @@ swiftc -O -o /tmp/forge LevelForge/main.swift $(find RotateRings/Model -name '*.
 Commands (paths are resolved from the repo root):
 
 ```
-/tmp/forge compose tangle-6-8 planet-9-12-locked --count 4 --out DIR [--time-cap 2] [--verbose] [--keep-stuck]
+/tmp/forge compose tangle-6-8 planet-9-12-locked --count 4 --out DIR [--state-cap N] [--verbose] [--keep-stuck]
 /tmp/forge probe --levels 16-20 --count 4            # why each seed of a level does or does not work
 /tmp/forge generate --levels 16-50 --jobs 6          # regenerate; keeps the other levels' files
-/tmp/forge generate --levels 18,35 --keep-seeds      # rebuild from the recorded seeds after a rule change
+/tmp/forge generate --levels 101-110 --out DIR       # the same into DIR; the shipped files are not touched
+/tmp/forge generate --levels 18,35 --keep-seeds      # rebuild from the shipped report's seeds after a rule change
 /tmp/forge diagnose DIR/x.json                       # play greedily; explain what blocks what is left
 /tmp/forge solve RotateRings/Levels/level33.json     # metrics for one file
 /tmp/forge report                                    # the level table
 ```
 
-`compose` lists every template id when called without one. Template ids are what the report's
+Run the tool with `SWIFT_DETERMINISTIC_HASHING=1` in the environment. Nothing should depend on it
+(§14), but it is a cheap safety net. `compose` lists every template id when called without one. Template ids are what the report's
 `template` column shows.
 
 Looking at levels: there is no renderer in the tool. Write a throwaway SVG from the JSON: the
@@ -113,7 +116,8 @@ look at every changed level, and play the hard ones on a phone.
 ## 5. Rules that bite
 
 These are the constraints behind most generator failures. The solver finds them, but it is slow
-to find them (8 s per unsolvable candidate), so generators check them up front.
+to find them (a full state cap, about four seconds, per unsolvable candidate), so generators check
+them up front.
 
 - **Touching keeps turning pieces on the board.** A turning piece with no connection stays as long
   as any body is within 16 units of it. So rings must sit at least 18 apart (stems are 18–26), and
@@ -611,3 +615,364 @@ disagreement in the solver is not fixed.
 
 **Not verified by play** beyond the six samples.
 
+## 14. Choosing levels for fun (October 2026)
+
+The owner's brief: the score of §10 measures size and tangle, not how hard a level feels or
+whether it is fun, and 151–200 sit flat at 66–71 on it. Without designing levels by hand, measure
+"is there a clever moment?" and "is this tedious?", choose candidates by that, and trim pieces that
+add nothing. Done in steps, each checked before the next.
+
+### Step 0: determinism
+
+Measurements that are compared across candidates must not depend on the machine, so every limit
+now counts work instead of seconds.
+
+- **The exact search stops at a state cap only** (`SolverConfig.stateCap` = 30,000; the time cap
+  is gone and `--time-cap` is refused). Measured on sixteen shipped boards from 30 to 200, four
+  seconds reached 12–42k states (median about 28k) and none finished; every board ever solved
+  exactly needed at most 15k. So generation takes about as long as before, and no exact level
+  becomes an estimate. `ownerPlayout` (600 moves) and `bestFirstSolution` (4,000 expansions)
+  already had fixed budgets.
+- **The job count no longer changes which level wins.** `generate` used to stop after a whole
+  batch of `--jobs` seeds, so six jobs could see more candidates than two. Results are now taken
+  in seed order and the search stops at the exact seed that made it enough; the rest of the batch
+  is thrown away.
+- **No timestamps in files.** The report has no `generatedAt` and metrics no longer write
+  `elapsed` (the tool still prints it). Older files still decode.
+- **Hash order.** Swift seeds `Set` and `Dictionary` hashing per process. Every loop over one in
+  `Model/Generation` and `Model/Solver` was checked: each builds another dictionary, sorts first,
+  or computes something order-free (counts, BFS distances, `allSatisfy`). None needed changing.
+  Every builder makes its own `SplitMix64` from the candidate seed; there is no shared generator.
+- `generate --out DIR` writes levels, report and candidates to DIR and leaves the shipped files
+  alone (it still reads the shipped report for `--keep-seeds` and the pins).
+- `LevelTests` takes `LEVEL_TESTS=1-10,101-110` (as `TEST_RUNNER_LEVEL_TESTS` through xcodebuild)
+  for a quick run over some levels.
+
+### Step 1: bot players
+
+`BotLevel` (`Model/Solver/BotPlayer.swift`), settings in `QualityConfig`. A bot with lookahead k
+looks k + 1 drags ahead: when some sequence of that many drags takes a piece off, it plays the
+first drag of the shortest one, breadth first in the solver's move order; otherwise it drags at
+random. It plays on a real `Board` with `Board.move` (the replay's call) and searches with
+`LevelSolver.successors`; each independent part of the board is searched on its own. A lookahead
+may expand 400 positions (`lookaheadBudget`); positions worked out in one game are reused by the
+next. A game is lost after 3 × `minMoves` + 20 drags. `forge bots --levels …` prints, per bot,
+the share of 20 games won, the median length of a won game, the mean number of blind drags (no
+piece to take off within the lookahead), and the share won within 1.5× and 1.2× the recorded
+solution.
+
+Measured on the shipped levels 11–200 (all four bots, 20 games each):
+
+- **Only hub webs need foresight.** The 2-deep bot makes on average 20.6 blind drags per game on
+  the 39 hub webs and about one on knots and thickets (0.98, 0.95); on mazes, cages, weaves,
+  tangles, giant rings and the two wild knots it never drags blind. On every level that is not a
+  web, a piece can come off within two drags from almost every position. That fits the owner's
+  verdict that 101–200 are not harder than 100.
+- **Even the bot without foresight wins most games.** It takes what comes off and drags at random
+  otherwise, and loses any games at all on only 50 of 190 levels. With the 3 × + 20 limit, the
+  bots that look two or more drags ahead win at least 80 % of the games on every level, so the
+  tier as first defined would be 0 or 1 everywhere.
+- **The 4-deep bot adds nothing** over the 3-deep one on any level and takes 43 % of the time.
+- **Cost.** About 0.5 s per level for all four bots, except webs: up to 516 s (level 125), almost
+  all of it in the 3- and 4-deep bots on blind positions. All 190 levels took 47 minutes on one
+  core.
+- **The board refused drags the solver offered** (302 over all levels, in 46 levels with sliding
+  bars). The solver keeps a sliding bar's offset rounded to half a unit; a bar pushed until it
+  stops ends at, say, 31.24, the solver rebuilds it at 31.0, just clear of its blocker, and offers
+  another push the real board refuses. This is very likely what made level 110's first solution
+  fail to replay (§13). The bot treats a refused drag as unavailable and chooses again. Fixed in
+  the solver next.
+
+### Bar precision
+
+The solver stored a sliding bar's offset in half units. The board samples a push every 2 units
+from wherever the bar starts, so a bar the solver rebuilds even slightly off its real spot can
+step over a thin edge the real bar catches (level 27: bar l3 at 17.571 on the board, 17.578 in the
+solver; pushed out of its hub, the board's samples hit b3, the solver's miss it). The state now
+keeps every bar's exact offset, and two states are the same position when their offsets agree on
+a 1/4096 grid (`LevelSolver.slideScale`): the grid only decides what counts as visited, while a
+board rebuilt from a state is exactly the board its moves came from. The bot's caches key on the
+exact offsets, as does the solver's sweep cache. (The owner asked for a 1/64 grid; that alone
+still left 156 refused drags, a 1/4096 grid left none but some drags landed one grid step off;
+exact offsets leave nothing, which is what the owner asked for as the option.)
+
+Checked on all 113 shipped levels with bars, solving each and walking 400 real boards breadth first
+(about 1.5 million solver drags offered):
+
+| solver keeps | refused drags | levels with any | landed elsewhere | solve time |
+|---|---|---|---|---|
+| half units (before) | 3,933 | 83 | 6,094 | 595 s |
+| 1/64 grid | 156 | 7 | 4,347 | 585 s |
+| 1/4096 grid | 0 | 0 | 5,384 (one step off) | 576 s |
+| exact offsets, 1/4096 identity | 0 | 0 | 0 | 620 s |
+
+No level's move count changes and every recorded solution still replays. Levels 15 and 25 are no
+longer solved exactly: bars that used to share a half-unit cell are now told apart, so their
+graphs pass the state cap (both keep their move count; regenerating them would mark them ≈).
+`SolverTests.solverMovesAreAcceptedByTheBoard` walks eight bar levels this way and requires every
+drag to be accepted and to land exactly where the solver said.
+
+
+### Step 2: quality measurements
+
+`LevelQuality` (`Model/Generation/LevelQuality.swift`), every weight and threshold in
+`QualityConfig`. Measured for the chosen level and its runner-ups only, in parallel, and written as
+`quality` next to the legacy `difficulty` in each report candidate (the report also records the
+`qualityConfig` and formula). `generate --no-quality` skips it, `--trap-rate` adds traps.
+`forge report [--dir DIR] [--levels …]` prints the columns.
+
+- **Bots.** Three now (looking 1, 2 and 3 drags ahead); the 4-deep one never beat the 3-deep one.
+  For each, over 20 games: win rate, mean blind drags, and the median over games of blind drags
+  per piece taken off (`blindRate`), so a big board does not score higher just for being big.
+- **tier**: the shallowest bot whose median game makes at most 0.05 blind drags per piece
+  (`plannedBlindRate`): that bot plans the level instead of trying things. 3 when none does.
+- **insightGap**: how far the blind rate drops at that bot from the next shallower one, capped at 1
+  (`insightGapScale` = 1). Tier 0 has none, and neither has a level no bot plans: at first that
+  case took the drop into the deepest bot, which gave the trial-and-error webs 150 and 180 the
+  highest interest of all (0.98, 0.99). Such levels are flagged **unplanned** instead, so they
+  stay visible until the owner has played them; the planners must not use them as peaks yet.
+- **forcedShare**: share of solution steps where exactly one piece can release a connection or
+  come off, the test `freedom` uses (`LevelSolver.openness`).
+- **setupDepth**: the longest run of solution moves that take nothing off.
+- **trapRate** (only with `--trap-rate`, weight 0): at up to 8 positions along the solution, the
+  share of moves after which best-first search with 300 expansions finds no way to finish.
+- **strategySolved**: whether `ownerPlayout` clears every component on its own, without the
+  best-first fallback.
+- **difficulty** = 100 · (0.4 · tier/3 + 0.4 · minMoves/60 + 0.2 · setupDepth/8), no cap.
+  **interest** = 0.6 · insightGap + 0.4 · (1 − forcedShare) (+ 0 · trapRate).
+
+Measured on the shipped 101–200, rebuilt from their seeds (`generate --levels 101-200 --keep-seeds
+--out …`, 71 minutes with six jobs, about 30 s a level of which most is solving four candidates;
+the rebuilt boards and metrics are identical to the shipped ones):
+
+| | legacy | difficulty | interest | tier 0/1/2/3 | strategySolved |
+|---|---|---|---|---|---|
+| 101–150 | 69.3 | 38.6 | 0.47 | 9 / 28 / 9 / 4 | 38 of 50 |
+| 151–200 | 66.9 | 38.6 | 0.46 | 9 / 24 / 12 / 5 | 33 of 50 |
+
+| kind | levels | difficulty | interest | tier 0/1/2/3 | forcedShare |
+|---|---|---|---|---|---|
+| hub web | 24 | 59.8 | 0.67 | 0 / 2 / 13 / 9 | 0.07 |
+| grid knot | 45 | 36.8 | 0.42 | 4 / 35 / 6 / 0 | 0.28 |
+| giant ring | 3 | 31.4 | 0.48 | 0 / 3 / 0 / 0 | 0.20 |
+| thicket | 19 | 28.4 | 0.38 | 5 / 12 / 2 / 0 | 0.27 |
+| maze | 4 | 16.7 | 0.33 | 4 / 0 / 0 / 0 | 0.17 |
+| cage | 5 | 14.2 | 0.25 | 5 / 0 / 0 / 0 | 0.37 |
+
+- **The new difficulty is set by the kind of board.** Webs need the 3-deep bot, knots and
+  thickets the 2-deep one, mazes and cages none: every bot clears them without a blind drag. The
+  legacy score rates cages at 66, the new one at 14.
+- **151–200 is not harder than 101–150** on average (38.6 both). Inside 151–200 it rises
+  (+17 over the 50 levels, r = 0.30, legacy +5), only because more webs sit late (10 of 176–200
+  are tier 2).
+- **Webs split into planned and trial-and-error.** On 15 of the 24 the 3-deep bot never drags
+  blind; on 9 (123, 125, 135, 150, 164, 170, 180, 192, 200) it still makes 0.2–1.5 blind drags per
+  piece, no better than the 2-deep bot on 135 and 170.
+- **strategySolved does not separate webs**: the owner-release strategy clears all 24 of them.
+  It is false mostly on knots and thickets (29 of the 100 levels).
+- **Lowest interest**: cages 145, 130, 178, knots 162, 154, thicket 118 — forced at almost
+  every step, or nothing to see in advance.
+
+### Step 3: choosing by interest
+
+`LevelGenerator.chooseByInterest`, settings in `QualityConfig` (`band` 6, `finalists` 4). Only for
+curve levels without a pin; tutorial levels and pins are chosen as before, and there are no hard
+levels left. The targets are still on the legacy scale, so the band is too:
+
+1. The search stops once four candidates are within ±6 legacy points of the target (it used to
+   stop at the first within ±5), or at the usual budget of 16 candidates.
+2. The four closest to the target (the old ranking) are the finalists, and only they get the bot
+   profile. The rest of the search costs what it did.
+3. Among the finalists within the band the highest interest wins, rounded to 0.01 so that near
+   ties go to a level the owner-release strategy cannot clear by itself (`strategySolved` false),
+   then to fewer pieces, then the seed. The other three are the runner-ups.
+4. With no finalist in the band the closest one is taken and the report marks the level
+   `outOfBand`.
+
+There is no interest threshold for stopping early: it would mean profiling more than four
+candidates.
+
+Generated afresh (no `--keep-seeds`) for 101–120 and 151–160 into a scratch folder, compared with
+the shipped choices measured the same way:
+
+- 15 of 30 levels pick a different board, always of the planned design. Mean interest rises from
+  0.41 to 0.47; the mean distance to the target grows from 4.4 to 5.0 points.
+- 8 of 30 are out of band (106, 107, 111, 119, 156, 157, 159, 160): 16 candidates of the planned
+  design never came within 6 points (107 and 157, Wild knot, sit at 44 against 58). They were
+  mostly out of band when shipped as well; it is a planning matter (Step 1).
+- Time: 62 s a level on average (median 50 s, most 153 s) with six jobs, against about 30 s when
+  only rebuilding: the search goes on until four candidates are in the band.
+- The choice is the same with two jobs as with six.
+- The cap on insightGap shows: on webs the bot that only takes what comes off flounders (3–6
+  blind drags a piece), so a web the 2-deep bot already plans gets a gap of 1 and an interest
+  near 1. At 115 that picks a tier-1 web (interest 0.98) over the shipped tier-2 one (0.71). To be
+  judged against the owner's play-test before the weights change.
+
+## 15. Variety: boards that look designed (October 2026)
+
+The owner's second brief: levels 91–110 look alike (8 of 10 in 91–100 are the same 4-column field;
+101–110 ping-pong between free-form and grid), free-form boards have no shape, grid holes look
+like missing pieces, nothing is symmetric or small, milestones are ordinary. More visual variety
+and designed-looking boards without designing levels by hand, every new board still through
+validate → solve → replay → bots. Nothing copied from the competitor.
+
+### Step 0: contact sheets
+
+`forge render [--levels 11-200] [--dir DIR] [--out DIR] [--candidates]` (`LevelForge/Render.swift`)
+writes one PNG per block of ten levels with CoreGraphics, from the model's own world geometry:
+rings and bars in their colours, clips white, hubs grey, bombs black. Under each board: number,
+name, piece count, design (template id), legacy score against the target, and when the report has
+them the new difficulty, interest and tier (`u` for unplanned). `--candidates` draws a row per
+level with its runner-ups. Sheets go to `LevelForge/sheets/` (git-ignored) unless `--out` says
+otherwise: `before/` holds the shipped 11–200, `step3/` the Step 3 sample. LevelForge now has two
+source files; build it with
+`swiftc -O LevelForge/*.swift $(find RotateRings/Model -name '*.swift')`.
+
+The "before" reference is the shipped 11–200 rebuilt from their seeds with quality measured
+(`generate --levels 11-200 --keep-seeds --out …`, 2 h 8 min with six jobs). All 190 boards are
+byte-identical to the shipped files; 16 bar levels record slightly different drag lengths (exact
+bar offsets) with the same move counts, and level 18 scores 23 instead of 28 (found under the
+state cap instead of the old time cap).
+
+Measured over 11–200 by kind of board:
+
+| kind | levels | legacy | difficulty | interest | tier 0/1/2/3 | unplanned |
+|---|---|---|---|---|---|---|
+| hub web | 39 | 67 | 58 | 0.54 | 0/4/19/16 | 16 |
+| grid knot | 91 | 60 | 34 | 0.46 | 6/73/11/1 | 1 |
+| giant ring | 3 | 59 | 31 | 0.48 | 0/3/0/0 | 0 |
+| thicket | 17 | 65 | 29 | 0.37 | 5/10/2/0 | 0 |
+| wild knot | 2 | 44 | 26 | 0.49 | 0/2/0/0 | 0 |
+| maze | 14 | 53 | 14 | 0.28 | 14/0/0/0 | 0 |
+| cages | 11 | 60 | 13 | 0.30 | 11/0/0/0 | 0 |
+| weave figure | 7 | 37 | 10 | 0.35 | 7/0/0/0 | 0 |
+| tangle | 4 | 36 | 10 | 0.27 | 4/0/0/0 | 0 |
+
+By chapter the new difficulty is 23 (11–50), 34 (51–100), 39 (101–150), 39 (151–200).
+
+What the bots say about foresight, as the base for Step 1b: only hub webs need it. A hub is a
+closed ring pinned by its own clips; it leaves only when every ring it grips has its gap on the
+hub's clip at the same moment, and a ring shared by two hubs serves one at a time. Raising a grid
+knot's holders, clips per ring and share of closed rings does not get there: six seeds each of
+four settings on the tall field stayed at tier 0–1, with one unplanned board. The shipped web
+settings are a lottery: of six seeds, two were planned by the 2-deep bot, one by the 3-deep bot,
+three by none.
+
+### Step 1b: locks and foresight
+
+**Locks** (`Knot.Options.locks`, `lockClips`; `knot(…, locks: N)`): closed rings that grip two or
+three neighbours and are gripped by nothing, ranked above every ring, as the hubs of a web. A lock
+never turns and leaves only when all the rings it grips have their gaps on its clips at once; each
+further lock sits two cells from an earlier one, so the two share the ring between them.
+
+Measured with the bots (8–12 seeds per setting, full pipeline):
+
+| board | valid | tier 0/1/2/3u | difficulty | interest |
+|---|---|---|---|---|
+| 3×3 knot, 1 lock (`hubs-nine`) | 14/20 | 2/11/1/0 | 21 | 0.63 |
+| 3×4 knot, 1 lock (`hubs-twelve`) | 7/20 | 1/4/2/0 | 25 | 0.51 |
+| field knots, 1–3 locks | 12/24 | 7/5/0/0 | 21 | 0.41 |
+| tall and gaps knots, 1–3 locks | 17/48 | 7/10/0/0 | 26 | 0.38 |
+| field and tall knots, 2–4 locks of 3–4 clips, many tails | 16/72 | 2/13/1/0 | 36 | 0.46 |
+
+- **On a small board a lock is the puzzle.** On the 3×3 knot the bot that only takes what comes off
+  makes about one blind drag per piece and the 2-deep bot none: one thing to see (interest up to
+  0.88). That is the lock introduction: `knot("hubs-twelve", holders: 2, locks: 1)` or the nine.
+- **On a big knot a lock is a moment, not a tier.** There is nearly always something else to take
+  off, so no bot gets stuck; a lock lifts a board from tier 0 to 1 at most. Stronger locks (3–4
+  clips, more tails) mostly make boards unsolvable. Locks stay a modifier: none on breathers, one
+  off-peak, two or three at peaks.
+- **Foresight lives in webs, and the clips per hub set how much.** On the tall field, 3–4 clips
+  and 3 holders (shipped) gave tier 2 on 5 of 8 boards and unplanned on 3; 2–3 clips gave 4 and 1;
+  2–3 clips with 2 holders gave tier 1 on 7 of 8.
+
+**Webs with an outline** (`webShapes`, five small rings across on the large board, stem 18 so
+they fit): Gem, Cross, Arch, Hourglass, Heart, Frame. Look family `hubShape`, so they do not count
+as grid fields. Twelve seeds each:
+
+| outline | 3–4 clips: tier 0/1/2/3u, difficulty | 2–3 clips: tier 0/1/2/3u, difficulty |
+|---|---|---|
+| Gem | 0/1/8/3, 52 | 0/4/6/2, 46 |
+| Heart | 0/0/10/2, 53 | 0/10/2/0, 36 |
+| Arch | 0/2/7/3, 59 | 0/8/3/1, 45 |
+| Hourglass | 0/1/6/5, 59 | 0/9/3/0, 40 |
+| Frame | 0/1/6/5, 62 | 0/10/1/1, 42 |
+| Cross | 0/1/2/9, 64 | 0/6/5/1, 46 |
+
+With 3–4 clips Gem and Heart are the most reliably planned peaks; Cross is mostly unplanned. With
+2–3 clips every outline is a mid-difficulty board the 2-deep bot plans (interest 0.61–0.89).
+
+### Step 1: look families and re-planning on the new difficulty
+
+**Look families** (`Look`, `Model/Generation/Looks.swift`, derived from the template id):
+gridField (square-grid knots), gridBars (knots with U-bars), diagonal (knots and webs on the
+diagonal grid), freeform (wild knots, gates, thickets, tangles), barMaze (mazes, cages, workshops),
+figure (ring figures, weaves, bullseye), hub (webs on a rectangle), hubShape (webs with an outline),
+giant (giant ring, planet, sun), and picture and small for later steps. A web on a rectangle
+looks like a grid field and counts as one for spacing.
+
+**One catalogue, measured.** `Compositions.catalogue` (`DesignCatalogue.swift`, generated by
+`LevelForge/catalogue.py`) lists every design the planners may choose under the exact expression
+they write into `Compositions.templates`: the 97 designs of the old table and old planners, the
+outlined webs, webs with 2–3 clips on the tall field and field, the lock introductions, and knots
+with 1–3 locks. `forge designs` builds 8 seeds of each through the whole pipeline with the bots and
+writes `LevelForge/design-quality.json` (mean difficulty, interest, legacy score, boards per tier,
+unplanned share, pieces, time); designs with fewer than three valid boards were measured again with
+32 seeds (`--retry-below 3`). 151 designs, 1 still short of data (column knot with three locks,
+which the planners skip). One run: 35 + 27 minutes with all cores.
+
+What the catalogue measures, by family: barMaze 6–15, figure 5–13, giant 7–19, freeform 6–20,
+gridBars 20–34, gridField 14–41, diagonal 10–52, hub 27–65, hubShape 36–64. Every board without
+hubs stays under about 41; only webs reach higher. (Shipped thickets measured about 29 because they
+were the heaviest of their candidates; a random thicket measures 10–20.)
+
+**The planners** (`plan-curve.py` for 11–100, `plan-chapter.py` for 101–150 and 151–200, shared
+rules in `planlib.py`) take the catalogue and each design's usual difficulty from that file, and
+`--apply` writes the plan into `Compositions.templates` and `DifficultyCurve.targets`, which now say
+they are on the new scale (`DifficultyCurve.onQualityScale`). Targets, waves as before (§10) at full
+size: 11–100 rise from 12 to 30, 101–150 from 28 to 34 (peaks to 60), 151–200 from 32 to 40 (peaks
+to 64). A level is a peak at +6 or more, a dip below 0. Rules, hard where they can be:
+
+- never the same family within three levels (a rectangular web counts as a grid field); at least
+  five families in a block of ten (a new family is welcome early, a fourth of one family is not);
+  grid fields at most 40 % of a chapter;
+- every five to eight levels a dip is a change of scene: a maze or cage, figure, giant ring or
+  free-form board, the heaviest that does not overshoot, and not the family of the last two
+  scenes; mazes and cages appear nowhere else;
+- webs are favoured at peaks; a design unplanned on more than half its boards never sits at a peak;
+- locks: none on dips, two or three only at peaks, from level 30, and the first lock level is an
+  introduction, one lock on a 3×3 or 3×4 knot;
+- bombs on knot boards about one level in four (fatal from 60), never two running; U-bars from 20,
+  outlined webs from 40; the last level of 101–150 and 151–200 is heavy and planned.
+
+**Generation** chooses on the new scale too: the search ranks candidates by a predicted difficulty
+(the design's usual tier from `design-quality.json` with the candidate's own moves and setup depth),
+stops at four within ±6 of the target, profiles the four closest, and checks the band on what they
+measured. `generate --keep-same-designs` rebuilds from the shipped seeds where a level keeps its
+design.
+
+Planned with `plan-curve.py 7`, `plan-chapter.py 101 30` and `plan-chapter.py 151 31`, then
+generated whole into a scratch folder with `--keep-same-designs` (96 minutes, six jobs; 9 levels
+kept their design and were rebuilt from their seeds, 181 were generated afresh). Contact sheets in
+`LevelForge/sheets/step1/`, the shipped levels in `before/`.
+
+| | old 11–100 | new 11–100 | old 101–150 | new 101–150 | old 151–200 | new 151–200 |
+|---|---|---|---|---|---|---|
+| same family within three levels | 99 levels over all of 11–200 | 0 | | 0 | | 0 |
+| grid fields (with rectangular webs) | 49 % | 27 % | 62 % | 30 % | 62 % | 32 % |
+| families per block of ten | 4–6 | 5–8 | 3–5 | 5–7 | 3–6 | 5–6 |
+| difficulty, mean | 29.2 | 22.4 | 38.6 | 31.3 | 38.6 | 32.9 |
+| interest, mean | 0.43 | 0.54 | 0.45 | 0.63 | 0.43 | 0.69 |
+| unplanned levels | 8 | 0 | 4 | 0 | 5 | 0 |
+
+- **Out of band**: 43 of 190 levels end more than 6 points from their target. 19 are changes of
+  scene, low on purpose. Of the other 24, 8 are peaks that came out low (100, 113, 135, 163, 169,
+  181, 200 and 23); of the 24, 14 are knots and 9 webs (five of them the diagonal Woven web).
+- **Why peaks come out low.** The webs the planner puts at peaks have an average difficulty near
+  the target, but a web is either one the 2-deep bot plans (32–38) or one only the 3-deep bot plans
+  (50 and up), never in between. The four finalists are picked by predicted difficulty, which cannot
+  tell the two apart, so at many peaks all four were of the lighter kind: 24 of the 35 webs at peaks
+  are tier 1.
+- **Locks**: 21 levels, the introduction at level 30 (one lock on the 3×3 knot, interest 0.88).
+- **Difficulty is lower than before on every chapter**, because the targets now follow what the
+  boards measure rather than the legacy score; it still climbs chapter by chapter.

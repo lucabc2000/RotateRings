@@ -48,6 +48,12 @@ enum Knot {
         /// Bombs riding on rings. A bomb goes off when it touches another piece, so the ring can
         /// only turn as far as the bomb has room; the solver never sets one off.
         var bombs = 0
+        /// Locks: closed rings that hold `lockClips` of their neighbours and are held by nothing, as
+        /// the hubs of a web (`HubWeb`). A lock never turns; it leaves only when every ring it grips
+        /// has its gap on its clip at the same moment. Each further lock sits two cells from an
+        /// earlier one, so the two share the ring between them, which can serve only one at a time.
+        var locks = 0
+        var lockClips: ClosedRange<Int> = 2...3
         var name = "Knot"
         var template = "knot"
     }
@@ -104,6 +110,46 @@ enum Knot {
         sites.removeAll(where: holes.contains)
         guard sites.count >= 3 else { return nil }
 
+        // Locks: the first anywhere with enough neighbours, each next one two cells from a lock with
+        // a ring between them, and never next to another lock.
+        var locks: [Cell] = []
+        var lockTargets: [Cell: [Cell]] = [:]
+        if options.locks > 0 {
+            func neighbours(_ cell: Cell) -> [Cell] { allSteps.map { cell.moved($0) }.filter { sites.contains($0) } }
+            func free(_ cell: Cell) -> Bool {
+                sites.contains(cell) && !locks.contains(cell) && !locks.contains { lock in neighbours(lock).contains(cell) }
+            }
+            for _ in 0..<options.locks {
+                var choices: [(lock: Cell, shared: Cell?)] = []
+                if locks.isEmpty {
+                    choices = sites.filter { neighbours($0).count >= options.lockClips.upperBound }.map { ($0, nil) }
+                } else {
+                    for lock in locks {
+                        for step in allSteps {
+                            let shared = lock.moved(step), cell = shared.moved(step)
+                            if sites.contains(shared), free(cell), neighbours(cell).count >= options.lockClips.lowerBound,
+                               !lockTargets.values.contains(where: { $0.count > 0 && $0.contains(cell) }) {
+                                choices.append((cell, shared))
+                            }
+                        }
+                    }
+                }
+                guard let choice = choices.isEmpty ? nil : rng.pick(choices) else { break }
+                let count = rng.int(in: options.lockClips)
+                var grips = choice.shared.map { [$0] } ?? []
+                for cell in neighbours(choice.lock).shuffled(using: &rng) where grips.count < count && !grips.contains(cell) && !locks.contains(cell) {
+                    grips.append(cell)
+                }
+                guard grips.count >= options.lockClips.lowerBound else { break }
+                locks.append(choice.lock)
+                lockTargets[choice.lock] = grips
+            }
+            guard locks.count == options.locks else {
+                LevelTemplate.debug?("\(options.template): room for \(locks.count) of \(options.locks) locks")
+                return nil
+            }
+        }
+
         // One ranking of all rings: a clip always runs from the higher ring to the lower.
         let origin = rng.pick(sites)
         var score: [Cell: Double] = [:]
@@ -113,6 +159,8 @@ enum Knot {
         }
         var rank: [Cell: Int] = [:]
         for (index, cell) in sites.sorted(by: { (score[$0]!, $0.r, $0.c) < (score[$1]!, $1.r, $1.c) }).enumerated() { rank[cell] = index }
+        // Locks rank above every ring, so nothing grips them.
+        for (index, lock) in locks.enumerated() { rank[lock] = sites.count + index }
 
         var pairs: [(Cell, Cell)] = []
         for cell in sites {
@@ -129,6 +177,14 @@ enum Knot {
             holders[target, default: []].append(owner)
             return true
         }
+        // A lock's clips are placed first and are its only links.
+        for lock in locks {
+            for target in lockTargets[lock] ?? [] {
+                targets[lock, default: []].append(target)
+                holders[target, default: []].append(lock)
+            }
+        }
+        pairs.removeAll { locks.contains($0.0) || locks.contains($0.1) }
         var skipped: [(Cell, Cell)] = []
         for pair in pairs.shuffled(using: &rng) {
             if rng.chance(options.linkChance) { _ = join(pair.0, pair.1) } else { skipped.append(pair) }
@@ -141,7 +197,10 @@ enum Knot {
         var draft = LevelDraft(name: options.name, template: options.template)
         var closed = Set<Cell>()
         for ring in rings {
-            if holders[ring] == nil, rng.chance(options.anchorChance) {
+            if locks.contains(ring) {
+                closed.insert(ring)
+                draft.pieces.append(.closedRing(id(ring), at: position(ring), radius: shape.radius))
+            } else if holders[ring] == nil, rng.chance(options.anchorChance) {
                 closed.insert(ring)
                 draft.pieces.append(.closedRing(id(ring), at: position(ring), radius: shape.radius))
             } else {

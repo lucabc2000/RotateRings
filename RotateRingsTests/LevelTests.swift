@@ -11,7 +11,18 @@ import Testing
 @testable import RotateRings
 
 private let appBundle = Bundle(for: GameScene.self)
-private let levelNumbers = Array(1...max(1, LevelLoader.levelCount(in: appBundle)))
+/// Every bundled level, or for a quick run only those in `LEVEL_TESTS`, e.g.
+/// `TEST_RUNNER_LEVEL_TESTS=1-10,101-110 xcodebuild test …` (xcodebuild passes `TEST_RUNNER_`
+/// variables on without the prefix).
+private let levelNumbers: [Int] = {
+    let all = Array(1...max(1, LevelLoader.levelCount(in: appBundle)))
+    guard let subset = ProcessInfo.processInfo.environment["LEVEL_TESTS"] else { return all }
+    let wanted = subset.split(separator: ",").flatMap { part -> [Int] in
+        let bounds = part.split(separator: "-").compactMap { Int($0) }
+        return bounds.count == 2 ? Array(bounds[0]...bounds[1]) : bounds
+    }
+    return all.filter(Set(wanted).contains)
+}()
 
 struct LevelTests {
 
