@@ -89,6 +89,17 @@ struct SolverTests {
         #expect(replayed)
     }
 
+    /// Even the bot without foresight clears the first levels, and a profile repeats exactly.
+    @Test(arguments: [1, 5, 8])
+    func botsClearTutorialLevelsReproducibly(number: Int) throws {
+        let board = try LevelLoader.load(level: number, in: appBundle).makeBoard()
+        var config = QualityConfig()
+        config.runs = 5
+        let profile = BotLevel(board: board, config: config).profile(levelSeed: 42, minMoves: 4)
+        #expect(profile == Array(repeating: 1, count: config.lookaheads.count))
+        #expect(BotLevel(board: board, config: config).profile(levelSeed: 42, minMoves: 4) == profile)
+    }
+
     @Test func slidingBarAppearsInTheSlideGateSolution() throws {
         // Level 6 introduces the sliding bar (ids starting with "s").
         let board = try LevelLoader.load(level: 6, in: appBundle).makeBoard()
@@ -96,6 +107,35 @@ struct SolverTests {
         let moves = try #require(result.solution)
         #expect(moves.contains { $0.piece.hasPrefix("s") })
         #expect(moves.count <= 5)
+    }
+
+    /// Every drag the solver offers must be one the real board accepts, landing exactly where the
+    /// solver says. Walks real boards, never rebuilt from solver states, breadth first on levels with
+    /// sliding bars, where a push stops at whatever spot the board's sampling finds. Levels with
+    /// sliding bars; 29, 83 and 149 have the most of them (19–22).
+    @Test(arguments: [6, 16, 29, 66, 83, 93, 149, 178])
+    func solverMovesAreAcceptedByTheBoard(number: Int) throws {
+        var start = try LevelLoader.load(level: number, in: appBundle).makeBoard()
+        start.removeUnconnectedPieces()
+        #expect(start.pieces.contains { $0.motion == .slide })
+        let solver = LevelSolver(board: start)
+        var queue = [start]
+        var seen: Set<LevelSolver.State> = [solver.encode(start)]
+        var head = 0
+        while head < queue.count && head < 150 {
+            let real = queue[head]
+            head += 1
+            for (next, move) in solver.successors(of: solver.encode(real)) {
+                var board = real
+                guard case .moved = board.move(move.piece, by: move.delta) else {
+                    Issue.record("level \(number): the board refuses \(move.piece) by \(move.delta)")
+                    continue
+                }
+                let landed = solver.encode(board)
+                #expect(landed.isExactly(next), "level \(number): \(move.piece) by \(move.delta) lands elsewhere")
+                if seen.insert(landed).inserted { queue.append(board) }
+            }
+        }
     }
 
     @Test func stateCapFallsBackToAnEstimateWithASolution() throws {

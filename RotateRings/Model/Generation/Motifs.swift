@@ -37,6 +37,10 @@ struct Motif {
     var name: String
     var template: String
     var pieces: [DraftPiece]
+    /// The board is mirror-symmetric and mirror images should share colours (`LevelDraft.assignColors`).
+    var mirrorColors = false
+    /// The pieces already carry the colours they should keep (a picture's parts).
+    var keepColors = false
 
     /// Axis-aligned extent of all strokes, including clips and stroke width.
     var bounds: (minX: Double, maxX: Double, minY: Double, maxY: Double) {

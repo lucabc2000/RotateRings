@@ -22,7 +22,7 @@ private enum ProgressKey {
 @MainActor
 @Observable
 final class GameViewModel {
-    private let bundle: Bundle
+    private var bundle: Bundle
     private let defaults: UserDefaults
 
     private(set) var levelNumber = 1
@@ -147,7 +147,7 @@ final class GameViewModel {
         return saved > 0 ? saved : 1
     }
 
-    init(bundle: Bundle = .main, defaults: UserDefaults = .standard, boosters: BoosterInventory? = nil, startingLevel: Int? = nil) {
+    init(bundle: Bundle = .levels, defaults: UserDefaults = .standard, boosters: BoosterInventory? = nil, startingLevel: Int? = nil) {
         self.bundle = bundle
         self.defaults = defaults
         self.boosters = boosters ?? .shared
@@ -194,6 +194,15 @@ final class GameViewModel {
             fail(error)
         }
     }
+
+    #if DEBUG
+    /// Plays another level set (Level Browser), at the same level number where it has one.
+    func switchLevels(to bundle: Bundle) {
+        self.bundle = bundle
+        levelCount = LevelLoader.levelCount(in: bundle)
+        loadLevel(min(max(1, levelNumber), max(1, levelCount)))
+    }
+    #endif
 
     /// Opens any level file, outside the campaign order. `nextLevel()` returns to the campaign.
     func play(_ file: LevelFile, title: String) {

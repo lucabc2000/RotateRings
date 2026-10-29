@@ -60,7 +60,7 @@ struct LevelDetailView: View {
         .navigationTitle("Level \(level.number)")
         .navigationBarTitleDisplayMode(.inline)
         .task {
-            chosenFile = try? LevelLoader.load(level: level.number, in: .main)
+            chosenFile = try? LevelLoader.load(level: level.number, in: .levels)
         }
     }
 }
@@ -112,6 +112,10 @@ private struct CandidateCard: View {
                         .font(.caption)
                         .foregroundStyle(Color(uiColor: Palette.textSecondary))
                     metric("Difficulty", DifficultyText.score(candidate))
+                    if let quality = candidate.quality {
+                        metric("Interest", String(format: "%.2f", quality.interest))
+                        metric("Setup depth", "\(quality.setupDepth)")
+                    }
                     metric("Min moves", "\(candidate.metrics.minMoves)")
                     metric("Dead-end moves", "\(candidate.metrics.deadEndMoves) / \(candidate.metrics.totalMoves)")
                     metric("Branching", String(format: "%.1f", candidate.metrics.branching))

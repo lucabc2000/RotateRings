@@ -6,7 +6,7 @@
 import SwiftUI
 import UIKit
 
-/// Sound and haptics toggles plus a restart action, shown as a sheet from the gear button.
+/// Sound and haptics toggles, a feedback link and a restart action, shown as a sheet from the gear button.
 struct SettingsView: View {
     let onRestart: () -> Void
     /// Debug builds only: opens the Level Browser. Ignored in release builds.
@@ -15,6 +15,9 @@ struct SettingsView: View {
     @Bindable private var settings = GameSettings.shared
     private let ads = RewardedAds.shared
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
+    /// Shown under the rows when no mail app could be opened.
+    @State private var feedbackNote: String?
 
     init(onRestart: @escaping () -> Void, onOpenLevelBrowser: (() -> Void)? = nil) {
         self.onRestart = onRestart
@@ -29,7 +32,7 @@ struct SettingsView: View {
 
     /// Tall enough for the rows on show: each extra row adds about 50 points.
     private var sheetHeight: CGFloat {
-        320 + (showsLevelBrowser ? 70 : 0) + (ads.needsPrivacyOptions ? 50 : 0)
+        370 + (showsLevelBrowser ? 70 : 0) + (ads.needsPrivacyOptions ? 50 : 0) + (feedbackNote == nil ? 0 : 40)
     }
 
     var body: some View {
@@ -44,6 +47,10 @@ struct SettingsView: View {
                     .overlay(Color(uiColor: Palette.cardBorder))
                     .padding(.horizontal, 16)
                 settingRow("Haptics", systemImage: "iphone.radiowaves.left.and.right", isOn: $settings.isHapticsEnabled)
+                Divider()
+                    .overlay(Color(uiColor: Palette.cardBorder))
+                    .padding(.horizontal, 16)
+                linkRow("Send feedback", systemImage: "envelope.fill", action: sendFeedback)
                 if ads.needsPrivacyOptions {
                     Divider()
                         .overlay(Color(uiColor: Palette.cardBorder))
@@ -68,6 +75,13 @@ struct SettingsView: View {
                     .fill(Color(uiColor: Palette.card))
                     .overlay(RoundedRectangle(cornerRadius: 18).strokeBorder(Color(uiColor: Palette.cardBorder), lineWidth: 1.5))
             )
+
+            if let feedbackNote {
+                Text(feedbackNote)
+                    .font(.footnote)
+                    .foregroundStyle(Color(uiColor: Palette.textSecondary))
+                    .multilineTextAlignment(.center)
+            }
 
             Button {
                 dismiss()
@@ -94,6 +108,17 @@ struct SettingsView: View {
         }
         .onChange(of: settings.isHapticsEnabled) { _, isOn in
             if isOn { UIImpactFeedbackGenerator(style: .medium).impactOccurred() }
+        }
+    }
+
+    /// Opens a new mail to the feedback address. Without a mail app the address is copied instead,
+    /// and a note under the rows says so.
+    private func sendFeedback() {
+        guard let url = Feedback.mailURL else { return }
+        openURL(url) { accepted in
+            guard !accepted else { return }
+            UIPasteboard.general.string = Feedback.address
+            feedbackNote = "No mail app found. The address \(Feedback.address) was copied."
         }
     }
 

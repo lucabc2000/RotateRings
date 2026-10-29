@@ -4,195 +4,416 @@
     "width" : 360
   },
   "id" : 16,
-  "name" : "Gridlock",
+  "name" : "Giant ring",
   "pieces" : [
     {
-      "color" : "coral",
-      "id" : "l1",
-      "motion" : "slide",
-      "position" : [
-        142,
-        300
-      ],
-      "shapes" : [
+      "clips" : [
         {
-          "segment" : {
-            "from" : [
-              -22,
-              0
-            ],
-            "to" : [
-              98,
-              0
-            ]
-          }
+          "grips" : "t3",
+          "stemEnd" : [
+            -84,
+            -145.492
+          ],
+          "stemStart" : [
+            -73,
+            -126.44
+          ]
         },
         {
-          "segment" : {
-            "from" : [
-              98,
-              0
-            ],
-            "to" : [
-              98,
-              -120
-            ]
-          }
+          "grips" : "t4",
+          "stemEnd" : [
+            43.223,
+            -161.31
+          ],
+          "stemStart" : [
+            37.788,
+            -141.025
+          ]
+        },
+        {
+          "grips" : "r3",
+          "stemEnd" : [
+            -42.964,
+            160.344
+          ],
+          "stemStart" : [
+            -37.788,
+            141.025
+          ]
+        },
+        {
+          "grips" : "r1",
+          "stemEnd" : [
+            -64,
+            -110.851
+          ],
+          "stemStart" : [
+            -73,
+            -126.44
+          ]
+        },
+        {
+          "grips" : "r4",
+          "stemEnd" : [
+            84,
+            145.492
+          ],
+          "stemStart" : [
+            73,
+            126.44
+          ]
+        },
+        {
+          "grips" : "r6",
+          "stemEnd" : [
+            64,
+            110.851
+          ],
+          "stemStart" : [
+            73,
+            126.44
+          ]
         }
-      ]
-    },
-    {
+      ],
       "color" : "purple",
-      "id" : "l2",
-      "motion" : "slide",
+      "id" : "o1",
       "position" : [
-        280,
-        202
+        180,
+        305.993
       ],
-      "rotation" : 90,
       "shapes" : [
         {
-          "segment" : {
-            "from" : [
-              -22,
+          "arc" : {
+            "center" : [
+              0,
               0
             ],
-            "to" : [
-              138,
-              0
-            ]
-          }
-        },
-        {
-          "segment" : {
-            "from" : [
-              138,
-              0
-            ],
-            "to" : [
-              138,
-              80
-            ]
+            "radius" : 146,
+            "start" : 0,
+            "sweep" : 360
           }
         }
       ]
     },
     {
-      "color" : "yellow",
-      "id" : "l3",
-      "motion" : "slide",
-      "position" : [
-        298,
-        380
+      "clips" : [
+        {
+          "grips" : "r2",
+          "stemEnd" : [
+            29.5,
+            51.095
+          ],
+          "stemStart" : [
+            19,
+            32.909
+          ]
+        }
       ],
-      "rotation" : 180,
+      "color" : "coral",
+      "id" : "r1",
+      "position" : [
+        135,
+        228.051
+      ],
       "shapes" : [
         {
-          "segment" : {
-            "from" : [
-              -22,
+          "arc" : {
+            "center" : [
+              0,
               0
             ],
-            "to" : [
-              218,
-              0
-            ]
+            "radius" : 38,
+            "start" : 10,
+            "sweep" : 280
           }
-        },
+        }
+      ]
+    },
+    {
+      "clips" : [
         {
-          "segment" : {
-            "from" : [
-              218,
+          "grips" : "t1",
+          "stemEnd" : [
+            -45.033,
+            26
+          ],
+          "stemStart" : [
+            -25.981,
+            15
+          ]
+        }
+      ],
+      "color" : "sky",
+      "id" : "r2",
+      "position" : [
+        179.5,
+        305.127
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
               0
             ],
-            "to" : [
-              218,
-              -120
-            ]
+            "radius" : 30,
+            "start" : 122.5,
+            "sweep" : 235
           }
         }
       ]
     },
     {
       "color" : "mint",
-      "id" : "l4",
-      "motion" : "slide",
+      "id" : "t1",
       "position" : [
-        40,
-        242
+        115.414,
+        342.127
       ],
-      "rotation" : 270,
       "shapes" : [
         {
-          "segment" : {
-            "from" : [
-              -218,
+          "arc" : {
+            "center" : [
+              0,
               0
             ],
-            "to" : [
-              22,
-              0
-            ]
+            "radius" : 22,
+            "start" : 100,
+            "sweep" : 280
           }
         },
         {
           "segment" : {
             "from" : [
-              22,
-              0
+              -21.25,
+              -5.694
             ],
             "to" : [
-              22,
-              40
+              -34.773,
+              -9.317
             ]
           }
         }
       ]
     },
     {
-      "color" : "sky",
-      "id" : "l5",
-      "motion" : "slide",
+      "clips" : [
+        {
+          "grips" : "r2",
+          "stemEnd" : [
+            -40.703,
+            23.5
+          ],
+          "stemStart" : [
+            -22.517,
+            13
+          ]
+        }
+      ],
+      "color" : "yellow",
+      "id" : "t2",
       "position" : [
-        62,
-        180
+        246.184,
+        266.627
       ],
       "shapes" : [
         {
-          "segment" : {
-            "from" : [
-              -22,
+          "arc" : {
+            "center" : [
+              0,
               0
             ],
-            "to" : [
-              58,
-              0
-            ]
+            "radius" : 26,
+            "start" : 10,
+            "sweep" : 280
           }
         },
         {
           "segment" : {
             "from" : [
-              58,
-              0
+              13,
+              22.517
             ],
             "to" : [
-              58,
-              40
+              20,
+              34.641
             ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "coral",
+      "id" : "t3",
+      "position" : [
+        85,
+        141.448
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 22,
+            "start" : 325,
+            "sweep" : 280
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              -19.053,
+              11
+            ],
+            "to" : [
+              -31.177,
+              18
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "coral",
+      "id" : "t4",
+      "position" : [
+        229.434,
+        121.501
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 24,
+            "start" : 235,
+            "sweep" : 280
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              23.182,
+              6.212
+            ],
+            "to" : [
+              36.705,
+              9.835
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "clips" : [
+        {
+          "grips" : "r5",
+          "stemEnd" : [
+            21.5,
+            37.239
+          ],
+          "stemStart" : [
+            12,
+            20.785
+          ]
+        }
+      ],
+      "color" : "sky",
+      "id" : "r3",
+      "position" : [
+        130.824,
+        489.519
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 24,
+            "start" : 190,
+            "sweep" : 280
+          }
+        }
+      ]
+    },
+    {
+      "color" : "mint",
+      "id" : "r4",
+      "position" : [
+        278,
+        475.734
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 28,
+            "start" : 55,
+            "sweep" : 280
           }
         }
       ]
     },
     {
       "color" : "yellow",
+      "id" : "r5",
+      "position" : [
+        164.324,
+        547.543
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 24,
+            "start" : 55,
+            "sweep" : 280
+          }
+        }
+      ]
+    },
+    {
+      "color" : "coral",
+      "id" : "r6",
+      "position" : [
+        229,
+        390.863
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 30,
+            "start" : 235,
+            "sweep" : 280
+          }
+        }
+      ]
+    },
+    {
+      "color" : "coral",
       "id" : "s1",
       "motion" : "slide",
       "position" : [
-        160,
-        202
+        199.098,
+        556.86
       ],
-      "rotation" : 90,
+      "rotation" : 15,
       "shapes" : [
         {
           "segment" : {
@@ -201,101 +422,8 @@
               0
             ],
             "to" : [
-              58,
+              40,
               0
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "color" : "mint",
-      "id" : "l6",
-      "motion" : "slide",
-      "position" : [
-        220,
-        140
-      ],
-      "shapes" : [
-        {
-          "segment" : {
-            "from" : [
-              -100,
-              0
-            ],
-            "to" : [
-              100,
-              0
-            ]
-          }
-        },
-        {
-          "segment" : {
-            "from" : [
-              100,
-              0
-            ],
-            "to" : [
-              100,
-              120
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "color" : "yellow",
-      "id" : "s2",
-      "motion" : "slide",
-      "position" : [
-        142,
-        420
-      ],
-      "shapes" : [
-        {
-          "segment" : {
-            "from" : [
-              -22,
-              0
-            ],
-            "to" : [
-              58,
-              0
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "color" : "mint",
-      "id" : "l7",
-      "motion" : "slide",
-      "position" : [
-        218,
-        460
-      ],
-      "shapes" : [
-        {
-          "segment" : {
-            "from" : [
-              -58,
-              0
-            ],
-            "to" : [
-              22,
-              0
-            ]
-          }
-        },
-        {
-          "segment" : {
-            "from" : [
-              22,
-              0
-            ],
-            "to" : [
-              22,
-              -40
             ]
           }
         }
@@ -303,34 +431,47 @@
     },
     {
       "color" : "sky",
-      "id" : "l8",
+      "id" : "s2",
       "motion" : "slide",
       "position" : [
-        258,
-        500
+        93.8,
+        108.607
       ],
+      "rotation" : 285,
       "shapes" : [
         {
           "segment" : {
             "from" : [
-              -58,
+              -22,
               0
             ],
             "to" : [
-              22,
+              45,
               0
             ]
           }
-        },
+        }
+      ]
+    },
+    {
+      "color" : "mint",
+      "id" : "s3",
+      "motion" : "slide",
+      "position" : [
+        194.661,
+        112.184
+      ],
+      "rotation" : 195,
+      "shapes" : [
         {
           "segment" : {
             "from" : [
-              22,
+              -22,
               0
             ],
             "to" : [
-              22,
-              -80
+              35,
+              0
             ]
           }
         }

@@ -1,41 +1,41 @@
 {
   "board" : {
-    "height" : 640,
-    "width" : 360
+    "height" : 512,
+    "width" : 288
   },
   "id" : 46,
-  "name" : "Kite",
+  "name" : "Little twelve",
   "pieces" : [
     {
       "clips" : [
         {
-          "grips" : "r9",
+          "grips" : "r2",
           "stemEnd" : [
-            -35.355,
-            -35.355
+            50,
+            0
           ],
           "stemStart" : [
-            -22.627,
-            -22.627
+            30,
+            0
           ]
         },
         {
-          "grips" : "r10",
+          "grips" : "r1",
           "stemEnd" : [
-            35.355,
-            -35.355
+            -50,
+            0
           ],
           "stemStart" : [
-            22.627,
-            -22.627
+            -30,
+            0
           ]
         }
       ],
       "color" : "coral",
       "id" : "o1",
       "position" : [
-        180,
-        262.017
+        144,
+        376
       ],
       "shapes" : [
         {
@@ -44,30 +44,9 @@
               0,
               0
             ],
-            "radius" : 32,
+            "radius" : 30,
             "start" : 0,
             "sweep" : 360
-          }
-        }
-      ]
-    },
-    {
-      "color" : "sky",
-      "id" : "r1",
-      "position" : [
-        180,
-        146.052
-      ],
-      "shapes" : [
-        {
-          "arc" : {
-            "center" : [
-              0,
-              0
-            ],
-            "radius" : 32,
-            "start" : 337.5,
-            "sweep" : 225
           }
         }
       ]
@@ -77,31 +56,42 @@
         {
           "grips" : "r3",
           "stemEnd" : [
-            -35.355,
-            35.355
+            50,
+            0
           ],
           "stemStart" : [
-            -22.627,
-            22.627
+            30,
+            0
           ]
         },
         {
           "grips" : "r4",
           "stemEnd" : [
-            35.355,
-            35.355
+            0,
+            -50
           ],
           "stemStart" : [
-            22.627,
-            22.627
+            0,
+            -30
+          ]
+        },
+        {
+          "grips" : "r1",
+          "stemEnd" : [
+            0,
+            50
+          ],
+          "stemStart" : [
+            0,
+            30
           ]
         }
       ],
-      "color" : "purple",
+      "color" : "yellow",
       "id" : "o2",
       "position" : [
-        180,
-        377.983
+        64,
+        296
       ],
       "shapes" : [
         {
@@ -110,7 +100,7 @@
               0,
               0
             ],
-            "radius" : 32,
+            "radius" : 30,
             "start" : 0,
             "sweep" : 360
           }
@@ -118,203 +108,35 @@
       ]
     },
     {
-      "color" : "mint",
-      "id" : "r2",
-      "position" : [
-        180,
-        493.948
-      ],
-      "shapes" : [
-        {
-          "arc" : {
-            "center" : [
-              0,
-              0
-            ],
-            "radius" : 32,
-            "start" : 157.5,
-            "sweep" : 225
-          }
-        }
-      ]
-    },
-    {
       "clips" : [
         {
-          "grips" : "r2",
+          "grips" : "r3",
           "stemEnd" : [
-            35.355,
-            35.355
+            -50,
+            0
           ],
           "stemStart" : [
-            22.627,
-            22.627
+            -30,
+            0
           ]
         },
-        {
-          "grips" : "r11",
-          "stemEnd" : [
-            -35.355,
-            -35.355
-          ],
-          "stemStart" : [
-            -22.627,
-            -22.627
-          ]
-        }
-      ],
-      "color" : "yellow",
-      "id" : "r3",
-      "position" : [
-        122.017,
-        435.966
-      ],
-      "shapes" : [
-        {
-          "arc" : {
-            "center" : [
-              0,
-              0
-            ],
-            "radius" : 32,
-            "start" : 28.5,
-            "sweep" : 303
-          }
-        }
-      ]
-    },
-    {
-      "clips" : [
-        {
-          "grips" : "r2",
-          "stemEnd" : [
-            -35.355,
-            35.355
-          ],
-          "stemStart" : [
-            -22.627,
-            22.627
-          ]
-        },
-        {
-          "grips" : "r12",
-          "stemEnd" : [
-            35.355,
-            -35.355
-          ],
-          "stemStart" : [
-            22.627,
-            -22.627
-          ]
-        }
-      ],
-      "color" : "coral",
-      "id" : "r4",
-      "position" : [
-        237.983,
-        435.966
-      ],
-      "shapes" : [
-        {
-          "arc" : {
-            "center" : [
-              0,
-              0
-            ],
-            "radius" : 32,
-            "start" : 208.5,
-            "sweep" : 303
-          }
-        }
-      ]
-    },
-    {
-      "clips" : [
-        {
-          "grips" : "r11",
-          "stemEnd" : [
-            -35.355,
-            35.355
-          ],
-          "stemStart" : [
-            -22.627,
-            22.627
-          ]
-        }
-      ],
-      "color" : "sky",
-      "id" : "r5",
-      "position" : [
-        122.017,
-        320
-      ],
-      "shapes" : [
-        {
-          "arc" : {
-            "center" : [
-              0,
-              0
-            ],
-            "radius" : 32,
-            "start" : 298.5,
-            "sweep" : 303
-          }
-        }
-      ]
-    },
-    {
-      "clips" : [
-        {
-          "grips" : "r12",
-          "stemEnd" : [
-            35.355,
-            35.355
-          ],
-          "stemStart" : [
-            22.627,
-            22.627
-          ]
-        }
-      ],
-      "color" : "mint",
-      "id" : "r6",
-      "position" : [
-        237.983,
-        320
-      ],
-      "shapes" : [
-        {
-          "arc" : {
-            "center" : [
-              0,
-              0
-            ],
-            "radius" : 32,
-            "start" : 298.5,
-            "sweep" : 303
-          }
-        }
-      ]
-    },
-    {
-      "clips" : [
         {
           "grips" : "r5",
           "stemEnd" : [
-            35.355,
-            35.355
+            0,
+            -50
           ],
           "stemStart" : [
-            22.627,
-            22.627
+            0,
+            -30
           ]
         }
       ],
       "color" : "mint",
-      "id" : "r7",
+      "id" : "o3",
       "position" : [
-        64.034,
-        262.017
+        224,
+        296
       ],
       "shapes" : [
         {
@@ -323,9 +145,9 @@
               0,
               0
             ],
-            "radius" : 32,
-            "start" : 28.5,
-            "sweep" : 303
+            "radius" : 30,
+            "start" : 0,
+            "sweep" : 360
           }
         }
       ]
@@ -335,20 +157,31 @@
         {
           "grips" : "r6",
           "stemEnd" : [
-            -35.355,
-            35.355
+            0,
+            -50
           ],
           "stemStart" : [
-            -22.627,
-            22.627
+            0,
+            -30
+          ]
+        },
+        {
+          "grips" : "r3",
+          "stemEnd" : [
+            0,
+            50
+          ],
+          "stemStart" : [
+            0,
+            30
           ]
         }
       ],
-      "color" : "yellow",
-      "id" : "r8",
+      "color" : "purple",
+      "id" : "o4",
       "position" : [
-        295.966,
-        262.017
+        144,
+        216
       ],
       "shapes" : [
         {
@@ -357,9 +190,9 @@
               0,
               0
             ],
-            "radius" : 32,
-            "start" : 208.5,
-            "sweep" : 303
+            "radius" : 30,
+            "start" : 0,
+            "sweep" : 360
           }
         }
       ]
@@ -367,33 +200,33 @@
     {
       "clips" : [
         {
-          "grips" : "r7",
+          "grips" : "r6",
           "stemEnd" : [
-            -35.355,
-            35.355
+            50,
+            0
           ],
           "stemStart" : [
-            -22.627,
-            22.627
+            30,
+            0
           ]
         },
         {
-          "grips" : "r1",
+          "grips" : "r4",
           "stemEnd" : [
-            35.355,
-            -35.355
+            0,
+            50
           ],
           "stemStart" : [
-            22.627,
-            -22.627
+            0,
+            30
           ]
         }
       ],
-      "color" : "purple",
-      "id" : "r9",
+      "color" : "sky",
+      "id" : "o5",
       "position" : [
-        122.017,
-        204.034
+        64,
+        136
       ],
       "shapes" : [
         {
@@ -402,9 +235,9 @@
               0,
               0
             ],
-            "radius" : 32,
-            "start" : 118.5,
-            "sweep" : 303
+            "radius" : 30,
+            "start" : 0,
+            "sweep" : 360
           }
         }
       ]
@@ -412,33 +245,33 @@
     {
       "clips" : [
         {
-          "grips" : "r8",
+          "grips" : "r5",
           "stemEnd" : [
-            35.355,
-            35.355
+            0,
+            50
           ],
           "stemStart" : [
-            22.627,
-            22.627
+            0,
+            30
           ]
         },
         {
-          "grips" : "r1",
+          "grips" : "r6",
           "stemEnd" : [
-            -35.355,
-            -35.355
+            -50,
+            0
           ],
           "stemStart" : [
-            -22.627,
-            -22.627
+            -30,
+            0
           ]
         }
       ],
-      "color" : "purple",
-      "id" : "r10",
+      "color" : "coral",
+      "id" : "o6",
       "position" : [
-        237.983,
-        204.034
+        224,
+        136
       ],
       "shapes" : [
         {
@@ -447,19 +280,40 @@
               0,
               0
             ],
-            "radius" : 32,
-            "start" : 118.5,
-            "sweep" : 303
+            "radius" : 30,
+            "start" : 0,
+            "sweep" : 360
+          }
+        }
+      ]
+    },
+    {
+      "color" : "mint",
+      "id" : "r1",
+      "position" : [
+        64,
+        376
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 30,
+            "start" : 130,
+            "sweep" : 280
           }
         }
       ]
     },
     {
       "color" : "purple",
-      "id" : "r11",
+      "id" : "r2",
       "position" : [
-        64.034,
-        377.983
+        224,
+        376
       ],
       "shapes" : [
         {
@@ -468,19 +322,61 @@
               0,
               0
             ],
-            "radius" : 32,
-            "start" : 247.5,
-            "sweep" : 225
+            "radius" : 30,
+            "start" : 355,
+            "sweep" : 280
+          }
+        }
+      ]
+    },
+    {
+      "color" : "sky",
+      "id" : "r3",
+      "position" : [
+        144,
+        296
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 30,
+            "start" : 130,
+            "sweep" : 280
+          }
+        }
+      ]
+    },
+    {
+      "color" : "coral",
+      "id" : "r4",
+      "position" : [
+        64,
+        216
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 30,
+            "start" : 220,
+            "sweep" : 280
           }
         }
       ]
     },
     {
       "color" : "yellow",
-      "id" : "r12",
+      "id" : "r5",
       "position" : [
-        295.966,
-        377.983
+        224,
+        216
       ],
       "shapes" : [
         {
@@ -489,9 +385,30 @@
               0,
               0
             ],
-            "radius" : 32,
-            "start" : 67.5,
-            "sweep" : 225
+            "radius" : 30,
+            "start" : 40,
+            "sweep" : 280
+          }
+        }
+      ]
+    },
+    {
+      "color" : "yellow",
+      "id" : "r6",
+      "position" : [
+        144,
+        136
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 30,
+            "start" : 310,
+            "sweep" : 280
           }
         }
       ]

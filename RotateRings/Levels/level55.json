@@ -4,647 +4,598 @@
     "width" : 360
   },
   "id" : 55,
-  "name" : "Gridlock",
+  "name" : "Field",
   "pieces" : [
     {
+      "clips" : [
+        {
+          "grips" : "t1",
+          "stemEnd" : [
+            50,
+            0
+          ],
+          "stemStart" : [
+            30,
+            0
+          ]
+        },
+        {
+          "grips" : "t3",
+          "stemEnd" : [
+            0,
+            -50
+          ],
+          "stemStart" : [
+            0,
+            -30
+          ]
+        }
+      ],
       "color" : "mint",
-      "id" : "l1",
-      "motion" : "slide",
-      "position" : [
-        308,
-        455
-      ],
-      "rotation" : 180,
-      "shapes" : [
-        {
-          "segment" : {
-            "from" : [
-              -22,
-              0
-            ],
-            "to" : [
-              158,
-              0
-            ]
-          }
-        },
-        {
-          "segment" : {
-            "from" : [
-              158,
-              0
-            ],
-            "to" : [
-              158,
-              90
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "color" : "yellow",
-      "id" : "l2",
-      "motion" : "slide",
-      "position" : [
-        120,
-        410
-      ],
-      "rotation" : 90,
-      "shapes" : [
-        {
-          "segment" : {
-            "from" : [
-              -75,
-              0
-            ],
-            "to" : [
-              75,
-              0
-            ]
-          }
-        },
-        {
-          "segment" : {
-            "from" : [
-              75,
-              0
-            ],
-            "to" : [
-              75,
-              -90
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "color" : "purple",
-      "id" : "l3",
-      "motion" : "slide",
-      "position" : [
-        248,
-        515
-      ],
-      "rotation" : 180,
-      "shapes" : [
-        {
-          "segment" : {
-            "from" : [
-              -22,
-              0
-            ],
-            "to" : [
-              158,
-              0
-            ]
-          }
-        },
-        {
-          "segment" : {
-            "from" : [
-              158,
-              0
-            ],
-            "to" : [
-              158,
-              90
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "color" : "sky",
-      "id" : "l4",
-      "motion" : "slide",
+      "id" : "o1",
       "position" : [
         60,
-        500
+        520
       ],
-      "rotation" : 270,
       "shapes" : [
         {
-          "segment" : {
-            "from" : [
-              -75,
+          "arc" : {
+            "center" : [
+              0,
               0
             ],
-            "to" : [
-              75,
-              0
-            ]
-          }
-        },
-        {
-          "segment" : {
-            "from" : [
-              75,
-              0
-            ],
-            "to" : [
-              75,
-              -30
-            ]
+            "radius" : 30,
+            "start" : 0,
+            "sweep" : 360
           }
         }
       ]
     },
     {
-      "color" : "coral",
-      "id" : "l5",
-      "motion" : "slide",
-      "position" : [
-        60,
-        267
-      ],
-      "rotation" : 270,
-      "shapes" : [
+      "clips" : [
         {
-          "segment" : {
-            "from" : [
-              -128,
-              0
-            ],
-            "to" : [
-              22,
-              0
-            ]
-          }
+          "grips" : "t1",
+          "stemEnd" : [
+            -50,
+            0
+          ],
+          "stemStart" : [
+            -30,
+            0
+          ]
         },
         {
-          "segment" : {
-            "from" : [
-              22,
-              0
-            ],
-            "to" : [
-              22,
-              -30
-            ]
-          }
+          "grips" : "t2",
+          "stemEnd" : [
+            50,
+            0
+          ],
+          "stemStart" : [
+            30,
+            0
+          ]
         }
-      ]
-    },
-    {
-      "color" : "mint",
-      "id" : "l6",
-      "motion" : "slide",
-      "position" : [
-        52,
-        215
       ],
-      "shapes" : [
-        {
-          "segment" : {
-            "from" : [
-              -22,
-              0
-            ],
-            "to" : [
-              128,
-              0
-            ]
-          }
-        },
-        {
-          "segment" : {
-            "from" : [
-              128,
-              0
-            ],
-            "to" : [
-              128,
-              -60
-            ]
-          }
-        }
-      ]
-    },
-    {
       "color" : "yellow",
-      "id" : "l7",
-      "motion" : "slide",
+      "id" : "o2",
       "position" : [
-        210,
-        223
+        220,
+        520
       ],
-      "rotation" : 270,
       "shapes" : [
         {
-          "segment" : {
-            "from" : [
-              -22,
+          "arc" : {
+            "center" : [
+              0,
               0
             ],
-            "to" : [
-              98,
-              0
-            ]
-          }
-        },
-        {
-          "segment" : {
-            "from" : [
-              98,
-              0
-            ],
-            "to" : [
-              98,
-              -90
-            ]
+            "radius" : 30,
+            "start" : 0,
+            "sweep" : 360
           }
         }
       ]
     },
     {
+      "clips" : [
+        {
+          "grips" : "t4",
+          "stemEnd" : [
+            50,
+            0
+          ],
+          "stemStart" : [
+            30,
+            0
+          ]
+        },
+        {
+          "grips" : "t1",
+          "stemEnd" : [
+            0,
+            50
+          ],
+          "stemStart" : [
+            0,
+            30
+          ]
+        },
+        {
+          "grips" : "t5",
+          "stemEnd" : [
+            0,
+            -50
+          ],
+          "stemStart" : [
+            0,
+            -30
+          ]
+        }
+      ],
       "color" : "purple",
-      "id" : "l8",
-      "motion" : "slide",
+      "id" : "o3",
       "position" : [
-        278,
-        95
+        140,
+        440
       ],
       "shapes" : [
         {
-          "segment" : {
-            "from" : [
-              -158,
+          "arc" : {
+            "center" : [
+              0,
               0
             ],
-            "to" : [
-              22,
-              0
-            ]
-          }
-        },
-        {
-          "segment" : {
-            "from" : [
-              22,
-              0
-            ],
-            "to" : [
-              22,
-              60
-            ]
+            "radius" : 30,
+            "start" : 0,
+            "sweep" : 360
           }
         }
       ]
     },
     {
+      "clips" : [
+        {
+          "grips" : "t2",
+          "stemEnd" : [
+            0,
+            50
+          ],
+          "stemStart" : [
+            0,
+            30
+          ]
+        },
+        {
+          "grips" : "t4",
+          "stemEnd" : [
+            -50,
+            0
+          ],
+          "stemStart" : [
+            -30,
+            0
+          ]
+        },
+        {
+          "grips" : "r1",
+          "stemEnd" : [
+            0,
+            -50
+          ],
+          "stemStart" : [
+            0,
+            -30
+          ]
+        }
+      ],
       "color" : "sky",
-      "id" : "l9",
-      "motion" : "slide",
-      "position" : [
-        330,
-        163
-      ],
-      "rotation" : 270,
-      "shapes" : [
-        {
-          "segment" : {
-            "from" : [
-              -22,
-              0
-            ],
-            "to" : [
-              98,
-              0
-            ]
-          }
-        },
-        {
-          "segment" : {
-            "from" : [
-              98,
-              0
-            ],
-            "to" : [
-              98,
-              -30
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "color" : "coral",
-      "id" : "l10",
-      "motion" : "slide",
-      "position" : [
-        255,
-        35
-      ],
-      "rotation" : 180,
-      "shapes" : [
-        {
-          "segment" : {
-            "from" : [
-              -75,
-              0
-            ],
-            "to" : [
-              75,
-              0
-            ]
-          }
-        },
-        {
-          "segment" : {
-            "from" : [
-              75,
-              0
-            ],
-            "to" : [
-              75,
-              -30
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "color" : "mint",
-      "id" : "l11",
-      "motion" : "slide",
-      "position" : [
-        128,
-        65
-      ],
-      "rotation" : 180,
-      "shapes" : [
-        {
-          "segment" : {
-            "from" : [
-              -22,
-              0
-            ],
-            "to" : [
-              68,
-              0
-            ]
-          }
-        },
-        {
-          "segment" : {
-            "from" : [
-              68,
-              0
-            ],
-            "to" : [
-              68,
-              30
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "color" : "yellow",
-      "id" : "l12",
-      "motion" : "slide",
-      "position" : [
-        30,
-        73
-      ],
-      "rotation" : 90,
-      "shapes" : [
-        {
-          "segment" : {
-            "from" : [
-              -38,
-              0
-            ],
-            "to" : [
-              22,
-              0
-            ]
-          }
-        },
-        {
-          "segment" : {
-            "from" : [
-              22,
-              0
-            ],
-            "to" : [
-              22,
-              -60
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "color" : "purple",
-      "id" : "s1",
-      "motion" : "slide",
-      "position" : [
-        82,
-        155
-      ],
-      "shapes" : [
-        {
-          "segment" : {
-            "from" : [
-              -22,
-              0
-            ],
-            "to" : [
-              68,
-              0
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "color" : "yellow",
-      "id" : "l13",
-      "motion" : "slide",
-      "position" : [
-        240,
-        177
-      ],
-      "rotation" : 90,
-      "shapes" : [
-        {
-          "segment" : {
-            "from" : [
-              -22,
-              0
-            ],
-            "to" : [
-              98,
-              0
-            ]
-          }
-        },
-        {
-          "segment" : {
-            "from" : [
-              98,
-              0
-            ],
-            "to" : [
-              98,
-              30
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "color" : "coral",
-      "id" : "l14",
-      "motion" : "slide",
-      "position" : [
-        248,
-        305
-      ],
-      "shapes" : [
-        {
-          "segment" : {
-            "from" : [
-              -38,
-              0
-            ],
-            "to" : [
-              22,
-              0
-            ]
-          }
-        },
-        {
-          "segment" : {
-            "from" : [
-              22,
-              0
-            ],
-            "to" : [
-              22,
-              -90
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "color" : "mint",
-      "id" : "l15",
-      "motion" : "slide",
+      "id" : "o4",
       "position" : [
         300,
-        237
+        440
       ],
-      "rotation" : 90,
       "shapes" : [
         {
-          "segment" : {
-            "from" : [
-              -22,
+          "arc" : {
+            "center" : [
+              0,
               0
             ],
-            "to" : [
-              98,
-              0
-            ]
+            "radius" : 30,
+            "start" : 0,
+            "sweep" : 360
           }
+        }
+      ]
+    },
+    {
+      "clips" : [
+        {
+          "grips" : "t5",
+          "stemEnd" : [
+            50,
+            0
+          ],
+          "stemStart" : [
+            30,
+            0
+          ]
         },
         {
-          "segment" : {
-            "from" : [
-              98,
-              0
-            ],
-            "to" : [
-              98,
-              90
-            ]
-          }
+          "grips" : "r2",
+          "stemEnd" : [
+            0,
+            -50
+          ],
+          "stemStart" : [
+            0,
+            -30
+          ]
         }
-      ]
-    },
-    {
-      "color" : "sky",
-      "id" : "s2",
-      "motion" : "slide",
-      "position" : [
-        202,
-        365
       ],
-      "rotation" : 180,
+      "color" : "coral",
+      "id" : "o5",
+      "position" : [
+        60,
+        360
+      ],
       "shapes" : [
         {
-          "segment" : {
-            "from" : [
-              -98,
+          "arc" : {
+            "center" : [
+              0,
               0
             ],
-            "to" : [
-              22,
-              0
-            ]
+            "radius" : 30,
+            "start" : 0,
+            "sweep" : 360
           }
         }
       ]
     },
     {
+      "clips" : [
+        {
+          "grips" : "r1",
+          "stemEnd" : [
+            50,
+            0
+          ],
+          "stemStart" : [
+            30,
+            0
+          ]
+        },
+        {
+          "grips" : "t4",
+          "stemEnd" : [
+            0,
+            50
+          ],
+          "stemStart" : [
+            0,
+            30
+          ]
+        }
+      ],
+      "color" : "mint",
+      "id" : "o6",
+      "position" : [
+        220,
+        360
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 30,
+            "start" : 0,
+            "sweep" : 360
+          }
+        }
+      ]
+    },
+    {
+      "clips" : [
+        {
+          "grips" : "t7",
+          "stemEnd" : [
+            0,
+            -50
+          ],
+          "stemStart" : [
+            0,
+            -30
+          ]
+        },
+        {
+          "grips" : "t5",
+          "stemEnd" : [
+            0,
+            50
+          ],
+          "stemStart" : [
+            0,
+            30
+          ]
+        }
+      ],
       "color" : "yellow",
-      "id" : "s3",
-      "motion" : "slide",
+      "id" : "o7",
       "position" : [
-        330,
-        403
+        140,
+        280
       ],
-      "rotation" : 270,
       "shapes" : [
         {
-          "segment" : {
-            "from" : [
-              -22,
+          "arc" : {
+            "center" : [
+              0,
               0
             ],
-            "to" : [
-              158,
+            "radius" : 30,
+            "start" : 0,
+            "sweep" : 360
+          }
+        }
+      ]
+    },
+    {
+      "clips" : [
+        {
+          "grips" : "t8",
+          "stemEnd" : [
+            0,
+            -50
+          ],
+          "stemStart" : [
+            0,
+            -30
+          ]
+        },
+        {
+          "grips" : "t6",
+          "stemEnd" : [
+            -50,
+            0
+          ],
+          "stemStart" : [
+            -30,
+            0
+          ]
+        }
+      ],
+      "color" : "purple",
+      "id" : "o8",
+      "position" : [
+        300,
+        280
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
               0
-            ]
+            ],
+            "radius" : 30,
+            "start" : 0,
+            "sweep" : 360
+          }
+        }
+      ]
+    },
+    {
+      "clips" : [
+        {
+          "grips" : "t7",
+          "stemEnd" : [
+            50,
+            0
+          ],
+          "stemStart" : [
+            30,
+            0
+          ]
+        },
+        {
+          "grips" : "t9",
+          "stemEnd" : [
+            0,
+            -50
+          ],
+          "stemStart" : [
+            0,
+            -30
+          ]
+        }
+      ],
+      "color" : "sky",
+      "id" : "o9",
+      "position" : [
+        60,
+        200
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 30,
+            "start" : 0,
+            "sweep" : 360
+          }
+        }
+      ]
+    },
+    {
+      "clips" : [
+        {
+          "grips" : "t10",
+          "stemEnd" : [
+            0,
+            -50
+          ],
+          "stemStart" : [
+            0,
+            -30
+          ]
+        },
+        {
+          "grips" : "t6",
+          "stemEnd" : [
+            0,
+            50
+          ],
+          "stemStart" : [
+            0,
+            30
+          ]
+        }
+      ],
+      "color" : "coral",
+      "id" : "o10",
+      "position" : [
+        220,
+        200
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 30,
+            "start" : 0,
+            "sweep" : 360
+          }
+        }
+      ]
+    },
+    {
+      "clips" : [
+        {
+          "grips" : "t10",
+          "stemEnd" : [
+            50,
+            0
+          ],
+          "stemStart" : [
+            30,
+            0
+          ]
+        },
+        {
+          "grips" : "t7",
+          "stemEnd" : [
+            0,
+            50
+          ],
+          "stemStart" : [
+            0,
+            30
+          ]
+        }
+      ],
+      "color" : "mint",
+      "id" : "o11",
+      "position" : [
+        140,
+        120
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 30,
+            "start" : 0,
+            "sweep" : 360
+          }
+        }
+      ]
+    },
+    {
+      "clips" : [
+        {
+          "grips" : "t8",
+          "stemEnd" : [
+            0,
+            50
+          ],
+          "stemStart" : [
+            0,
+            30
+          ]
+        },
+        {
+          "grips" : "t10",
+          "stemEnd" : [
+            -50,
+            0
+          ],
+          "stemStart" : [
+            -30,
+            0
+          ]
+        }
+      ],
+      "color" : "yellow",
+      "id" : "o12",
+      "position" : [
+        300,
+        120
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 30,
+            "start" : 0,
+            "sweep" : 360
           }
         }
       ]
     },
     {
       "color" : "sky",
-      "id" : "l16",
-      "motion" : "slide",
+      "id" : "t1",
       "position" : [
-        52,
-        125
+        140,
+        520
       ],
-      "rotation" : 180,
       "shapes" : [
         {
-          "segment" : {
-            "from" : [
-              -38,
+          "arc" : {
+            "center" : [
+              0,
               0
             ],
-            "to" : [
-              22,
-              0
-            ]
+            "radius" : 30,
+            "start" : 252.5,
+            "sweep" : 305
           }
         },
         {
           "segment" : {
             "from" : [
-              22,
-              0
+              -21.213,
+              21.213
             ],
             "to" : [
-              22,
-              -60
+              -32.527,
+              32.527
             ]
           }
         }
@@ -652,93 +603,239 @@
     },
     {
       "color" : "coral",
-      "id" : "s4",
-      "motion" : "slide",
+      "id" : "t2",
       "position" : [
-        30,
-        553
+        300,
+        520
       ],
-      "rotation" : 90,
       "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 30,
+            "start" : 85,
+            "sweep" : 280
+          }
+        },
         {
           "segment" : {
             "from" : [
-              -98,
-              0
+              -21.213,
+              21.213
             ],
             "to" : [
-              22,
-              0
+              -32.527,
+              32.527
             ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "yellow",
+      "id" : "t3",
+      "position" : [
+        60,
+        440
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 30,
+            "start" : 162.5,
+            "sweep" : 305
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              21.213,
+              -21.213
+            ],
+            "to" : [
+              32.527,
+              -32.527
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "coral",
+      "id" : "t4",
+      "position" : [
+        220,
+        440
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 30,
+            "start" : 252.5,
+            "sweep" : 305
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              0,
+              30
+            ],
+            "to" : [
+              0,
+              39
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "sky",
+      "id" : "t5",
+      "position" : [
+        140,
+        360
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 30,
+            "start" : 252.5,
+            "sweep" : 305
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              21.213,
+              -21.213
+            ],
+            "to" : [
+              32.527,
+              -32.527
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "coral",
+      "id" : "r1",
+      "position" : [
+        300,
+        360
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 30,
+            "start" : 40,
+            "sweep" : 280
           }
         }
       ]
     },
     {
       "color" : "mint",
-      "id" : "l17",
-      "motion" : "slide",
+      "id" : "r2",
       "position" : [
-        188,
-        605
+        60,
+        280
       ],
       "shapes" : [
         {
-          "segment" : {
-            "from" : [
-              -158,
+          "arc" : {
+            "center" : [
+              0,
               0
             ],
-            "to" : [
-              22,
+            "radius" : 30,
+            "start" : 265,
+            "sweep" : 280
+          }
+        }
+      ]
+    },
+    {
+      "color" : "sky",
+      "id" : "t6",
+      "position" : [
+        220,
+        280
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
               0
-            ]
+            ],
+            "radius" : 30,
+            "start" : 175,
+            "sweep" : 280
           }
         },
         {
           "segment" : {
             "from" : [
-              22,
-              0
+              -21.213,
+              -21.213
             ],
             "to" : [
-              22,
-              -60
+              -27.577,
+              -27.577
             ]
           }
         }
       ]
     },
     {
-      "color" : "yellow",
-      "id" : "l18",
-      "motion" : "slide",
+      "color" : "purple",
+      "id" : "t7",
       "position" : [
-        262,
-        575
+        140,
+        200
       ],
       "shapes" : [
         {
-          "segment" : {
-            "from" : [
-              -22,
+          "arc" : {
+            "center" : [
+              0,
               0
             ],
-            "to" : [
-              38,
-              0
-            ]
+            "radius" : 30,
+            "start" : 342.5,
+            "sweep" : 305
           }
         },
         {
           "segment" : {
             "from" : [
-              38,
-              0
+              21.213,
+              21.213
             ],
             "to" : [
-              38,
-              -90
+              32.527,
+              32.527
             ]
           }
         }
@@ -746,47 +843,98 @@
     },
     {
       "color" : "sky",
-      "id" : "s5",
-      "motion" : "slide",
+      "id" : "t8",
       "position" : [
-        330,
-        530
+        300,
+        200
       ],
-      "rotation" : 270,
       "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 30,
+            "start" : 207.5,
+            "sweep" : 305
+          }
+        },
         {
           "segment" : {
             "from" : [
-              -45,
-              0
+              -21.213,
+              -21.213
             ],
             "to" : [
-              45,
-              0
+              -27.577,
+              -27.577
             ]
           }
         }
       ]
     },
     {
-      "color" : "coral",
-      "id" : "s6",
-      "motion" : "slide",
+      "color" : "purple",
+      "id" : "t9",
       "position" : [
-        262,
-        605
+        60,
+        120
       ],
-      "rotation" : 180,
       "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
+              0
+            ],
+            "radius" : 30,
+            "start" : 72.5,
+            "sweep" : 305
+          }
+        },
         {
           "segment" : {
             "from" : [
-              -68,
-              0
+              21.213,
+              -21.213
             ],
             "to" : [
-              22,
+              32.527,
+              -32.527
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "color" : "sky",
+      "id" : "t10",
+      "position" : [
+        220,
+        120
+      ],
+      "shapes" : [
+        {
+          "arc" : {
+            "center" : [
+              0,
               0
+            ],
+            "radius" : 30,
+            "start" : 72.5,
+            "sweep" : 305
+          }
+        },
+        {
+          "segment" : {
+            "from" : [
+              21.213,
+              -21.213
+            ],
+            "to" : [
+              32.527,
+              -32.527
             ]
           }
         }

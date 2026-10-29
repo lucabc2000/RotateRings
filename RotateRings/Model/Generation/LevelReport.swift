@@ -23,7 +23,10 @@ struct LevelReport: Codable, Equatable, Sendable {
         /// Distinct `PieceKind` raw values present, sorted.
         var kinds: [String]
         var metrics: SolverMetrics
+        /// The legacy score (`DifficultyScore`).
         var difficulty: Double
+        /// How the level plays (`LevelQuality`); nil in reports made before it existed.
+        var quality: LevelQuality?
         var solution: [SolverMove]
     }
 
@@ -35,14 +38,20 @@ struct LevelReport: Codable, Equatable, Sendable {
         var pinned: Bool
         /// Curve target for levels 16–50; nil for tutorial levels.
         var targetDifficulty: Double?
+        /// Set when the level was chosen by interest (LEVEL-DESIGN.md §14): true when no finalist
+        /// was within `QualityConfig.band` of the target and the closest one was taken instead.
+        var outOfBand: Bool?
         var runnerUps: [Candidate]
     }
 
+    /// No timestamp: the same seeds and settings give a byte-identical report (git records when).
     var version: Int
-    var generatedAt: Date
     var masterSeed: UInt64
     var solverConfig: SolverConfig
     var difficultyFormula: String
+    /// The settings `quality` was measured with; nil when it was not measured.
+    var qualityConfig: QualityConfig?
+    var qualityFormula: String?
     var levels: [Level]
 
     static func candidateID(level: Int, seed: UInt64) -> String {

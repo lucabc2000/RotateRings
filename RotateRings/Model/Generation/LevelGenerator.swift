@@ -19,6 +19,11 @@ struct GeneratorConfig {
     var jobs = 4
     /// Level number → candidate seed the user chose in the Level Browser.
     var pins: [Int: UInt64] = [:]
+    /// Quality measurements of the chosen level and its runner-ups; nil skips them.
+    var quality: QualityConfig? = QualityConfig()
+    /// Template id → the tier its boards usually reach (LevelForge/design-quality.json), for
+    /// predicting a candidate's `difficulty` before the bots play it. Missing designs count as 1.
+    var expectedTier: [String: Double] = [:]
 
     init() {}
 }
@@ -39,13 +44,17 @@ struct Candidate {
     let kinds: [PieceKind]
     let metrics: SolverMetrics
     let solution: [SolverMove]
+    /// The legacy score (`DifficultyScore`), still what the curve ranks by.
     let difficulty: Double
+    /// Set for the chosen level and its runner-ups (`LevelGenerator.measureQuality`).
+    var quality: LevelQuality? = nil
 
     var id: String { LevelReport.candidateID(level: level, seed: seed) }
 
     var reportCandidate: LevelReport.Candidate {
         LevelReport.Candidate(id: id, seed: seed, template: template, pieceCount: file.pieces.count,
-                              kinds: kinds.map(\.rawValue), metrics: metrics, difficulty: difficulty, solution: solution)
+                              kinds: kinds.map(\.rawValue), metrics: metrics, difficulty: difficulty, quality: quality,
+                              solution: solution)
     }
 }
 
@@ -54,10 +63,13 @@ struct GeneratedLevel {
     let runnerUps: [Candidate]
     let pinned: Bool
     let targetDifficulty: Double?
+    /// Chosen by interest: whether no finalist was within the band of the target. Nil when the
+    /// level was not chosen that way (tutorial, pin, no quality measurements, rebuilt from seeds).
+    var outOfBand: Bool? = nil
 
     var reportEntry: LevelReport.Level {
         LevelReport.Level(number: chosen.level, name: chosen.file.name, chosen: chosen.reportCandidate, pinned: pinned,
-                          targetDifficulty: targetDifficulty, runnerUps: runnerUps.map(\.reportCandidate))
+                          targetDifficulty: targetDifficulty, outOfBand: outOfBand, runnerUps: runnerUps.map(\.reportCandidate))
     }
 }
 
@@ -180,17 +192,34 @@ enum LevelGenerator {
         }
 
         let budget = goal.isTutorial ? config.tutorialCandidates : config.maxCandidates
-        var index = 0
+        let maxAttempts = budget * 6
         var attempts = 0
         let batch = goal.isTutorial ? 1 : max(1, config.jobs)
+        /// Whether the candidates so far are enough to choose from.
+        func isEnough() -> Bool {
+            if candidates.count >= budget { return true }
+            if goal.isHard {
+                // Hard levels compare a full set of candidates.
+                return candidates.count >= (level > 50 ? lateHardCandidates : hardCandidates)
+            }
+            guard !goal.isTutorial, let target = goal.targetDifficulty, candidates.count >= 4 else { return false }
+            if let quality = config.quality {
+                // Enough finalists within the band to choose the most interesting of them, and at
+                // peaks and milestones enough for the extra ones too.
+                return candidates.filter { abs(score(of: $0, config: config) - target) <= quality.band }.count
+                    >= candidatesWanted(level: level, quality: quality)
+            }
+            // Close enough for the curve, with runner-ups to spare.
+            return candidates.contains { abs($0.difficulty - target) <= tolerance(for: $0, target: target) }
+        }
         // Try seeds in parallel batches until enough valid candidates exist; invalid drafts are cheap,
-        // so allow extra attempts.
-        while candidates.count < budget && attempts < budget * 6 {
-            let seeds = (0..<batch).map { candidateSeed(master: config.masterSeed, level: level, index: index + $0) }
-            index += batch
-            attempts += batch
+        // so allow extra attempts. Results are taken in seed order and the search stops at the exact
+        // seed that made it enough, discarding the rest of the batch, so the number of jobs only
+        // changes how fast a level is made, never which candidates it sees.
+        search: while attempts < maxAttempts {
+            let seeds = (0..<min(batch, maxAttempts - attempts)).map { candidateSeed(master: config.masterSeed, level: level, index: attempts + $0) }
             var results = [Candidate?](repeating: nil, count: seeds.count)
-            if batch == 1 {
+            if seeds.count == 1 {
                 results[0] = makeCandidate(level: level, seed: seeds[0], config: config)
             } else {
                 let lock = NSLock()
@@ -201,22 +230,23 @@ enum LevelGenerator {
                     lock.unlock()
                 }
             }
-            for candidate in results.compactMap({ $0 }) where candidate.seed != pinned?.seed {
-                candidates.append(candidate)
-            }
-            if goal.isHard {
-                // Hard levels compare a full set of candidates.
-                if candidates.count >= (level > 50 ? lateHardCandidates : hardCandidates) { break }
-            } else if !goal.isTutorial, let target = goal.targetDifficulty,
-               candidates.count >= 4,
-               candidates.contains(where: { abs($0.difficulty - target) <= tolerance(for: $0, target: target) }) {
-                // Close enough for the curve, with runner-ups to spare.
-                break
+            for result in results {
+                attempts += 1
+                if let candidate = result, candidate.seed != pinned?.seed {
+                    candidates.append(candidate)
+                }
+                if isEnough() { break search }
             }
         }
         progress?("\(candidates.count) valid candidate(s) from \(attempts) attempt(s)")
 
         candidates.sort { a, b in rank(a, goal: goal) < rank(b, goal: goal) }
+        if pinned == nil, !goal.isTutorial, !goal.isHard, let quality = config.quality, let target = goal.targetDifficulty {
+            if DifficultyCurve.onQualityScale {
+                candidates.sort { (abs(score(of: $0, config: config) - target), $0.seed) < (abs(score(of: $1, config: config) - target), $1.seed) }
+            }
+            return chooseByInterest(candidates, level: level, target: target, quality: quality, config: config)
+        }
         let chosen: Candidate
         if let pinned {
             chosen = pinned
@@ -226,7 +256,87 @@ enum LevelGenerator {
             candidates.removeFirst()
         }
         let runnerUpCount = goal.isTutorial ? 7 : 3
-        return GeneratedLevel(chosen: chosen, runnerUps: Array(candidates.prefix(runnerUpCount)), pinned: pinned != nil, targetDifficulty: goal.targetDifficulty)
+        let measured = measureQuality([chosen] + candidates.prefix(runnerUpCount), config: config)
+        return GeneratedLevel(chosen: measured[0], runnerUps: Array(measured.dropFirst()), pinned: pinned != nil, targetDifficulty: goal.targetDifficulty)
+    }
+
+    /// Candidates the search wants within the band before it stops: the finalists, at a peak also
+    /// the extra ones it may need, at a milestone all the owner gets to choose from.
+    private static func candidatesWanted(level: Int, quality: QualityConfig) -> Int {
+        let peaks = quality.peaks ?? QualityConfig.Peaks()
+        if DifficultyCurve.milestones.contains(level) { return peaks.milestoneFinalists }
+        if DifficultyCurve.peaks.contains(level) { return quality.finalists + peaks.extraFinalists }
+        return quality.finalists
+    }
+
+    /// Curve levels: the finalists are the candidates closest to the target (`rank`), and only they
+    /// are measured. Those within the band compete on interest, rounded to 0.01 so that near ties
+    /// go to a level the owner-release strategy cannot clear by itself, then to fewer pieces. With
+    /// no finalist in the band the closest one wins and the level is marked out of band.
+    ///
+    /// At a small breather (`DifficultyCurve.breathers`) the most interesting finalist wins, in or out
+    /// of the band.
+    ///
+    /// At a peak (`DifficultyCurve.peaks`) only finalists that reach the peak's tier compete, when
+    /// there are any; if none of the first finalists does, more candidates are measured. A milestone
+    /// measures more finalists, and all of them stay as runner-ups.
+    private static func chooseByInterest(_ ranked: [Candidate], level: Int, target: Double, quality: QualityConfig,
+                                         config: GeneratorConfig) -> GeneratedLevel? {
+        guard !ranked.isEmpty else { return nil }
+        let peaks = quality.peaks ?? QualityConfig.Peaks()
+        let isPeak = DifficultyCurve.peaks.contains(level)
+        let count = DifficultyCurve.milestones.contains(level) ? peaks.milestoneFinalists : quality.finalists
+        var finalists = measureQuality(Array(ranked.prefix(count)), config: config)
+        func reachesTier(_ c: Candidate) -> Bool {
+            c.quality.map { $0.tier >= peaks.tier && !$0.unplanned } == true
+        }
+        if isPeak, !finalists.contains(where: reachesTier) {
+            finalists += measureQuality(Array(ranked.dropFirst(finalists.count).prefix(peaks.extraFinalists)), config: config)
+        }
+        let pool = isPeak && finalists.contains(where: reachesTier) ? finalists.filter(reachesTier) : finalists
+        let inBand = pool.filter { abs(score(of: $0, config: config) - target) <= quality.band }
+        let outOfBand = inBand.isEmpty
+        func key(_ c: Candidate) -> (Double, Int, Int, UInt64) {
+            (-((c.quality?.interest ?? 0) * 100).rounded(), c.quality?.strategySolved == true ? 1 : 0, c.file.pieces.count, c.seed)
+        }
+        // A small breather is there to be enjoyed, not to hit its target: every finalist competes.
+        let contenders = DifficultyCurve.breathers.contains(level) ? pool : inBand
+        // Out of band, the closest in ranking order (the pool keeps it).
+        let best = contenders.isEmpty ? pool[0] : contenders.min { key($0) < key($1) }!
+        if best.seed != finalists[0].seed {
+            finalists.removeAll { $0.seed == best.seed }
+            finalists.insert(best, at: 0)
+        }
+        return GeneratedLevel(chosen: finalists[0], runnerUps: Array(finalists.dropFirst()), pinned: false,
+                              targetDifficulty: target, outOfBand: outOfBand)
+    }
+
+    /// A candidate's score on the scale of the curve targets: the legacy score, or once the targets
+    /// are on the quality scale, `LevelQuality.difficulty` when measured and otherwise predicted
+    /// from the design's usual tier with the candidate's own moves and setup depth.
+    static func score(of candidate: Candidate, config: GeneratorConfig) -> Double {
+        guard DifficultyCurve.onQualityScale, let quality = config.quality else { return candidate.difficulty }
+        if let measured = candidate.quality { return measured.difficulty }
+        return quality.difficulty(tier: config.expectedTier[candidate.template] ?? 1, minMoves: candidate.metrics.minMoves,
+                                  setupDepth: QualityConfig.setupDepth(of: candidate.solution))
+    }
+
+    /// Adds the quality measurements to each candidate, in parallel. Each depends only on its own
+    /// candidate, so the order of evaluation never shows in the result.
+    static func measureQuality(_ candidates: [Candidate], config: GeneratorConfig) -> [Candidate] {
+        guard let quality = config.quality else { return candidates }
+        var measured = candidates
+        let lock = NSLock()
+        DispatchQueue.concurrentPerform(iterations: candidates.count) { i in
+            let candidate = candidates[i]
+            guard let board = try? candidate.file.makeBoard() else { return }
+            let result = QualityMeasure.measure(board: board, solution: candidate.solution, minMoves: candidate.metrics.minMoves,
+                                                seed: candidate.seed, config: quality, solverConfig: config.solver)
+            lock.lock()
+            measured[i].quality = result
+            lock.unlock()
+        }
+        return measured
     }
 
     /// Candidates compared for a hard level.
@@ -241,7 +351,8 @@ enum LevelGenerator {
     static func rebuild(_ entry: LevelReport.Level, config: GeneratorConfig) -> GeneratedLevel? {
         guard let chosen = makeCandidate(level: entry.number, seed: entry.chosen.seed, config: config) else { return nil }
         let runnerUps = entry.runnerUps.compactMap { makeCandidate(level: entry.number, seed: $0.seed, config: config) }
-        return GeneratedLevel(chosen: chosen, runnerUps: runnerUps, pinned: entry.pinned, targetDifficulty: entry.targetDifficulty)
+        let measured = measureQuality([chosen] + runnerUps, config: config)
+        return GeneratedLevel(chosen: measured[0], runnerUps: Array(measured.dropFirst()), pinned: entry.pinned, targetDifficulty: entry.targetDifficulty)
     }
 
     private static func tolerance(for candidate: Candidate, target: Double) -> Double {

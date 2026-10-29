@@ -111,32 +111,56 @@ enum Compositions {
             // other, so these webs need less preparing; holes would thin the hubs further.
             shape("hubs-kite", "Web kite", .diagonal, radius: 32, stem: 18, ["..#..", ".#.#.", "#.#.#", ".#.#.", "#.#.#", ".#.#.", "#.#.#", ".#.#.", "..#.."]),
             shape("hubs-weave", "Woven web", .diagonal, radius: 32, stem: 18, ["#.#.#", ".#.#.", "#.#.#", ".#.#.", "#.#.#", ".#.#.", "#.#.#", ".#.#.", "#.#.#"]),
+            // Outlines, five small rings across on the large board, so a web has a shape of its own
+            // instead of the rectangle every grid shares.
+            shape("hubs-gem", "Gem", .square, radius: 30, stem: 18, ["..#..", ".###.", "#####", "#####", "#####", ".###.", "..#.."]),
+            shape("hubs-cross", "Cross", .square, radius: 30, stem: 18, [".###.", ".###.", "#####", "#####", "#####", ".###.", ".###."]),
+            shape("hubs-arch", "Arch", .square, radius: 30, stem: 18, [".###.", "#####", "#####", "##.##", "##.##", "##.##", "##.##"]),
+            shape("hubs-hourglass", "Hourglass", .square, radius: 30, stem: 18, ["#####", "#####", ".###.", "..#..", ".###.", "#####", "#####"]),
+            shape("hubs-heart", "Heart", .square, radius: 30, stem: 18, ["##.##", "#####", "#####", "#####", ".###.", "..#.."]),
+            shape("hubs-frame", "Frame", .square, radius: 30, stem: 18, ["#####", "#####", "##.##", "#...#", "##.##", "#####", "#####"]),
+            // Small levels (on `BoardSize.small`, drawn larger): eight to twelve rings.
+            shape("hubs-mini", "Little nine", .square, radius: 30, stem: 20, ["###", "###", "###"]),
+            shape("hubs-mini12", "Little twelve", .square, radius: 30, stem: 20, ["###", "###", "###", "###"]),
+            shape("hubs-minigem", "Little gem", .square, radius: 30, stem: 20, [".#.", "###", "###", ".#."]),
         ]
         return Dictionary(uniqueKeysWithValues: list.map { ($0.template, $0) })
     }()
 
     /// A web of closed hubs and shared rings (`HubWeb`).
-    static func hubWeb(_ shapeID: String, clips: ClosedRange<Int> = 2...4, holders: Int = 3, bars: Int = 0, tails: Double = 0) -> LevelTemplate {
+    static func hubWeb(_ shapeID: String, clips: ClosedRange<Int> = 2...4, holders: Int = 3, bars: Int = 0, tails: Double = 0,
+                       small: Bool = false) -> LevelTemplate {
         let shape = webShapes[shapeID]!
         var options = HubWeb.Options()
+        // Five rings across do not fit the standard board; a small level is drawn larger.
+        let board: BoardSize = small ? .small : shape.rows.map(\.count).max() ?? 0 > 4 && shape.layout == .square ? .large : .standard
+        options.board = board
         options.clips = clips
         options.holdersPerRing = holders
         options.bars = bars
         options.tailShare = tails
         options.name = shape.name
-        let id = shapeID + (tails > 0 ? "-tails" : "")
+        // The clip range is part of the design: 3–4 clips plays far deeper than 2–3.
+        let id = shapeID + (clips == 2...4 ? "" : "-c\(clips.lowerBound)\(clips.upperBound)") + (tails > 0 ? "-tails" : "") + (small ? "-small" : "")
         options.template = id
         var kinds: Set<PieceKind> = [.cRing, .closedRing]
         if bars > 0 { kinds.insert(.slideBar) }
         if tails > 0 { kinds.insert(.tailRing) }
-        return LevelTemplate.single(id, kinds: kinds) { rng in HubWeb.build(shape, options: options, rng: &rng) }
+        return LevelTemplate.single(id, kinds: kinds, board: board) { rng in HubWeb.build(shape, options: options, rng: &rng) }
     }
 
     /// Rings that hold and are held (`Knot`), on one of the web masks.
     static func knot(_ shapeID: String, holders: Int = 2, clips: Int = 2, link: Double = 0.85, anchors: Double = 0.25, bars: Int = 0, uBars: Int = 0,
-                     tails: Double = 0, bombs: Int = 0) -> LevelTemplate {
+                     tails: Double = 0, bombs: Int = 0, locks: Int = 0, lockClips: ClosedRange<Int> = 2...3,
+                     mirror: Bool = false, mirrorColors: Bool = true, holes: String? = nil, small: Bool = false) -> LevelTemplate {
         let shape = webShapes[shapeID]!
         var options = Knot.Options()
+        options.board = small ? .small : .standard
+        // Bars go into the mask's own holes where it has some, otherwise into a sieve of holes.
+        let defaultHoles: Knot.HolePattern = shape.rows.contains { $0.contains("o") } ? .mask : .sieve
+        options.holes = holes.map { Knot.HolePattern(rawValue: $0)! } ?? defaultHoles
+        options.mirror = mirror
+        options.mirrorColors = mirrorColors
         options.maxHolders = holders
         options.maxClips = clips
         options.linkChance = link
@@ -145,25 +169,38 @@ enum Compositions {
         options.bars = bars
         options.uBars = uBars
         options.bombs = bombs
+        options.locks = locks
+        options.lockClips = lockClips
         options.name = shape.name
         let id = shapeID.replacingOccurrences(of: "hubs-", with: "knot-") + "-\(holders)\(clips)" + (bars > 0 ? "-b\(bars)" : "")
             + (uBars > 0 ? "-u\(uBars)" : "") + (tails > 0 ? "-tails" : "") + (bombs > 0 ? "-bomb\(bombs)" : "")
+            + (locks > 0 ? "-lock\(locks)" + (lockClips == 2...3 ? "" : "c\(lockClips.upperBound)") : "")
+            + (mirror ? "-mirror" : "") + (holes.map { "-h\($0)" } ?? "") + (small ? "-small" : "")
         options.template = id
         var kinds: Set<PieceKind> = [.cRing, .closedRing]
         if tails > 0 { kinds.insert(.tailRing) }
         if bars > 0 { kinds.insert(.slideBar) }
         if uBars > 0 { kinds.insert(.uBar) }
-        return LevelTemplate.single(id, kinds: kinds) { rng in Knot.build(shape, options: options, rng: &rng) }
+        return LevelTemplate.single(id, kinds: kinds, board: options.board) { rng in Knot.build(shape, options: options, rng: &rng) }
     }
 
     // MARK: Free-form knots
+
+    /// Level names for free-form knots inside a silhouette.
+    static let silhouetteNames = ["circle": "Round knot", "donut": "Donut", "scurve": "Serpent", "crescent": "Crescent",
+                                  "heart": "Heart knot", "diamond": "Diamond knot", "arch": "Archway"]
 
     /// A knot without a grid (`FreeKnot`). `gate` makes its tails long enough to reach into a
     /// neighbour's circle; `giant` grows it inside and around one big closed ring; `dense` draws it
     /// on the larger board with more, smaller rings.
     static func freeKnot(rings: ClosedRange<Int>, holders: Int = 2, tails: Double = 0, gate: Bool = false, pokes: Int = 0,
-                         bombs: Int = 0, giant: Double? = nil, dense: Bool = false) -> LevelTemplate {
+                         bombs: Int = 0, giant: Double? = nil, dense: Bool = false, mirror: Bool = false,
+                         silhouette: String? = nil, anchors: Int = 0, small: Bool = false) -> LevelTemplate {
         var options = FreeKnot.Options()
+        if small { options.board = .small }
+        options.mirror = mirror
+        options.silhouette = silhouette.map { Silhouette.all[$0]! }
+        options.anchors = anchors
         options.rings = rings
         options.maxHolders = holders
         options.tailShare = tails
@@ -176,13 +213,39 @@ enum Compositions {
             options.radii = [22, 24, 26, 28, 30, 34]
         }
         let kind = giant != nil ? "giant" : dense ? "dense" : "free"
-        options.name = giant != nil ? "Giant ring" : dense ? "Thicket" : gate ? "Gates" : "Wild knot"
+        options.name = silhouette.flatMap { silhouetteNames[$0] }
+            ?? (giant != nil ? "Giant ring" : dense ? "Thicket" : small ? "Little knot" : gate ? "Gates" : "Wild knot")
         let id = "\(kind)-\(rings.lowerBound)-\(rings.upperBound)-\(holders)" + (tails > 0 ? (gate ? "-gates" : "-tails") : "")
-            + (pokes > 0 ? "-p\(pokes)" : "") + (bombs > 0 ? "-bomb\(bombs)" : "")
+            + (pokes > 0 ? "-p\(pokes)" : "") + (bombs > 0 ? "-bomb\(bombs)" : "") + (mirror ? "-mirror" : "")
+            + (silhouette.map { "-sil-\($0)" } ?? "") + (anchors > 0 ? "-a\(anchors)" : "") + (small ? "-small" : "")
         options.template = id
         var kinds: Set<PieceKind> = [.cRing, .closedRing]
         if tails > 0 { kinds.insert(.tailRing) }
         if pokes > 0 { kinds.insert(.slideBar) }
+        return LevelTemplate.single(id, kinds: kinds, board: options.board) { rng in FreeKnot.build(options, rng: &rng) }
+    }
+
+    // MARK: Pictures
+
+    /// A milestone picture (`Picture`, `PictureLibrary`): the picture fixes the rings, the seed the
+    /// puzzle on them.
+    static func picture(_ name: String, holders: Int = 3, tails: Double = 0.3, bombs: Int = 0, locks: Int = 0) -> LevelTemplate {
+        let picture = PictureLibrary.all[name]!
+        var options = FreeKnot.Options()
+        options.picture = picture
+        options.pictureLocks = locks
+        options.maxClips = picture.clips ?? options.maxClips
+        options.board = picture.boardSize
+        options.maxHolders = holders
+        options.tailShare = tails
+        options.bombs = bombs
+        options.name = picture.title
+        let id = "picture-\(name)" + (tails > 0 ? "-tails" : "") + (bombs > 0 ? "-bomb\(bombs)" : "") + (locks > 0 ? "-lock\(locks)" : "")
+        options.template = id
+        var kinds: Set<PieceKind> = [.cRing, .closedRing]
+        if tails > 0 { kinds.insert(.tailRing) }
+        if (picture.bars ?? []).contains(where: { $0.ring != nil }) { kinds.insert(.slideBar) }
+        if (picture.bars ?? []).contains(where: { $0.rings != nil }) { kinds.insert(.uBar) }
         return LevelTemplate.single(id, kinds: kinds, board: options.board) { rng in FreeKnot.build(options, rng: &rng) }
     }
 
@@ -287,198 +350,198 @@ enum Compositions {
     static func templates(level: Int) -> [LevelTemplate] {
         let lock = 1...4
         switch level {
-        case 11: return [knot("hubs-nine", holders: 2)]
-        case 12: return [knot("hubs-nine", holders: 2, tails: 0.4)]
-        case 13: return [hubWeb("hubs-nine", clips: 2...3, holders: 2, tails: 0.85)]
-        case 14: return [tangle(rings: 15...18, pokes: 2, latches: 1, hubs: 3, lock: lock)]
-        case 15: return [knot("hubs-nine", holders: 2, bars: 1, tails: 0.4)]
-        case 16: return [maze(cols: 8, rows: 10, bars: 11, freeLimit: 2)]
-        case 17: return [net("weave-crystal", lock: lock, crossClips: 1, tails: 3)]
-        case 18: return [knot("hubs-twelve", holders: 2)]
-        case 19: return [knot("hubs-twelve", holders: 2, bars: 2)]
-        case 20: return [knot("hubs-grand", holders: 2, bars: 1, uBars: 1)]
-        case 21: return [net("figure-block", lock: lock)]
-        case 22: return [knot("hubs-twelve", holders: 2, bars: 2, tails: 0.4)]
-        case 23: return [knot("hubs-grand", holders: 2, bars: 3)]
+        case 11: return [knot("hubs-kite", holders: 2, tails: 0.3)]
+        case 12: return [cages(across: 3, down: 3, count: 4, border: 0, bars: 13, freeLimit: 3)]
+        case 13: return [freeKnot(rings: 18...22, holders: 3, tails: 0.5, gate: true)]
+        case 14: return [hubWeb("hubs-nine", clips: 2...3, holders: 2, tails: 0.85)]
+        case 15: return [hubWeb("hubs-mini12", clips: 2...3, holders: 3, small: true)]
+        case 16: return [freeKnot(rings: 12...16, holders: 3, tails: 0.3, pokes: 3, giant: 146)]
+        case 17: return [knot("hubs-field", holders: 3, bars: 3, tails: 0.4, mirror: true, holes: "frame")]
+        case 18: return [net("weave-tapestry", lock: lock, crossClips: 2, tails: 4)]
+        case 19: return [freeKnot(rings: 26...32, holders: 3, tails: 0.4, bombs: 2, dense: true)]
+        case 20: return [picture("key", locks: 1)]
+        case 21: return [freeKnot(rings: 6...10, holders: 3, tails: 0.4, mirror: true, silhouette: "heart")]
+        case 22: return [knot("hubs-field", holders: 3, bars: 2, uBars: 1, mirror: true)]
+        case 23: return [hubWeb("hubs-twelve", clips: 2...3, holders: 2, tails: 0.85)]
         case 24: return [net("weave-butterfly", lock: lock)]
-        case 25: return [knot("hubs-twelve", holders: 2, uBars: 1)]
-        case 26: return [knot("hubs-grand", holders: 2, bombs: 1)]
-        case 27: return [cages(across: 3, down: 3, count: 4, border: 0, bars: 13, freeLimit: 3)]
-        case 28: return [knot("hubs-nine", holders: 2, bars: 1)]
-        case 29: return [maze(cols: 10, rows: 14, bars: 17, freeLimit: 2)]
-        case 30: return [knot("hubs-column", holders: 3, bars: 1, uBars: 1)]
-        case 31: return [hubWeb("hubs-twelve", clips: 2...3, holders: 2, tails: 0.85)]
-        case 32: return [knot("hubs-column", holders: 3, bombs: 1)]
-        case 33: return [tangle(rings: 11...14, pokes: 1, latches: 1, lock: lock)]
-        case 34: return [knot("hubs-grand", holders: 2, bars: 3, tails: 0.4)]
-        case 35: return [hubWeb("hubs-grand", clips: 3...4, holders: 3, tails: 0.85)]
-        case 36: return [net("weave-lantern", lock: lock, bars: 1, tails: 3)]
-        case 37: return [knot("hubs-column", holders: 3, bars: 3, tails: 0.4, bombs: 1)]
-        case 38: return [sunAndMoons(lock: lock)]
-        case 39: return [knot("hubs-kite", holders: 2, tails: 0.3)]
-        case 40: return [tangle(rings: 13...16, pokes: 2, latches: 2, chain: 0.7, lock: lock)]
-        case 41: return [knot("hubs-grand", holders: 2, tails: 0.4, bombs: 1)]
-        case 42: return [hubWeb("hubs-weave", clips: 3...4, holders: 3, tails: 0.85)]
-        case 43: return [net("weave-tapestry", lock: lock, crossClips: 2, tails: 4)]
-        case 44: return [knot("hubs-twelve", holders: 2, tails: 0.4, bombs: 1)]
-        case 45: return [knot("hubs-field", holders: 3, uBars: 2)]
-        case 46: return [net("weave-kite", lock: lock, crossClips: 1)]
-        case 47: return [hubWeb("hubs-column", clips: 3...4, holders: 3, tails: 0.85)]
-        case 48: return [maze(cols: 11, rows: 18, bars: 23, freeLimit: 3)]
-        case 49: return [knot("hubs-column", holders: 3, bars: 3, bombs: 1)]
-        case 50: return [knot("hubs-field", holders: 3, bars: 2, uBars: 1)]
-        case 51: return [net("weave-lantern", lock: lock, bars: 1, tails: 3)]
-        case 52: return [maze(cols: 11, rows: 16, bars: 21, freeLimit: 3)]
-        case 53: return [hubWeb("hubs-weave", clips: 3...4, holders: 3, tails: 0.85)]
-        case 54: return [tangle(rings: 17...21, pokes: 3, latches: 2, chain: 0.75, lock: lock)]
-        case 55: return [maze(cols: 11, rows: 20, bars: 26, freeLimit: 3)]
-        case 56: return [hubWeb("hubs-kite", clips: 3...4, holders: 3, tails: 0.85)]
-        case 57: return [cages(across: 3, down: 4, count: 5, border: 0, bars: 15, freeLimit: 3)]
-        case 58: return [knot("hubs-column", holders: 3, bombs: 1)]
-        case 59: return [knot("hubs-field", holders: 3, bars: 4)]
-        case 60: return [maze(cols: 11, rows: 15, bars: 19, freeLimit: 3)]
-        case 61: return [knot("hubs-column", holders: 3, bars: 1, uBars: 1, bombs: 1)]
-        case 62: return [knot("hubs-column", holders: 3, tails: 0.4)]
-        case 63: return [knot("hubs-weave", holders: 3, tails: 0.4)]
-        case 64: return [knot("hubs-grand", holders: 2, bars: 1, uBars: 1, bombs: 1)]
-        case 65: return [net("weave-tapestry", lock: lock, crossClips: 2, tails: 4)]
-        case 66: return [maze(cols: 11, rows: 18, bars: 23, freeLimit: 3)]
-        case 67: return [hubWeb("hubs-field", clips: 3...4, holders: 3, tails: 0.85)]
-        case 68: return [cages(across: 3, down: 4, count: 6, border: 0, bars: 16, freeLimit: 3)]
-        case 69: return [knot("hubs-tall", holders: 3, bars: 2, uBars: 2, bombs: 1)]
-        case 70: return [knot("hubs-column", holders: 3, bars: 3, tails: 0.4)]
-        case 71: return [cages(across: 3, down: 4, count: 5, border: 0, bars: 15, freeLimit: 3)]
-        case 72: return [knot("hubs-field", holders: 3, bombs: 1)]
-        case 73: return [knot("hubs-field", holders: 3, uBars: 2)]
-        case 74: return [knot("hubs-field", holders: 3, bars: 4, tails: 0.4)]
-        case 75: return [hubWeb("hubs-riddle", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
-        case 76: return [maze(cols: 11, rows: 15, bars: 19, freeLimit: 3)]
-        case 77: return [knot("hubs-field", holders: 3, bars: 2, uBars: 1, bombs: 2)]
-        case 78: return [knot("hubs-field", holders: 3, tails: 0.4)]
-        case 79: return [maze(cols: 11, rows: 16, bars: 21, freeLimit: 3)]
-        case 80: return [knot("hubs-field", holders: 3, bars: 4)]
-        case 81: return [hubWeb("hubs-gaps", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
-        case 82: return [knot("hubs-tall", holders: 3, bars: 6, tails: 0.4, bombs: 2)]
-        case 83: return [cages(across: 3, down: 3, count: 4, border: 0, bars: 13, freeLimit: 3)]
-        case 84: return [hubWeb("hubs-lace", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
-        case 85: return [hubWeb("hubs-field", clips: 3...4, holders: 3, tails: 0.85)]
-        case 86: return [knot("hubs-field", holders: 3, bombs: 2)]
-        case 87: return [knot("hubs-tall", holders: 3, bars: 6)]
-        case 88: return [knot("hubs-weave", holders: 3, tails: 0.4)]
-        case 89: return [knot("hubs-column", holders: 3, tails: 0.4, bombs: 1)]
-        case 90: return [hubWeb("hubs-riddle", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
-        case 91: return [knot("hubs-field", holders: 3, bars: 4, tails: 0.4)]
-        case 92: return [hubWeb("hubs-tall", clips: 3...4, holders: 3, tails: 0.85)]
-        case 93: return [maze(cols: 11, rows: 20, bars: 26, freeLimit: 3)]
-        case 94: return [knot("hubs-tall", holders: 3, tails: 0.4, bombs: 2)]
-        case 95: return [cages(across: 3, down: 4, count: 6, border: 0, bars: 16, freeLimit: 3)]
-        case 96: return [hubWeb("hubs-gaps", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
-        case 97: return [knot("hubs-field", holders: 3, tails: 0.4)]
-        case 98: return [knot("hubs-tall", holders: 3, bars: 2, uBars: 2)]
-        case 99: return [knot("hubs-field", holders: 3, bombs: 1)]
-        case 100: return [knot("hubs-tall", holders: 3, tails: 0.4)]
+        case 25: return [sunAndMoons(lock: lock)]
+        case 26: return [knot("hubs-grand", holders: 2, bars: 1, uBars: 1, bombs: 1)]
+        case 27: return [hubWeb("hubs-twelve", clips: 2...3, holders: 2, tails: 0.85)]
+        case 28: return [hubWeb("hubs-mini", clips: 2...3, holders: 3, tails: 0.85, small: true)]
+        case 29: return [maze(cols: 11, rows: 20, bars: 26, freeLimit: 3)]
+        case 30: return [knot("hubs-nine", holders: 2, locks: 1)]
+        case 31: return [freeKnot(rings: 18...22, holders: 3, tails: 0.4)]
+        case 32: return [knot("hubs-diamond", holders: 3, bars: 2, uBars: 1)]
+        case 33: return [freeKnot(rings: 10...16, holders: 3, tails: 0.4, dense: true, silhouette: "circle")]
+        case 34: return [knot("hubs-tall", holders: 3, bars: 3, tails: 0.4, bombs: 1, holes: "diagonal")]
+        case 35: return [maze(cols: 11, rows: 18, bars: 23, freeLimit: 3)]
+        case 36: return [freeKnot(rings: 18...24, holders: 3, tails: 0.4, pokes: 3, giant: 176, dense: true)]
+        case 37: return [knot("hubs-tall", holders: 3, bars: 2, uBars: 2, mirror: true)]
+        case 38: return [tangle(rings: 13...16, pokes: 2, latches: 2, chain: 0.7, lock: lock)]
+        case 39: return [knot("hubs-field", holders: 3, tails: 0.4, locks: 3)]
+        case 40: return [picture("tree")]
+        case 41: return [knot("hubs-final", holders: 3, uBars: 2)]
+        case 42: return [hubWeb("hubs-nine", clips: 2...3, holders: 2, tails: 0.85)]
+        case 43: return [freeKnot(rings: 14...20, holders: 3, tails: 0.4, anchors: 1)]
+        case 44: return [net("weave-crystal", lock: lock, crossClips: 1, tails: 3)]
+        case 45: return [knot("hubs-grand", holders: 2, locks: 1)]
+        case 46: return [hubWeb("hubs-mini12", clips: 2...3, holders: 3, small: true)]
+        case 47: return [knot("hubs-column", holders: 3, bars: 1, uBars: 1, bombs: 1)]
+        case 48: return [knot("hubs-grand", holders: 2, locks: 3)]
+        case 49: return [knot("hubs-weave", holders: 3, tails: 0.4)]
+        case 50: return [hubWeb("hubs-gem", clips: 2...3, holders: 3, tails: 0.85)]
+        case 51: return [sun(lock: lock)]
+        case 52: return [knot("hubs-sieve", holders: 3, tails: 0.6, locks: 1)]
+        case 53: return [knot("hubs-field", holders: 3, uBars: 2, bombs: 1)]
+        case 54: return [freeKnot(rings: 26...32, holders: 3, tails: 0.5, gate: true, bombs: 1, dense: true)]
+        case 55: return [hubWeb("hubs-field", clips: 2...3, holders: 3, tails: 0.85)]
+        case 56: return [freeKnot(rings: 7...12, holders: 3, tails: 0.4, silhouette: "circle")]
+        case 57: return [knot("hubs-twelve", holders: 2, uBars: 1, bombs: 1)]
+        case 58: return [knot("hubs-twelve", holders: 2, tails: 0.4, locks: 1)]
+        case 59: return [hubWeb("hubs-gem", clips: 2...3, holders: 3, tails: 0.85)]
+        case 60: return [picture("house")]
+        case 61: return [cages(across: 3, down: 4, count: 5, border: 0, bars: 15, freeLimit: 3)]
+        case 62: return [knot("hubs-gaps", holders: 3, tails: 0.6, locks: 1)]
+        case 63: return [knot("hubs-diamond", holders: 3, bars: 2, uBars: 1, mirror: true)]
+        case 64: return [hubWeb("hubs-mini", clips: 2...3, holders: 3, tails: 0.85, small: true)]
+        case 65: return [freeKnot(rings: 6...10, holders: 3, tails: 0.4, mirror: true, silhouette: "diamond")]
+        case 66: return [knot("hubs-tall", holders: 3, bars: 6, bombs: 1)]
+        case 67: return [hubWeb("hubs-heart", clips: 2...3, holders: 3, tails: 0.85)]
+        case 68: return [knot("hubs-field", holders: 3, uBars: 2)]
+        case 69: return [hubWeb("hubs-grand", clips: 3...4, holders: 3, tails: 0.85)]
+        case 70: return [freeKnot(rings: 26...32, holders: 3, tails: 0.4, dense: true)]
+        case 71: return [freeKnot(rings: 10...16, holders: 3, tails: 0.4, dense: true, silhouette: "heart")]
+        case 72: return [hubWeb("hubs-field", clips: 2...3, holders: 3, tails: 0.85)]
+        case 73: return [hubWeb("hubs-mini12", clips: 2...3, holders: 3, small: true)]
+        case 74: return [knot("hubs-twelve", holders: 2, uBars: 1, bombs: 2)]
+        case 75: return [hubWeb("hubs-heart", clips: 3...4, holders: 3, tails: 0.85)]
+        case 76: return [net("weave-lantern", lock: lock, bars: 1, tails: 3)]
+        case 77: return [knot("hubs-final", holders: 3, tails: 0.4)]
+        case 78: return [hubWeb("hubs-gem", clips: 2...3, holders: 3, tails: 0.85)]
+        case 79: return [freeKnot(rings: 26...32, holders: 3, tails: 0.5, gate: true, pokes: 2, dense: true)]
+        case 80: return [picture("snail", locks: 1)]
+        case 81: return [knot("hubs-field", holders: 3, tails: 0.4, locks: 2)]
+        case 82: return [hubWeb("hubs-frame", clips: 2...3, holders: 3, tails: 0.85)]
+        case 83: return [maze(cols: 11, rows: 15, bars: 19, freeLimit: 3)]
+        case 84: return [knot("hubs-diamond", holders: 3, bars: 2, uBars: 1)]
+        case 85: return [freeKnot(rings: 26...32, holders: 3, tails: 0.5, gate: true, dense: true)]
+        case 86: return [knot("hubs-final", holders: 3, tails: 0.4, locks: 1)]
+        case 87: return [hubWeb("hubs-heart", clips: 3...4, holders: 3, tails: 0.85)]
+        case 88: return [hubWeb("hubs-mini", clips: 2...3, holders: 3, tails: 0.85, small: true)]
+        case 89: return [knot("hubs-tall", holders: 3, bars: 3, tails: 0.4, bombs: 2, holes: "frame")]
+        case 90: return [knot("hubs-diamond", holders: 3, bars: 2, uBars: 1, mirror: true)]
+        case 91: return [freeKnot(rings: 26...32, holders: 3, tails: 0.5, gate: true, dense: true)]
+        case 92: return [knot("hubs-gaps", holders: 3, tails: 0.6, locks: 3)]
+        case 93: return [freeKnot(rings: 18...24, holders: 3, tails: 0.4, pokes: 3, giant: 176, dense: true)]
+        case 94: return [hubWeb("hubs-arch", clips: 2...3, holders: 3, tails: 0.85)]
+        case 95: return [knot("hubs-weave", holders: 3, tails: 0.4)]
+        case 96: return [knot("hubs-gaps", holders: 3, bars: 2, tails: 0.4)]
+        case 97: return [knot("hubs-final", holders: 3, uBars: 2)]
+        case 98: return [knot("hubs-kite", holders: 2, tails: 0.3, mirror: true)]
+        case 99: return [freeKnot(rings: 18...22, holders: 3, tails: 0.4, gate: true, bombs: 1)]
+        case 100: return [hubWeb("hubs-column", clips: 3...4, holders: 3, tails: 0.85)]
         // 101-150: plan-chapter.py 101 12 (LEVEL-DESIGN.md §13).
-        case 101: return [freeKnot(rings: 26...32, holders: 3, tails: 0.5, gate: true, pokes: 2, dense: true)]
+        case 101: return [knot("hubs-weave", holders: 3, tails: 0.4)]
         case 102: return [knot("hubs-final", holders: 3, uBars: 2)]
-        case 103: return [freeKnot(rings: 26...32, holders: 3, tails: 0.4, dense: true)]
-        case 104: return [knot("hubs-field", holders: 3, bars: 4, tails: 0.4, bombs: 2)]
-        case 105: return [freeKnot(rings: 26...32, holders: 3, tails: 0.5, gate: true, bombs: 1, dense: true)]
-        case 106: return [knot("hubs-gaps", holders: 3, bars: 2, tails: 0.4)]
-        case 107: return [freeKnot(rings: 18...22, holders: 3, tails: 0.4)]
-        case 108: return [knot("hubs-sieve", holders: 3, tails: 0.6)]
-        case 109: return [freeKnot(rings: 26...32, holders: 3, tails: 0.4, bombs: 2, dense: true)]
-        case 110: return [knot("hubs-tall", holders: 3, bars: 6, tails: 0.4, bombs: 2)]
-        case 111: return [freeKnot(rings: 18...24, holders: 3, tails: 0.4, pokes: 3, giant: 176, dense: true)]
-        case 112: return [knot("hubs-tall", holders: 3, tails: 0.4)]
-        case 113: return [freeKnot(rings: 26...32, holders: 3, tails: 0.4, dense: true)]
-        case 114: return [knot("hubs-tall", holders: 3, bars: 6, tails: 0.4, bombs: 2)]
-        case 115: return [hubWeb("hubs-final", clips: 3...4, holders: 3, bars: 2, tails: 0.85)]
-        case 116: return [maze(cols: 11, rows: 20, bars: 26, freeLimit: 3)]
-        case 117: return [knot("hubs-gaps", holders: 3, tails: 0.6)]
-        case 118: return [freeKnot(rings: 26...32, holders: 3, tails: 0.5, gate: true, pokes: 2, dense: true)]
-        case 119: return [knot("hubs-field", holders: 3, bombs: 1)]
-        case 120: return [hubWeb("hubs-riddle", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
-        case 121: return [cages(across: 3, down: 4, count: 6, border: 0, bars: 16, freeLimit: 3)]
-        case 122: return [knot("hubs-diamond", holders: 3, tails: 0.4)]
-        case 123: return [hubWeb("hubs-sieve", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
-        case 124: return [knot("hubs-field", holders: 3, bars: 4, tails: 0.4, bombs: 1)]
-        case 125: return [hubWeb("hubs-tall", clips: 3...4, holders: 3, tails: 0.85)]
-        case 126: return [knot("hubs-weave", holders: 3, tails: 0.4)]
-        case 127: return [hubWeb("hubs-lace", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
-        case 128: return [freeKnot(rings: 26...32, holders: 3, tails: 0.4, dense: true)]
-        case 129: return [knot("hubs-tall", holders: 3, tails: 0.4, bombs: 1)]
-        case 130: return [cages(across: 3, down: 4, count: 6, border: 0, bars: 16, freeLimit: 3)]
-        case 131: return [knot("hubs-gaps", holders: 3, bars: 2, tails: 0.4)]
-        case 132: return [hubWeb("hubs-riddle", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
-        case 133: return [knot("hubs-field", holders: 3, tails: 0.4, bombs: 2)]
-        case 134: return [freeKnot(rings: 26...32, holders: 3, tails: 0.5, gate: true, bombs: 1, dense: true)]
-        case 135: return [hubWeb("hubs-sieve", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
-        case 136: return [knot("hubs-tall", holders: 3, tails: 0.4, bombs: 1)]
-        case 137: return [hubWeb("hubs-final", clips: 3...4, holders: 3, bars: 2, tails: 0.85)]
-        case 138: return [maze(cols: 11, rows: 20, bars: 26, freeLimit: 3)]
-        case 139: return [knot("hubs-diamond", holders: 3, bars: 2, uBars: 1)]
-        case 140: return [knot("hubs-gaps", holders: 3, tails: 0.6)]
-        case 141: return [hubWeb("hubs-final", clips: 3...4, holders: 3, bars: 2, tails: 0.85)]
-        case 142: return [knot("hubs-gaps", holders: 3, bars: 2, tails: 0.4)]
-        case 143: return [hubWeb("hubs-tall", clips: 3...4, holders: 3, tails: 0.85)]
-        case 144: return [knot("hubs-field", holders: 3, tails: 0.4, bombs: 2)]
-        case 145: return [cages(across: 3, down: 4, count: 6, border: 0, bars: 16, freeLimit: 3)]
-        case 146: return [hubWeb("hubs-riddle", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
-        case 147: return [knot("hubs-tall", holders: 3, tails: 0.4, bombs: 2)]
-        case 148: return [freeKnot(rings: 26...32, holders: 3, tails: 0.4, dense: true)]
-        case 149: return [knot("hubs-sieve", holders: 3, bars: 2, tails: 0.4)]
-        case 150: return [hubWeb("hubs-final", clips: 3...4, holders: 3, bars: 2, tails: 0.85)]
+        case 103: return [freeKnot(rings: 10...16, holders: 3, tails: 0.4, dense: true, silhouette: "heart")]
+        case 104: return [freeKnot(rings: 26...32, holders: 3, tails: 0.5, gate: true, bombs: 1, dense: true)]
+        case 105: return [hubWeb("hubs-field", clips: 2...3, holders: 3, tails: 0.85)]
+        case 106: return [hubWeb("hubs-mini", clips: 2...3, holders: 3, tails: 0.85, small: true)]
+        case 107: return [knot("hubs-diamond", holders: 3, bars: 2, uBars: 1, mirror: true)]
+        case 108: return [freeKnot(rings: 14...20, holders: 3, tails: 0.4, anchors: 1)]
+        case 109: return [hubWeb("hubs-gem", clips: 2...3, holders: 3, tails: 0.85)]
+        case 110: return [knot("hubs-gaps", holders: 3, tails: 0.6, locks: 1)]
+        case 111: return [knot("hubs-diamond", holders: 3, bars: 2, uBars: 1)]
+        case 112: return [freeKnot(rings: 26...32, holders: 3, tails: 0.5, gate: true, dense: true)]
+        case 113: return [hubWeb("hubs-column", clips: 3...4, holders: 3, tails: 0.85)]
+        case 114: return [freeKnot(rings: 18...24, holders: 3, tails: 0.4, pokes: 3, giant: 176, dense: true)]
+        case 115: return [freeKnot(rings: 10...16, holders: 3, tails: 0.4, dense: true, silhouette: "heart")]
+        case 116: return [knot("hubs-grand", holders: 2, tails: 0.4, locks: 1)]
+        case 117: return [net("weave-tapestry", lock: lock, crossClips: 2, tails: 4)]
+        case 118: return [hubWeb("hubs-heart", clips: 3...4, holders: 3, tails: 0.85)]
+        case 119: return [hubWeb("hubs-ports", clips: 3...4, holders: 3, bars: 2, tails: 0.85)]
+        case 120: return [picture("lighthouse", locks: 1)]
+        case 121: return [knot("hubs-tall", holders: 3, bars: 2, uBars: 2, bombs: 1, mirror: true)]
+        case 122: return [knot("hubs-tall", holders: 3, tails: 0.4, locks: 1)]
+        case 123: return [freeKnot(rings: 12...16, holders: 3, tails: 0.3, pokes: 3, giant: 146)]
+        case 124: return [hubWeb("hubs-arch", clips: 2...3, holders: 3, tails: 0.85)]
+        case 125: return [hubWeb("hubs-mini12", clips: 2...3, holders: 3, small: true)]
+        case 126: return [knot("hubs-final", holders: 3, tails: 0.4, locks: 1)]
+        case 127: return [freeKnot(rings: 26...32, holders: 3, tails: 0.5, gate: true, pokes: 2, dense: true)]
+        case 128: return [knot("hubs-diamond", holders: 3, bars: 2, uBars: 1, mirror: true)]
+        case 129: return [knot("hubs-field", holders: 3, locks: 1)]
+        case 130: return [hubWeb("hubs-weave", clips: 3...4, holders: 3, tails: 0.85)]
+        case 131: return [hubWeb("hubs-arch", clips: 2...3, holders: 3, tails: 0.85)]
+        case 132: return [freeKnot(rings: 18...22, holders: 3, tails: 0.4, gate: true, bombs: 1)]
+        case 133: return [knot("hubs-field", holders: 3, bars: 3, tails: 0.4, bombs: 2, mirror: true, holes: "center")]
+        case 134: return [knot("hubs-column", holders: 3, bars: 1, uBars: 1)]
+        case 135: return [hubWeb("hubs-heart", clips: 3...4, holders: 3, tails: 0.85)]
+        case 136: return [hubWeb("hubs-column", clips: 3...4, holders: 3, tails: 0.85)]
+        case 137: return [freeKnot(rings: 26...32, holders: 3, tails: 0.4, dense: true)]
+        case 138: return [knot("hubs-weave", holders: 3, tails: 0.4)]
+        case 139: return [knot("hubs-tall", holders: 3, bars: 3, tails: 0.4, bombs: 2, holes: "center")]
+        case 140: return [picture("anchor", locks: 1)]
+        case 141: return [knot("hubs-diamond", holders: 3, bars: 2, uBars: 1)]
+        case 142: return [hubWeb("hubs-grand", clips: 3...4, holders: 3, tails: 0.85)]
+        case 143: return [net("weave-crystal", lock: lock, crossClips: 1, tails: 3)]
+        case 144: return [hubWeb("hubs-heart", clips: 2...3, holders: 3, tails: 0.85)]
+        case 145: return [freeKnot(rings: 26...32, holders: 3, tails: 0.4, bombs: 2, dense: true)]
+        case 146: return [knot("hubs-diamond", holders: 3, bars: 2, uBars: 1, mirror: true)]
+        case 147: return [knot("hubs-column", holders: 3, locks: 2)]
+        case 148: return [knot("hubs-mini12", holders: 2, mirror: true, small: true)]
+        case 149: return [maze(cols: 11, rows: 16, bars: 21, freeLimit: 3)]
+        case 150: return [hubWeb("hubs-arch", clips: 2...3, holders: 3, tails: 0.85)]
         // 151-200: plan-chapter.py 151 83 (LEVEL-DESIGN.md §13).
-        case 151: return [freeKnot(rings: 26...32, holders: 3, tails: 0.5, gate: true, pokes: 2, dense: true)]
-        case 152: return [knot("hubs-gaps", holders: 3, bars: 2, tails: 0.4)]
-        case 153: return [freeKnot(rings: 26...32, holders: 3, tails: 0.4, bombs: 2, dense: true)]
-        case 154: return [knot("hubs-sieve", holders: 3, tails: 0.6)]
-        case 155: return [freeKnot(rings: 26...32, holders: 3, tails: 0.5, gate: true, bombs: 1, dense: true)]
-        case 156: return [knot("hubs-tall", holders: 3, bars: 6, tails: 0.4, bombs: 1)]
-        case 157: return [freeKnot(rings: 18...22, holders: 3, tails: 0.4)]
-        case 158: return [knot("hubs-final", holders: 3, uBars: 2)]
-        case 159: return [freeKnot(rings: 18...24, holders: 3, tails: 0.4, pokes: 3, giant: 176, dense: true)]
-        case 160: return [knot("hubs-field", holders: 3, tails: 0.4, bombs: 2)]
-        case 161: return [freeKnot(rings: 26...32, holders: 3, tails: 0.4, dense: true)]
-        case 162: return [knot("hubs-diamond", holders: 3, bars: 2, uBars: 1)]
-        case 163: return [freeKnot(rings: 26...32, holders: 3, tails: 0.5, gate: true, bombs: 1, dense: true)]
-        case 164: return [hubWeb("hubs-riddle", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
-        case 165: return [knot("hubs-tall", holders: 3, tails: 0.4, bombs: 1)]
-        case 166: return [freeKnot(rings: 26...32, holders: 3, tails: 0.4, dense: true)]
-        case 167: return [hubWeb("hubs-final", clips: 3...4, holders: 3, bars: 2, tails: 0.85)]
-        case 168: return [maze(cols: 11, rows: 20, bars: 26, freeLimit: 3)]
-        case 169: return [knot("hubs-field", holders: 3, bars: 4, tails: 0.4, bombs: 1)]
-        case 170: return [hubWeb("hubs-lace", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
-        case 171: return [knot("hubs-gaps", holders: 3, tails: 0.6)]
-        case 172: return [freeKnot(rings: 26...32, holders: 3, tails: 0.5, gate: true, pokes: 2, dense: true)]
-        case 173: return [knot("hubs-tall", holders: 3, bars: 6, bombs: 1)]
-        case 174: return [hubWeb("hubs-sieve", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
-        case 175: return [knot("hubs-weave", holders: 3, tails: 0.4)]
-        case 176: return [knot("hubs-field", holders: 3, bombs: 2)]
-        case 177: return [hubWeb("hubs-final", clips: 3...4, holders: 3, bars: 2, tails: 0.85)]
-        case 178: return [cages(across: 3, down: 4, count: 6, border: 0, bars: 16, freeLimit: 3)]
-        case 179: return [knot("hubs-diamond", holders: 3, tails: 0.4)]
-        case 180: return [hubWeb("hubs-tall", clips: 3...4, holders: 3, tails: 0.85)]
-        case 181: return [knot("hubs-sieve", holders: 3, bars: 2, tails: 0.4)]
-        case 182: return [hubWeb("hubs-riddle", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
-        case 183: return [knot("hubs-field", holders: 3, tails: 0.4, bombs: 2)]
-        case 184: return [freeKnot(rings: 26...32, holders: 3, tails: 0.4, dense: true)]
-        case 185: return [knot("hubs-gaps", holders: 3, bars: 2, tails: 0.4)]
-        case 186: return [maze(cols: 11, rows: 20, bars: 26, freeLimit: 3)]
-        case 187: return [knot("hubs-weave", holders: 3, tails: 0.4)]
-        case 188: return [hubWeb("hubs-ports", clips: 3...4, holders: 3, bars: 2, tails: 0.85)]
-        case 189: return [knot("hubs-gaps", holders: 3, bars: 2, tails: 0.4)]
-        case 190: return [freeKnot(rings: 18...24, holders: 3, tails: 0.4, pokes: 3, giant: 176, dense: true)]
+        case 151: return [knot("hubs-twelve", holders: 2, uBars: 1)]
+        case 152: return [freeKnot(rings: 26...32, holders: 3, tails: 0.5, gate: true, dense: true)]
+        case 153: return [knot("hubs-final", holders: 3, tails: 0.4, locks: 2)]
+        case 154: return [hubWeb("hubs-mini", clips: 2...3, holders: 3, tails: 0.85, small: true)]
+        case 155: return [hubWeb("hubs-gem", clips: 2...3, holders: 3, tails: 0.85)]
+        case 156: return [knot("hubs-column", holders: 3, tails: 0.4, locks: 1)]
+        case 157: return [freeKnot(rings: 26...32, holders: 3, tails: 0.5, gate: true, bombs: 1, dense: true)]
+        case 158: return [hubWeb("hubs-arch", clips: 2...3, holders: 3, tails: 0.85)]
+        case 159: return [knot("hubs-sieve", holders: 3, bars: 2, tails: 0.4)]
+        case 160: return [picture("padlock")]
+        case 161: return [knot("hubs-tall", holders: 3, bars: 2, uBars: 2, bombs: 2, mirror: true)]
+        case 162: return [knot("hubs-tall", holders: 3, tails: 0.4, locks: 1)]
+        case 163: return [hubWeb("hubs-heart", clips: 3...4, holders: 3, tails: 0.85)]
+        case 164: return [hubWeb("hubs-mini12", clips: 2...3, holders: 3, small: true)]
+        case 165: return [freeKnot(rings: 18...24, holders: 3, tails: 0.4, pokes: 3, giant: 176, dense: true)]
+        case 166: return [knot("hubs-grand", holders: 2, tails: 0.4, locks: 1)]
+        case 167: return [hubWeb("hubs-arch", clips: 2...3, holders: 3, tails: 0.85)]
+        case 168: return [knot("hubs-column", holders: 3, bars: 1, uBars: 1, bombs: 1)]
+        case 169: return [hubWeb("hubs-ports", clips: 3...4, holders: 3, bars: 2, tails: 0.85)]
+        case 170: return [freeKnot(rings: 14...20, holders: 3, tails: 0.4, anchors: 1)]
+        case 171: return [hubWeb("hubs-heart", clips: 3...4, holders: 3, tails: 0.85)]
+        case 172: return [net("weave-lantern", lock: lock, bars: 1, tails: 3)]
+        case 173: return [hubWeb("hubs-ports", clips: 3...4, holders: 3, bars: 2, tails: 0.85)]
+        case 174: return [hubWeb("hubs-mini", clips: 2...3, holders: 3, tails: 0.85, small: true)]
+        case 175: return [knot("hubs-diamond", holders: 3, bars: 2, uBars: 1, mirror: true)]
+        case 176: return [knot("hubs-column", holders: 3, locks: 1)]
+        case 177: return [hubWeb("hubs-arch", clips: 2...3, holders: 3, tails: 0.85)]
+        case 178: return [knot("hubs-field", holders: 3, uBars: 2, bombs: 2)]
+        case 179: return [knot("hubs-final", holders: 3, bars: 4, tails: 0.4, mirror: true)]
+        case 180: return [picture("crown", locks: 1)]
+        case 181: return [hubWeb("hubs-heart", clips: 3...4, holders: 3, tails: 0.85)]
+        case 182: return [freeKnot(rings: 18...22, holders: 3, tails: 0.4, gate: true, bombs: 1)]
+        case 183: return [knot("hubs-twelve", holders: 2, bars: 2, tails: 0.4, bombs: 2)]
+        case 184: return [hubWeb("hubs-weave", clips: 3...4, holders: 3, tails: 0.85)]
+        case 185: return [hubWeb("hubs-arch", clips: 2...3, holders: 3, tails: 0.85)]
+        case 186: return [hubWeb("hubs-mini12", clips: 2...3, holders: 3, small: true)]
+        case 187: return [cages(across: 3, down: 4, count: 6, border: 0, bars: 16, freeLimit: 3)]
+        case 188: return [knot("hubs-field", holders: 3, tails: 0.4, locks: 1)]
+        case 189: return [knot("hubs-final", holders: 3, uBars: 2)]
+        case 190: return [hubWeb("hubs-hourglass", clips: 2...3, holders: 3, tails: 0.85)]
         case 191: return [knot("hubs-tall", holders: 3, tails: 0.4, bombs: 1)]
-        case 192: return [hubWeb("hubs-lace", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
-        case 193: return [knot("hubs-sieve", holders: 3, bars: 2, tails: 0.4)]
-        case 194: return [cages(across: 3, down: 4, count: 6, border: 0, bars: 16, freeLimit: 3)]
-        case 195: return [knot("hubs-tall", holders: 3, tails: 0.4, bombs: 1)]
-        case 196: return [hubWeb("hubs-diamond", clips: 3...4, holders: 3, tails: 0.85)]
-        case 197: return [knot("hubs-gaps", holders: 3, bars: 2, tails: 0.4)]
-        case 198: return [hubWeb("hubs-lace", clips: 3...4, holders: 3, bars: 4, tails: 0.85)]
-        case 199: return [knot("hubs-final", holders: 3, tails: 0.4)]
-        case 200: return [hubWeb("hubs-tall", clips: 3...4, holders: 3, tails: 0.85)]
+        case 192: return [net("weave-tapestry", lock: lock, crossClips: 2, tails: 4)]
+        case 193: return [hubWeb("hubs-arch", clips: 2...3, holders: 3, tails: 0.85)]
+        case 194: return [knot("hubs-twelve", holders: 2, uBars: 1)]
+        case 195: return [hubWeb("hubs-column", clips: 3...4, holders: 3, tails: 0.85)]
+        case 196: return [hubWeb("hubs-mini", clips: 2...3, holders: 3, tails: 0.85, small: true)]
+        case 197: return [freeKnot(rings: 26...32, holders: 3, tails: 0.4, bombs: 2, dense: true)]
+        case 198: return [knot("hubs-weave", holders: 3, tails: 0.4, mirror: true)]
+        case 199: return [knot("hubs-diamond", holders: 3, bars: 2, uBars: 1)]
+        case 200: return [hubWeb("hubs-ports", clips: 3...4, holders: 3, bars: 2, tails: 0.85)]
         default: return [knot("hubs-nine", holders: 2)]
         }
     }

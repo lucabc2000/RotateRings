@@ -23,6 +23,8 @@ struct LevelTemplate {
         LevelTemplate(id: id, kinds: kinds) { _, rng in
             guard let motif = motif(&rng) else { return nil }
             var draft = LevelDraft(name: motif.name, template: id, pieces: motif.placed(at: board.center, board: board), board: board)
+            draft.mirrorColors = motif.mirrorColors
+            draft.keepColors = motif.keepColors
             draft.renumberIDs()
             return draft
         }

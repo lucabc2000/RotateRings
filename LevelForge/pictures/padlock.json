@@ -1,0 +1,59 @@
+{
+  "name": "padlock",
+  "title": "Padlock",
+  "rings": [
+    {
+      "x": 0.0,
+      "y": 43.0,
+      "r": 30,
+      "color": "coral"
+    },
+    {
+      "x": -78.0,
+      "y": 43.0,
+      "r": 30,
+      "color": "coral"
+    },
+    {
+      "x": 78.0,
+      "y": 43.0,
+      "r": 30,
+      "color": "coral"
+    },
+    {
+      "x": -0.0,
+      "y": -39.0,
+      "r": 34,
+      "color": "coral"
+    },
+    {
+      "x": -78.0,
+      "y": -35.0,
+      "r": 30,
+      "color": "coral"
+    },
+    {
+      "x": 78.0,
+      "y": -35.0,
+      "r": 30,
+      "color": "coral"
+    }
+  ],
+  "bars": [
+    {
+      "rings": [
+        1,
+        2
+      ],
+      "degrees": 90,
+      "length": 46,
+      "color": "yellow"
+    },
+    {
+      "ring": 3,
+      "degrees": 270,
+      "length": 56,
+      "color": "sky"
+    }
+  ]
+}

@@ -77,6 +77,9 @@ struct BoardSize: Equatable {
     static let standard = BoardSize(width: ForgeRules.boardWidth, height: ForgeRules.boardHeight)
     /// One fifth larger each way: on screen everything is drawn at about 83 %.
     static let large = BoardSize(width: 432, height: 768)
+    /// One fifth smaller each way, for small breather levels: on screen everything is drawn at 125 %,
+    /// so eight to twelve pieces fill the screen instead of looking lost on it.
+    static let small = BoardSize(width: 288, height: 512)
 
     var center: Point { Point(width / 2, height / 2) }
     /// Half the room a motif centred on the board may take, inside the margins.
