@@ -1217,3 +1217,372 @@ Written to `RotateRings/Levels` (the game is not live yet, so nothing else is pi
 from the set, the report and candidates with levels 1–10 kept as they were, and the set's pins
 (50, 100, 103, 150, 200) as `level-selection.json`, so regenerating keeps them.
 `LevelForge/curve.py` draws the curve (`LevelForge/sheets/step7/curve.svg`).
+
+## 16. Pacing (November 2026)
+
+The owner's verdicts after §15 were still "too easy" and "feels similar". A comparison of the shipped
+200 levels with all 122 of the Yandex Games "Rotate Rings" (same structural measures on both) found
+the boards about as tangled as theirs (holders per ring, dependency depth, open moves) but paced very
+differently: theirs ramp up piece count over about thirty levels, one level in four is a small
+breather, sizes vary a lot late in the game, and the picture levels are the biggest boards of all,
+logically light. The targets are in `LevelForge/pacing_check.py` (starting points, to be retuned
+after play): `python3 LevelForge/pacing_check.py RotateRings/Levels` prints PASS or FAIL per target.
+Only the pacing patterns are taken from the other game; no level or picture is.
+
+### Step 1: baseline
+
+The shipped levels and `sets/step7` are the same 190 boards, so both pass 1 of 9:
+
+```
+FAIL  median_pieces_11_20                        17   target 7–11
+FAIL  median_pieces_21_40                        16   target 11–15
+FAIL  max_pieces_first5_after_tutorial           20   target 0–12
+FAIL  breather_share_11_plus                    0.1   target 0.25–1.0
+FAIL  max_breather_gap_11_100                    18   target 0–10
+PASS  max_breather_gap_101_plus                  20   target 0–20
+FAIL  size_cv_61_plus                         0.289   target 0.4–9.9
+FAIL  picture_ratio_min                        0.35   target 1.0–99.0
+FAIL  picture_ratio_median                     0.45   target 1.5–99.0
+breathers: 14, 20, 21, 28, 30, 42, 56, 64, 65, 80, 88, 106, 120, 140, 154, 160, 174, 180, 196
+pictures: 20 (8 pieces, 0.5× its neighbours), 40 (11, 0.58), 60 (11, 0.92), 80 (8, 0.35),
+          120 (10, 0.43), 140 (10, 0.45), 160 (8, 0.35), 180 (10, 0.48)
+median pieces per twenty levels: 17, 16, 15, 22, 23, 23, 23, 21, 22, 23
+```
+
+Why: the planners chose by difficulty, family and spacing, never by piece count, and the difficulty
+of a tier-0 board barely depends on its size, so an early target of 10–13 was met by 17–28-piece
+boards (thickets, weaves, cage boards) as readily as by nine-piece ones.
+
+### Step 2: piece count as a planner input
+
+`planlib.piece_range(level, offset)`: every level gets a piece range next to its target, a ramp
+through the anchors 8 pieces at 11, 12 at 20, 15 at 40, 18 at 60, 22 at 100, 23 at 200, shifted by
+0.35 a point of offset (a peak heavier, a dip lighter), with ±2 pieces of room through level 19, ±3
+to 60 and ±5 after. A design pays 4 a piece for leaving the range; through level 15 nothing over 12
+pieces. A level whose range tops out at 12 is **light**: the most interesting design that fits wins
+(the breather rule, −20 × interest, target at 0.3), the small-board designs may serve there, no
+zoomed-out board (`dense`, the large giant) through level 19 or on any light level, and the level's
+target is set to what the chosen design measures, so the generator's band sits on it. The lock
+introduction comes earlier (`LOCKS_FROM` 16: the first level from 16 on that is not a dip, 17 in
+this plan): it is a nine- or twelve-ring board, which is what the opening needs. The very same design within ten levels now costs a little. Plans print the usual
+piece count against the range and the pacing targets read off the plan (`print_pacing`).
+
+**Missing from the catalogue** were interesting designs of 9–14 pieces outside the grid families:
+figures, planets and tangles of that size are tier 0 at interest 0.17–0.35. Eleven standard-board
+candidates were measured (`forge designs --missing`, in `design-quality.json`): wild knots of 10–14
+rings (plain 13.8 / 0.43 on 5 of 8 valid; with pokes 10 / 0.32; gated or mirrored 2 of 8 valid), a
+small giant ring (`giant: 120`, 8–12 rings, 10 / 0.36, 4 of 8), one anchor ring (9 / 0.31), gated
+silhouettes (0.11–0.20) and nets with tails (0.27–0.33). Only the plain small wild knot is worth
+having; the rest confirm that at this size interest comes from hubs and locks (§15, Step 1b). The
+opening therefore leans on the small webs, the nine- and twelve-ring webs and the lock knots, with
+figures, planets and wild knots as scenes between them.
+
+**The owner's changes at the checkpoint** (all in `planlib`): level 11 and the lightest of 13–15 are
+confidence boards (`confidence`: usually tier 0, 6–9 pieces); the other light levels want tier 1 (a
+design that is mostly tier 0 costs 15 there); in 11–40 the 3×3 and 3×4 knots and webs (`SMALL_GRID`
+shapes, the small boards included) serve at most four times, U-bars twice, bombs not at all (the
+planner adds none and refuses designs with one built in); the same board shape (`shape_of`: the grid
+mask, the outline and size of a free-form knot, a net, a maze) within five levels costs 25; a web's
+bonus at a peak only applies within ten points of the target. The generator holds the opening to the
+plan: `DifficultyCurve.pieceRange` allows 6–12 pieces on 11–15 and 5–10 on every breather (a level
+the plan marks as one: a scheduled small board, or a light level whose range tops out at ten;
+pictures no longer count as breathers, they become showpieces in Step 5).
+
+The owner's second round: every outline counts as one family for the repeat rule, with a ten-level
+window (`SILHOUETTE_DISTANCE`); the ramp anchor at 40 is 14; one big but easy board (14–16 pieces,
+tier 0–1, `big_easy`) on the heavier of 18 and 19, so the sawtooth starts early; and at least half the
+breathers should have interest 0.5 or more. At ten pieces that is only the 3×3 family (nine web 0.67,
+Little nine 0.73, nine knots 0.62–0.68), so four more small-board webs were measured: Little nine and
+Little gem with 3–4 clips (0.73 and 0.51, tier 1, 8 of 8 valid), Little nine with two holders (0.53),
+Little gem with two holders (0.32). The gem ones are not 3×3 boards, so the cap on those (now 5 in
+11–40, `SMALL_GRID_LIMIT`; the gem is not counted) no longer leaves the breathers without an
+interesting board. `PLAN_DEBUG=35 python3 LevelForge/plan-curve.py 7` prints a level's cheapest
+candidates with their costs.
+
+### Step 3: breathers
+
+About one level in four is a breather (`BREATHER_EVERY` 3–4, `BREATHER_FORCE` 4): one is due three
+or four levels after the last and is taken on the first level after a peak, or at once when four
+levels have passed without one, and a dip past the opening whose range tops out at twelve is one too.
+Never on a peak, a chapter end or beside one. A breather is a board of 7–10 pieces (`SMALL_PIECES`;
+the generator holds it to ten), the most interesting that fits, tier 1 preferred over tier 0 (a mostly
+tier-0 design costs 15 there), and a breather may come round again sooner than other boards (its
+reuse costs 1 a time, not 3). The levels of the opening that measure ten pieces or fewer count as
+breathers too; pictures no longer do.
+
+### Step 4: size variety late in the game
+
+From level 61 the piece range has a wave of its own (`SIZE_WAVE`, the difficulty phrases from a fixed
+seed, 0.6 pieces a point) on top of the ramp and the offset, with ±5 pieces of room, and a change of
+scene after 60 may be any size (`free_size`): big boards that are easy to read (thickets, giant rings,
+mazes) next to small ones that are hard (small webs, lock knots). Measured on the plan, neither the
+width of the range nor the wave moved the spread (0.36–0.37 at ±3 to ±7): the planner chooses the
+design closest to the target, and the catalogue's bulk sits at 20–28 pieces. What moves it is mass
+at the ends: breathers every four levels and pictures of 30–40 pieces (Step 5).
+
+**The plan for 11–200** (`plan-curve.py 7`, `plan-chapter.py 101 30`, `plan-chapter.py 151 31`, applied
+to the tables; 157 of 190 designs differ from the shipped set) read off the designs' usual piece counts
+(`LevelForge/pacing_plan.py`):
+
+```
+PASS  median pieces 11–20                 9   target 7–11
+PASS  median pieces 21–40                12   target 11–15
+PASS  most pieces 11–15                  12   target 0–12
+PASS  breathers (≤10 pieces) 11–200    0.29   target 0.25–1      (0.26 once the pictures are big)
+PASS  longest gap between breathers       6   target 0–10        (7 once the pictures are big)
+PASS  size spread after 60 (cv)         0.40   target 0.4–9.9     (0.40 with pictures of 36 pieces)
+FAIL  picture ratio, min / median  0.36 / 0.45                    (1.64 / 1.64 with pictures of 36: Step 5)
+```
+
+55 breathers, 33 with interest ≥ 0.5; in 11–40, 12 breathers by piece count, of which 11 and 15 are
+the confidence boards, 13, 16 and 25 changes of scene, 20 the Key, and of the seven breathers proper
+four reach 0.5 (12, 17, 21, 28) and 33 and 38 do not (0.31, 0.45): the 3×3 cap was full. Pieces after
+60: 36 levels at 5–9, 13 at 10–14, 12 at 15–19, 45 at 20–24, 32 at 25–29, 2 at 30 or more. The size
+spread sits right on 0.40, and built boards differ from the usual counts by a piece or two, so it may
+land just under after generation. Nothing generated yet.
+
+### Step 5: pictures as showpieces
+
+Twelve pictures, no repeats, about every fifteen levels right after a peak (`planlib.PICTURE_SLOTS`,
+the smallest first): 18 Cherries, 33 Snowman, 46 Alarm clock, 68 Key, 82 Lighthouse, 95 Hot-air
+balloon, 114 Snail, 132 Anchor, 143 Crown, 159 House, 178 Padlock, 194 Tree. Planet was dropped; a
+Ferris wheel, a bicycle and an owl were drawn and cut by the owner (they did not read). The limit: a
+connection is a clip or a sliding piece, the solver takes 64 and `FreeKnot` refuses a board over 60;
+pictures wire about 0.7 clips a ring, so 40 pieces are safe and about 45 is the ceiling. Drawn in
+`LevelForge/pictures.py`, mostly as text art on a square lattice (`Pic.art`, pitch 78), with what the
+builder needs learnt from its refusals and written into the checks there:
+
+- Every ring needs a lattice neighbour (a hollow block needs its corners); a ring with four is closed
+  and two closed rings cannot clip together, so no two four-link rings side by side, and a closed
+  ring holds eight at most.
+- A ring in a straight run that holds and is held, or with three links, needs a gap wide enough for a
+  holder's clip to swing out (145°), which only fits from radius 30 up; leaves and corners can be 24,
+  and the builder moves them a stem from their neighbour (at 34 apart it no longer does, so two
+  leaves side by side are 24, not 22). Rings under 20 leave no gap wide enough for the move grid.
+- A bar as a line sits on a ring with a single link opposite it, slides at least 44 (two hub insets),
+  and its slid-out end keeps 14 clear of every ring and stays inside the margins; a bar to a stop ring
+  may be shorter. A bar always runs outward from a ring's gap, so a clock's hands cannot be drawn.
+  `finish()` counts a free bar's reach in the bounds.
+- Tails make most seeds unsolvable (`picture(…, tails: 0)`); lace fills with many cycles come out
+  tier 2 (an owl of 36 rings measured 55), so a picture is one or two cycles with chains hanging off.
+- Round things drawn as a grid of small rings look blocky. The snowman, cherries and clock are drawn
+  with large rings instead (three stacked rings; two fruit with bar stems from the leaves; a closed
+  face of 64 with bells, feet, a button and two hour markers): they read, at the price of 9–12 pieces
+  each, tier 0, difficulty 4–7. The owner keeps them as early rewards and accepts that the picture
+  lines of the pacing check fail there.
+- `BoardSize.huge` (540 × 960, drawn at about 67 %) holds 6 × 11 cells; the lattice pictures use it.
+  `forge pictures --only a,b --tails X` builds some of them without the template's default tails.
+
+Measured (`forge designs --only 'picture('`, 8 seeds): the lattice pictures 15–35 pieces, difficulty
+12–52, interest 0.36–0.61, mostly tier 1; valid seeds from 6 of 8 (snail) down to 2 of 8 (lighthouse,
+tree, crown), so the picture levels generate with `--max-candidates 48`. The generator keeps a
+picture light: it measures finalists until one is tier 0 or 1, those compete and the most interesting
+wins, in or out of the band; with no such candidate at all the level is not generated and the run
+says so (`LevelGenerator.chooseByInterest`, `isPicture`), so a tier-2 picture never ships. Against their neighbourhoods on the
+plan: 0.8–1.0 for the three round ones, 1.2–1.3 for Key, Lighthouse, Balloon, Snail and Anchor
+(27–29 pieces against 22), 1.5–1.8 for Crown, House, Padlock and Tree. Sheets in
+`LevelForge/sheets/step5/` (`pictures`, `round`, `enlarged`, each as drawn and as built).
+
+### Step 6: the set
+
+`LevelForge/sets/pacing-v1`, pins for the four chapter ends only (the step7 pin of 103 belonged to
+that plan). Two passes, so the picture levels get the bigger budget without the others paying for it:
+
+```
+forge generate --levels 11-17,19-32,… --jobs 6 --selection LevelForge/sets/pacing-v1/level-selection.json --out LevelForge/sets/pacing-v1
+forge generate --levels 18,33,46,68,82,95,114,132,143,159,178,194 --jobs 6 --max-candidates 48 --selection … --out …
+```
+
+Pass 1 took 2 h 25 min for 178 levels, pass 2 36 min for the pictures (Key alone 26 min: its 15-ring
+lattice has few valid seeds). Results:
+
+- **Pictures** all tier 0–1 with no help: Cherries 9 pieces T0, Snowman 11 T0, Clock 12 T0, Key 15 T1
+  (interest 0.77), Lighthouse 28 T1, Balloon 29 T0, Snail 29 T1, Anchor 27 T1, Crown 29 T1 (0.65; 25
+  valid of 288 attempts, 343 s), House 32 T0, Padlock 32 T1, Tree 35 T0. The Tree first got no
+  candidate at all: 33 rings and two bars make 35 pieces, over the generator's 34-piece safeguard,
+  so every attempt was refused before solving ("0 valid from 288 attempts in 0 s"). Picture levels
+  now use `DifficultyCurve.pictureRange` (6…40, the size the owner asked for) and the Tree built in
+  51 s. A tier-2 picture never ships: `chooseByInterest` keeps measuring finalists until a tier 0–1
+  one appears and returns nil otherwise (main then reports NO VALID CANDIDATE).
+- **Pacing check** on the files: 6 of 9 (shipped: 1 of 9). Median pieces 11–20 = 9, 21–40 = 11, max in
+  11–15 = 12, breathers 28% of 11+, longest gap 6 through 100 and 7 after. Fails as predicted by the
+  plan: size cv after 60 = 0.383 (target 0.40), picture ratio min 0.8 (Clock at 46) and median 1.26
+  (the three small early pictures the owner kept because they read).
+- **Against step7** (`compare.py`): interest per chapter 0.59 / 0.62 / 0.63 against 0.52 / 0.55 / 0.58;
+  no unplanned tier-2 levels; 29 out of band against 47; the four milestone pins kept; families per
+  block of ten 6.9 (step7 7.6: the breathers repeat the small families more often; never the same
+  family within two levels). Peaks: 25 of 26 tier 2; 69 (Arch) tier 1.
+- **Breathers**: 46 levels, every one at most 10 pieces, 39 at interest ≥ 0.5. The breather rule (the
+  most interesting finalist, in or out of band) put tier-2 boards on 180, 188 and 192 (7–9 pieces,
+  difficulty 37–44): small but hard, which late in the game is a kind of breather of its own. Two pins
+  corrected the rule where it went against the owner's decisions: 11 (the confidence board had come
+  out tier 1 at difficulty 20; the pinned seed is tier 0 at 7) and 52 (tier 2 at difficulty 36 on a
+  six-piece board at level 52; the pin is tier 1 at 22, on target). The pins are in
+  `sets/pacing-v1/level-selection.json`.
+- The generator replays every chosen solution on a real board before accepting it
+  (`Failure.replayFails`); `LevelTests` run against the app bundle, so they cover the set once it is
+  shipped. `forge bots --dir LevelForge/sets/pacing-v1 --levels 11-200` (`--dir` is new) over 20 games
+  each: the greedy bot (k=0) wins 92% of games, never loses every game of a level, and falls under
+  half on nine levels; the bots with one or two drags of lookahead win every game of every level.
+
+Sheets: `LevelForge/sheets/pacing-v1/sheet-*.png`. Installed on the simulator with `install-set.sh`
+as "pacing-v1".
+
+### Shipped: pacing-v2 (5 November 2026)
+
+What is in `RotateRings/Levels` now: pacing-v1 for 11–120 (unchanged, play-tested) with the late
+game of §17 for 121–200, under the 12-point touch rule. Levels 1–10 as before. Pins in
+`level-selection.json`: 11, 50, 52, 100 (as in pacing-v1) and the three late peaks 150 (Tower,
+seed …86695), 186 (Tower without bars, seed …85861) and 200 (Citadel with bars, seed …51621).
+Final numbers, from `levels-report.json`:
+
+| levels | usual pieces (median, >10) | mean difficulty | top-3 | tier-2 | tier-0 |
+|---|---|---|---|---|---|
+| 11–20 | 12 | 16.3 | 26 25 24 | 0 | 4 |
+| 21–40 | 15 | 17.2 | 33 30 26 | 0 | 8 |
+| 41–60 | 16 | 25.1 | 48 35 33 | 1 | 3 |
+| 61–80 | 23 | 26.7 | 49 40 36 | 1 | 3 |
+| 81–100 | 24 | 30.4 | 54 51 49 | 3 | 3 |
+| 101–120 | 23 | 31.6 | 55 51 50 | 3 | 1 |
+| 121–140 | 24 | 30.6 | 55 52 37 | 2 | 2 |
+| 141–160 | 27 | 32.5 | 62 56 52 | 3 | 3 |
+| 161–180 | 27 | 38.0 | 62 62 61 | 8 | 1 |
+| 181–200 | 28 | 38.7 | 64 62 55 | 8 | 3 |
+
+The hardest levels of the set are 200 (63.7), 186 (62.3), then 150, 162 and 179 (61.7) and 170
+(61.0): all six huge webs, 38–41 pieces, 42–46 clips, 44–48 moves. Pacing check on the shipped
+files: 7 of 9 (median pieces 9 and 11, max 12 in 11–15, breathers 28%, longest gap 6 and 5, size
+cv after 60 = 0.411); the two picture-ratio lines fail as accepted in Step 5. Bots over 20 games:
+the greedy bot wins 93% of games (under half on eight levels, never none; 10–55% on the huge webs
+except 200 at 90%), one drag of lookahead wins every game of every level. The full test suite
+(`RotateRingsTests`, including the recorded-solution replays of every shipped level) passes:
+510 tests. Sheets: `LevelForge/sheets/pacing-v2/`.
+
+## 17. The touch rule and the late game (November 2026)
+
+### The touch rule: 16 → 12
+
+Playing pacing-v1 the owner met a ring with nothing gripping it that stayed on the board until a
+neighbour's tail was nudged a little further away. Not a tail hitbox: `GameRules.touchDistance`
+was 16 while the stroke is 10, so two strokes counted as touching with up to 6 units of daylight
+between their edges (about 2 mm on a phone). A tail tip aimed at a neighbour makes that gap
+visible; two rings side by side rarely sit in the 0–6 band.
+
+Dry run first (a scratch build with 12, `touchcheck` replaying every recorded solution and
+re-solving): no level unsolvable, no solution longer; 21 shipped and 17 pacing-v1 solutions get 1–4
+moves shorter, almost all on bar knots (`u1`/`u2`/`b2`) and gate thickets, where a freed ring used
+to need one more turn to clear a bar arm it sat 1–6 units from. Tails still hold: a tail tip aimed
+at a neighbour sits 4 units from its rim, inside both 12 and 16. The owner approved 12.
+
+Applied: `touchDistance = 12`. One side effect found and pinned back: `Tangle.addLatchBar` used
+`touchDistance + 2` as a drafting bound, which would have redrawn level 38 from its seed; it keeps
+the literal 18. The boards do not change, their solutions and measurements do:
+
+- `forge remeasure [--dir DIR]` (new) re-solves and re-measures a folder's levels as they are, the
+  chosen board and its runner-ups, keeping pins, targets and the out-of-band flag. `--keep-seeds`
+  is not the tool for this: it redraws from the *current* design table, which after a re-plan is
+  another plan's. The shipped report was remeasured this way (31 entries changed; 1–10 now carry
+  quality numbers they never had; 60, 141, 146, 151 dropped to tier 0 — those boards ship as they
+  are until the set replaces them). The set's report came from a `--keep-seeds --seeds-from DIR`
+  rebuild (new option) checked byte-identical on all 190 files: 19 entries changed, four of them
+  (45, 91, 96, 121) to tier 0 — the greedy bot now wins them. The owner had 45, 91 and 96
+  regenerated with their designs (pacing-v2); 121 was re-planned anyway.
+
+### The late game does not rise
+
+The owner's play-test of pacing-v1: 11–110 good, then a plateau. From the report: peak difficulty
+reaches 52–55 by 110 and stays; median pieces 21–23 and moves 20–24 from 71 on; 200 (53.5) below
+113, 136, 181 and 195; every family and board size seen before 120. The catalogue's heaviest
+*planned* boards (tier 2) top out at the Arch's 55: difficulty is 26.7 + 0.67·moves + 2.5·setup at
+tier 2 (`QualityConfig.difficulty`), so only longer solutions — bigger boards — go higher, and the
+designs that measure 60+ do so with unplanned (tier 3) boards.
+
+Decisions: keep 11–120, the breathers and the pictures exactly; add heavier late-only designs
+through size on the 540×960 board (`BoardSize.huge`, 30–40 pieces, within the connection limit),
+measured first and planned tier 2; reserve them and the huge board for levels after 120; raise the
+size ramp from 23 at 120 to about 30 at 200 for non-breather levels; let peak difficulty rise to
+the set's maximum at 200; re-pin 150 and 200 as the biggest and hardest boards of their chapters.
+
+**Measured** (`forge designs --only "huge: true" --seeds 8 --level 180`), fifteen designs:
+
+| design | valid | pieces | difficulty | interest | tiers 0/1/2/3 |
+|---|---|---|---|---|---|
+| hubWeb citadel c23 (5×9, two holes) | 8/8 | 39 | 55.8 | 0.71 | 0/4/2/2 |
+| hubWeb citadel c23, bars 2 | 8/8 | 41 | 61.4 | 0.67 | 0/3/2/3 |
+| hubWeb tower c23 (4×10, two holes) | 8/8 | 38 | 56.4 | 0.78 | 0/4/2/2 |
+| hubWeb tower c23, bars 2 | 8/8 | 40 | 60.0 | 0.67 | 0/4/1/3 |
+| hubWeb bastion c23 (6×7, corners cut) | 8/8 | 36 | 55.4 | 0.70 | 0/4/1/3 |
+| the same three masks at 2–4 clips | 8/8 | 36–39 | 70–75 | 0.46–0.50 | mostly 3 (unplanned) |
+| freeKnot dense/giant on the huge board (26–38 rings) | 2–3/8 | 30+ | 20–26 | 0.36–0.45 | 0–1 |
+| knot citadel/tower/bastion with bars and U-bars | 1–2/8 | 38+ | 21–42 | 0.35–0.47 | 0–1 |
+
+Size carries into difficulty only on the webs; a free knot stays chains however big, and the grid
+knots on the huge board rarely solve. The five webs at 2–3 clips per hub are the late family; the
+others stay measured in `design-quality.json` and are excluded from planning (`planlib.catalogue`).
+Masks: holes on hub cells (column + row even) so the hubs stay within the solver's 64 connections
+at 2–3 clips each (`LevelDraft.validate` now refuses a board over 64 — nothing outside `FreeKnot`
+checked before; `FreeKnot.maxConnections` stays 60). `hubWeb`, `knot` and `freeKnot` take
+`huge: true` (template ids end in `-huge`); `DifficultyCurve.pieceRange` allows 42 pieces after 120.
+
+**The plan** (`plan-chapter.py 121 --count=80 --keep --keep-from=LevelForge/sets/pacing-v1 --apply`,
+new options): 121–200 in one run; every level of the set with ten pieces or fewer keeps its
+design, target and place as a breather (`Planner.keep_breathers`; no breather is added between
+them), the pictures stay; `LATE_FROM = 120` bars the huge designs before 121; `PIECE_ANCHORS` add
+(120, 23) and (200, 30); `tier2_target` climbs from 48 at 120 to `TIER2_TOP = 63` at 200; the huge
+webs are their own look family (`hugeHub`, the owner's rules: six to eight late peaks including 150
+and 200, never two peaks running, the same outline no sooner than `HUGE_DISTANCE = 15`); a late
+peak may be bigger than its range and a tier-2 peak short of its target costs double; the three
+levels before a chapter end build up (offset ≤ 3) and the one after lets go; a chapter end's
+target tops its chapter. Milestones: 150 Tower with bars, 200 Citadel with bars.
+
+Planned: huge webs on 150 (Tower), 162 (Citadel), 170 (Tower), 179 (Citadel), 186 (Tower), 200
+(Citadel); the other tier-2 peaks on the Arch, Heart, Column and Ports webs. Per twenty levels
+(median usual pieces · mean target · top-3 targets · tier-2 peaks): 111–130 22 · 30.9 · 48 48 48 ·
+3; 131–150 24 · 35.1 · 54 52 52 · 4; 151–170 24 · 36.6 · 57 57 56 · 4; 171–190 24 · 39.3 · 60 59
+59 · 4; 191–200 28 · 45.4 · 63 62 61 · 3. Plan pacing (11–200): breathers 0.26, gap 7, size cv
+0.42 (passing now that the late boards spread the sizes), picture ratios as in §16.
+
+### The set: pacing-v2
+
+`LevelForge/sets/pacing-v2`, a copy of pacing-v1 with 45, 91, 96 and the 58 re-planned levels of
+121–200 regenerated (the kept breathers and pictures untouched), 150 and 200 at eight finalists:
+
+```
+forge generate --levels 45,91,96,121-122,124,126-128,… --jobs 6 --selection LevelForge/sets/pacing-v2/level-selection.json --out LevelForge/sets/pacing-v2
+```
+
+11 h 20 min for 58 levels; the huge webs cost it (the solver takes up to 16 min per candidate on
+a 40-piece board: 162 alone 3 h 20 min). No level failed. Results:
+
+- **The huge webs**: 150 Tower 61.7 / 0.57, 162 Citadel 61.7 / 0.51, 179 Citadel 61.7 / 0.47,
+  186 Tower 63.7 / 0.68 and 200 Citadel 61.0 / 0.51 came out planned tier 2 at 44–48 moves;
+  170 (Tower) got only tier-1 boards (interest 0.98, 43–47 moves) and unplanned ones from its
+  eight seeds. 45 came out tier 0 again (its four finalists: three tier 0, one tier 2). Both were
+  redrawn under another master seed (`--seed 2`, the same designs) and spliced into the set with a
+  note in their report entries: 170 is tier 2 at 61.0 / 0.78, 45 tier 1 at 28.5 / 0.40 on a
+  target of 28. `--candidates` does not help here: it widens the tutorial search only, and the
+  finalists come out identical.
+- **Pins**: 150 as generated; 200 to the finalist at 63.7 / 0.50 (48 moves), so the finale is
+  above 150, 162, 179 and 186; 186 then had to go under 200. Its runner-ups and 24 fresh seeds of
+  the Tower with bars gave nothing near 58–60 (a planned tier-2 web has 45–48 moves, so 61.7 is
+  its floor), so the owner chose the Tower *without* bars at 186 (table changed, measured in a
+  scratch build first): 62.3 / 0.77, 46 moves, the most interesting of the six.
+- **Against the plan** (per twenty levels, usual pieces · mean · top-3 · tier-2 peaks): 111–130
+  24 · 32.0 · 55 51 50 · 3 (plan 22 · 30.9 · 48 48 48 · 3); 131–150 24 · 35.0 · 62 56 55 · 4 (24 ·
+  35.1 · 54 52 52 · 4); 151–170 27 · 33.0 · 62 54 52 · 4 (24 · 36.6 · 57 57 56 · 4); 171–190 27 ·
+  36.9 · 64 62 55 · 7 (24 · 39.3 · 60 59 59 · 4); 191–200 28 · 40.1 · 61 55 55 · 5 (28 · 45.4 ·
+  63 62 61 · 3). The peaks rise as planned; the means in 151–170 and 191–200 fall short because
+  the scene designs the planner placed as rests (124 Woven web, 134 Giant ring, 157 Gridlock,
+  158 Gaps knot, 177 Sun and moons, 182 Workshop, 197 Tapestry: 19–28 pieces, catalogue
+  difficulty 10–20) come out tier 0, the greedy bot wins them. The owner kept them as big easy
+  rests. Fifteen late levels are out of band, these and the peaks above their targets.
+- **Against pacing-v1** (`compare.py`): 151–200 difficulty 36.0 against 34.2, pieces 22.8 against
+  20.0, 16 planned tier-2 levels against 15, interest 0.61 both; 11–100 unchanged but for 45.
+- `VarietyTests.everyRewardLevelHasAPictureThatBuilds` still asserted the nine-picture library and
+  the old reward slots from before §16 Step 5 (the cause of the "TEST FAILED" in Step 6's run); it
+  now expects the fifteen pictures and the twelve slots. `SolverTests.solverMovesAreAcceptedByTheBoard`
+  walked levels hand-picked for sliding bars in the old set; 83 and 93 are small breathers now, so
+  it takes 79 and 157 (22 and 23 sliding bars) instead. With both fixed the suite passes: 510
+  tests, all 200 replays included.
+
+Finalist sheets: `LevelForge/sheets/pacing-v2-finalists/`. Shipped as described at the end of §16.
