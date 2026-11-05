@@ -64,8 +64,10 @@ struct VarietyTests {
     }
 
     @Test func everyRewardLevelHasAPictureThatBuilds() {
-        #expect(PictureLibrary.all.count == 9)
-        #expect(Set(PictureLibrary.milestones.keys) == [20, 40, 60, 80, 120, 140, 160, 180])
+        // Twelve reward pictures (§16, Step 5) plus the three the owner cut from the slots but kept.
+        #expect(PictureLibrary.all.count == 15)
+        #expect(Set(PictureLibrary.milestones.keys) == [18, 33, 46, 68, 82, 95, 114, 132, 143, 159, 178, 194])
+        #expect(PictureLibrary.milestones.values.allSatisfy { PictureLibrary.all[$0] != nil })
         for (level, name) in PictureLibrary.milestones {
             #expect(!drafts(Compositions.picture(name), seeds: 24).isEmpty, "level \(level): \(name) builds no board")
         }
