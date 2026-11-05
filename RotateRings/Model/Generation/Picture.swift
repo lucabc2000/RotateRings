@@ -45,11 +45,11 @@ struct Picture: Codable, Equatable {
     var title: String
     var rings: [Ring]
     var bars: [Bar]?
-    /// "large" for a picture drawn on the larger board.
+    /// "large" or "huge" for a picture drawn on a larger board (LEVEL-DESIGN.md §16, Step 5).
     var board: String?
     /// Most clips one open ring carries (2 when absent): a ring between three single neighbours
     /// needs 3.
     var clips: Int?
 
-    var boardSize: BoardSize { board == "large" ? .large : .standard }
+    var boardSize: BoardSize { board == "huge" ? .huge : board == "large" ? .large : .standard }
 }

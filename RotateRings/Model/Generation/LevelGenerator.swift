@@ -280,6 +280,10 @@ enum LevelGenerator {
     /// At a peak (`DifficultyCurve.peaks`) only finalists that reach the peak's tier compete, when
     /// there are any; if none of the first finalists does, more candidates are measured. A milestone
     /// measures more finalists, and all of them stay as runner-ups.
+    ///
+    /// A picture (a `picture-…` template) is a reward: it stays tier 0 or 1. Finalists are measured
+    /// until one is, and the most interesting of those wins, in or out of the band; a picture with no
+    /// tier-0 or tier-1 candidate at all is not generated (LEVEL-DESIGN.md §16, Step 5).
     private static func chooseByInterest(_ ranked: [Candidate], level: Int, target: Double, quality: QualityConfig,
                                          config: GeneratorConfig) -> GeneratedLevel? {
         guard !ranked.isEmpty else { return nil }
@@ -293,14 +297,23 @@ enum LevelGenerator {
         if isPeak, !finalists.contains(where: reachesTier) {
             finalists += measureQuality(Array(ranked.dropFirst(finalists.count).prefix(peaks.extraFinalists)), config: config)
         }
-        let pool = isPeak && finalists.contains(where: reachesTier) ? finalists.filter(reachesTier) : finalists
+        let isPicture = ranked[0].template.hasPrefix("picture")
+        func isLight(_ c: Candidate) -> Bool { c.quality.map { $0.tier <= 1 } == true }
+        if isPicture {
+            while !finalists.contains(where: isLight), finalists.count < ranked.count {
+                finalists += measureQuality(Array(ranked.dropFirst(finalists.count).prefix(quality.finalists)), config: config)
+            }
+            guard finalists.contains(where: isLight) else { return nil }
+        }
+        var pool = isPeak && finalists.contains(where: reachesTier) ? finalists.filter(reachesTier) : finalists
+        if isPicture { pool = pool.filter(isLight) }
         let inBand = pool.filter { abs(score(of: $0, config: config) - target) <= quality.band }
         let outOfBand = inBand.isEmpty
         func key(_ c: Candidate) -> (Double, Int, Int, UInt64) {
             (-((c.quality?.interest ?? 0) * 100).rounded(), c.quality?.strategySolved == true ? 1 : 0, c.file.pieces.count, c.seed)
         }
         // A small breather is there to be enjoyed, not to hit its target: every finalist competes.
-        let contenders = DifficultyCurve.breathers.contains(level) ? pool : inBand
+        let contenders = DifficultyCurve.breathers.contains(level) || isPicture ? pool : inBand
         // Out of band, the closest in ranking order (the pool keeps it).
         let best = contenders.isEmpty ? pool[0] : contenders.min { key($0) < key($1) }!
         if best.seed != finalists[0].seed {

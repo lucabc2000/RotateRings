@@ -80,6 +80,8 @@ struct BoardSize: Equatable {
     /// One fifth smaller each way, for small breather levels: on screen everything is drawn at 125 %,
     /// so eight to twelve pieces fill the screen instead of looking lost on it.
     static let small = BoardSize(width: 288, height: 512)
+    /// Half again as large as the standard board, for the biggest pictures: drawn at about 67 %.
+    static let huge = BoardSize(width: 540, height: 960)
 
     var center: Point { Point(width / 2, height / 2) }
     /// Half the room a motif centred on the board may take, inside the margins.

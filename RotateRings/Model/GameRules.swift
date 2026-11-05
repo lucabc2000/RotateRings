@@ -29,7 +29,7 @@ enum GameRules {
     static let strokeThickness: Double = 10
     /// Two body strokes with center lines closer than this are touching. A piece with no connection
     /// stays on the board as long as it touches something; it leaves the moment it is clear.
-    static let touchDistance: Double = 16
+    static let touchDistance: Double = 12
     /// Side length of the square at the end of a clip stem.
     static let clipSize: Double = 16
     /// Radius of a bomb's body. It goes off when its edge comes within a stroke's edge of another

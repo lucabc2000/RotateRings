@@ -66,8 +66,11 @@ enum TutorialPlan {
             return LevelGoal(level: 10, templates: [MotifCatalog.single("tailClip2", lockRange: 1...3)],
                              newKind: .tailRing, pieceRange: 4...8, targetMinMoves: 2, maxDeadEndMoves: 3, firstMoveFrees: false, targetDifficulty: nil)
         default:
-            return LevelGoal(level: level, templates: Compositions.templates(level: level), newKind: nil,
-                             pieceRange: DifficultyCurve.pieceRange(level: level), targetMinMoves: 0, maxDeadEndMoves: .max,
+            let templates = Compositions.templates(level: level)
+            let isPicture = templates.contains { $0.id.hasPrefix("picture") }
+            return LevelGoal(level: level, templates: templates, newKind: nil,
+                             pieceRange: isPicture ? DifficultyCurve.pictureRange : DifficultyCurve.pieceRange(level: level),
+                             targetMinMoves: 0, maxDeadEndMoves: .max,
                              firstMoveFrees: false, targetDifficulty: DifficultyCurve.target(level: level),
                              isHard: Compositions.hardLevels.contains(level))
         }

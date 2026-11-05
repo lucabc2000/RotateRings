@@ -276,6 +276,7 @@ struct LevelDraft {
         case outOfBounds(String)
         case gapTooNarrow(String)
         case gripsClosedRing(String)
+        case tooManyConnections(Int)
 
         var description: String {
             switch self {
@@ -286,6 +287,7 @@ struct LevelDraft {
             case .outOfBounds(let id): return "\(id) leaves the board"
             case .gapTooNarrow(let id): return "\(id) has a gap too narrow for the move grid"
             case .gripsClosedRing(let id): return "\(id) grips a closed ring"
+            case .tooManyConnections(let count): return "\(count) connections, more than the solver's 64"
             }
         }
     }
@@ -299,6 +301,10 @@ struct LevelDraft {
         } catch let error as LevelError {
             throw DraftError.level(error)
         }
+        // The solver keeps the connections in one 64-bit word (`FreeKnot.maxConnections` stops its
+        // boards earlier; the grid builders have no limit of their own).
+        let connections = Board.potentialConnections(of: board.pieces).count
+        guard connections <= 64 else { throw DraftError.tooManyConnections(connections) }
         // Nothing may leave on load: every piece is either connected or held by contact.
         var probe = board
         if let dropped = probe.removeUnconnectedPieces().first {

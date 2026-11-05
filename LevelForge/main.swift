@@ -16,7 +16,10 @@
 //                                          or into DIR with --out, leaving the shipped files alone.
 //                                          With --keep-seeds the levels are rebuilt from the seeds in the shipped
 //                                          report instead of chosen again, e.g. after a drafting rule changed;
-//                                          --keep-same-designs does so only where the level's design is unchanged.
+//                                          --keep-same-designs does so only where the level's design is unchanged;
+//                                          --seeds-from DIR takes the seeds from that folder's report (a set).
+//   forge remeasure [--dir DIR] [--levels A-B]   Re-solve and re-measure the levels as they are (after a rule change);
+//                                          the files stay, the report's solutions, metrics and quality are redone.
 //                                          Output depends only on the seeds and settings, not on --jobs or the
 //                                          machine; run with SWIFT_DETERMINISTIC_HASHING=1 as a safety net.
 //                                          The chosen level and its runner-ups get quality measurements (bots,
@@ -34,7 +37,7 @@
 //                                          Measure every design of Compositions.catalogue over a few seeds (bots
 //                                          included) into LevelForge/design-quality.json for the planners; with
 //                                          --sheet also a contact sheet, one row of boards per design.
-//    pictures [--seeds 6] [--locks N] [--locks-for a,b] [--sheet PNG]
+//    pictures [--seeds 6] [--only a,b] [--locks N] [--locks-for a,b] [--tails X] [--sheet PNG]
 //                                          The reward pictures (LevelForge/pictures.py): each as drawn, then
 //                                          boards built on it for a few seeds at its milestone level, measured.
 //    compose <template>... [--count N] [--out DIR] [--no-solve]
@@ -164,6 +167,61 @@ func solveCommand(_ arguments: Arguments) throws {
     }
 }
 
+
+/// Re-solves and re-measures a folder's levels as they are: after a rule change (§17: the touching
+/// distance) the boards stay, but their solutions, metrics and quality do not. The chosen board and
+/// its runner-ups (from levels-candidates.json) are measured again; pins, targets and the
+/// out-of-band flag are kept. `--dir DIR` (the shipped levels by default), `--levels A-B`.
+func remeasureCommand(_ arguments: Arguments) throws {
+    let directory = arguments.options["dir"].map { URL(fileURLWithPath: $0, isDirectory: true) } ?? levelsDirectory
+    let reportURL = sideFileURL(LevelResources.report, in: directory)
+    var report = try read(LevelReport.self, from: reportURL)
+    let store = try? read(CandidateStore.self, from: sideFileURL(LevelResources.candidates, in: directory))
+    let wanted = Set(arguments.levelRange("levels", default: 1...LevelGenerator.levelCount))
+    var config = GeneratorConfig()
+    if let cap = arguments.int("state-cap") { config.solver.stateCap = cap }
+    if arguments.options["no-quality"] != nil { config.quality = nil }
+    let started = Date()
+    func remeasure(_ old: LevelReport.Candidate, file: LevelFile, level: Int) -> Candidate? {
+        guard let board = try? file.makeBoard() else { return nil }
+        let solver = LevelSolver(board: board, config: config.solver)
+        var result = solver.solve()
+        guard result.isSolvable, let solution = result.solution else { return nil }
+        var replay = board
+        guard replay.replay(solution) else { return nil }
+        result.metrics.freedom = solver.freedom(along: solution)
+        result.metrics.setupMoves = solution.filter { $0.removed.isEmpty }.count
+        let kinds = PieceKind.kinds(in: file)
+        let difficulty = DifficultyScore.score(metrics: result.metrics, pieceCount: file.pieces.count, distinctKinds: kinds.count)
+        return Candidate(level: level, seed: old.seed, template: old.template, file: file, kinds: kinds,
+                         metrics: result.metrics, solution: solution, difficulty: difficulty)
+    }
+    var failed: [Int] = []
+    for index in report.levels.indices where wanted.contains(report.levels[index].number) {
+        let entry = report.levels[index]
+        let levelStarted = Date()
+        guard let file = try? LevelLoader.decode(Data(contentsOf: levelURL(entry.number, in: directory))),
+              let chosen = remeasure(entry.chosen, file: file, level: entry.number) else {
+            print("level \(entry.number): NOT SOLVABLE OR NOT REPLAYING, left as it was")
+            failed.append(entry.number)
+            continue
+        }
+        let runnerUps = entry.runnerUps.compactMap { old in store?.candidates[old.id].flatMap { remeasure(old, file: $0, level: entry.number) } }
+        let measured = LevelGenerator.measureQuality([chosen] + runnerUps, config: config)
+        let generated = GeneratedLevel(chosen: measured[0], runnerUps: Array(measured.dropFirst()), pinned: entry.pinned,
+                                       targetDifficulty: entry.targetDifficulty, outOfBand: entry.outOfBand)
+        report.levels[index] = generated.reportEntry
+        let c = measured[0]
+        let was = entry.chosen.metrics.minMoves
+        let quality = c.quality.map { String(format: "  quality %.1f / %.2f tier %d", $0.difficulty, $0.interest, $0.tier) } ?? ""
+        print(String(format: "level %3d  %-18@ pieces %2d  moves %2d (was %2d)  runner-ups %d/%d%@  %.0fs", entry.number, c.template, file.pieces.count,
+                     c.metrics.minMoves, was, runnerUps.count, entry.runnerUps.count, quality, Date().timeIntervalSince(levelStarted)))
+        try write(report, to: reportURL)
+    }
+    print(String(format: "remeasured in %.0fs", Date().timeIntervalSince(started)))
+    if !failed.isEmpty { fail("not solvable or not replaying: \(failed.map(String.init).joined(separator: ", "))") }
+}
+
 func reportCommand(_ arguments: Arguments) throws {
     let directory = arguments.options["dir"].map { URL(fileURLWithPath: $0, isDirectory: true) } ?? levelsDirectory
     let report = try read(LevelReport.self, from: sideFileURL(LevelResources.report, in: directory))
@@ -237,8 +295,11 @@ func generateCommand(_ arguments: Arguments) throws {
     if FileManager.default.fileExists(atPath: reportURL.path), let old = try? read(LevelReport.self, from: reportURL) {
         for level in old.levels { existingLevels[level.number] = level }
     }
+    // --seeds-from DIR: with --keep-seeds, rebuild from that folder's report instead of the shipped one
+    // (a generated set after a rule change).
+    let seedsDirectory = arguments.options["seeds-from"].map { URL(fileURLWithPath: $0, isDirectory: true) } ?? levelsDirectory
     var shippedLevels: [Int: LevelReport.Level] = [:]
-    if let shipped = try? read(LevelReport.self, from: sideFileURL(LevelResources.report)) {
+    if let shipped = try? read(LevelReport.self, from: sideFileURL(LevelResources.report, in: seedsDirectory)) {
         for level in shipped.levels { shippedLevels[level.number] = level }
     }
     let candidatesURL = sideFileURL(LevelResources.candidates, in: outDirectory)
@@ -445,7 +506,8 @@ func composeCommand(_ arguments: Arguments) throws {
 
 /// Bot profiles of shipped levels, with the time per bot.
 func botsCommand(_ arguments: Arguments) throws {
-    let report = try read(LevelReport.self, from: sideFileURL(LevelResources.report))
+    let directory = arguments.options["dir"].map { URL(fileURLWithPath: $0, isDirectory: true) } ?? levelsDirectory
+    let report = try read(LevelReport.self, from: sideFileURL(LevelResources.report, in: directory))
     var config = QualityConfig()
     if let runs = arguments.int("runs") { config.runs = runs }
     if let budget = arguments.int("budget") { config.lookaheadBudget = budget }
@@ -458,7 +520,7 @@ func botsCommand(_ arguments: Arguments) throws {
     let started = Date()
     for number in arguments.levelRange("levels", default: 1...10) {
         guard let entry = report.levels.first(where: { $0.number == number }) else { continue }
-        let board = try LevelLoader.decode(Data(contentsOf: levelURL(number))).makeBoard()
+        let board = try LevelLoader.decode(Data(contentsOf: levelURL(number, in: directory))).makeBoard()
         let minMoves = entry.chosen.metrics.minMoves
         let levelStarted = Date()
         var columns: [String] = []
@@ -563,6 +625,9 @@ func designsCommand(_ arguments: Arguments) throws {
         var unplannedShare: Double
         var pieces: Double
         var seconds: Double
+        /// Mean shortest solution and share of forced moves along it (nil in older measurements).
+        var moves: Double?
+        var forced: Double?
     }
     let url = arguments.options["out"].map { URL(fileURLWithPath: $0) } ?? repoRoot.appendingPathComponent("LevelForge/design-quality.json")
     var existing: [String: Summary] = (try? JSONDecoder().decode([String: Summary].self, from: Data(contentsOf: url))) ?? [:]
@@ -580,7 +645,7 @@ func designsCommand(_ arguments: Arguments) throws {
     if let below = arguments.int("retry-below") { designs = designs.filter { (existing[$0.expr]?.valid ?? 0) < below } }
     print("measuring \(designs.count) design(s), \(seeds) seed(s) each")
     let jobs = designs.count * seeds
-    struct Sample { var legacy: Double; var quality: LevelQuality; var pieces: Int; var seconds: Double; var file: LevelFile }
+    struct Sample { var legacy: Double; var quality: LevelQuality; var pieces: Int; var seconds: Double; var file: LevelFile; var moves: Int }
     var samples = [Sample?](repeating: nil, count: jobs)
     var drafted = [Bool](repeating: false, count: jobs)
     let lock = NSLock()
@@ -609,7 +674,8 @@ func designsCommand(_ arguments: Arguments) throws {
         let legacy = DifficultyScore.score(metrics: result.metrics, pieceCount: file.pieces.count, distinctKinds: PieceKind.kinds(in: file).count)
         let quality = QualityMeasure.measure(board: board, solution: solution, minMoves: result.metrics.minMoves, seed: seed,
                                              config: QualityConfig(), solverConfig: SolverConfig())
-        let sample = Sample(legacy: legacy, quality: quality, pieces: file.pieces.count, seconds: Date().timeIntervalSince(started), file: file)
+        let sample = Sample(legacy: legacy, quality: quality, pieces: file.pieces.count, seconds: Date().timeIntervalSince(started), file: file,
+                            moves: result.metrics.minMoves)
         lock.lock()
         samples[j] = sample
         lock.unlock()
@@ -635,10 +701,11 @@ func designsCommand(_ arguments: Arguments) throws {
                                         difficulty: mean(valid.map(\.quality.difficulty)),
                                         interest: (mean(valid.map { $0.quality.interest * 100 }) / 100),
                                         tiers: tiers, unplannedShare: valid.isEmpty ? 0 : Double(valid.filter(\.quality.unplanned).count) / Double(valid.count),
-                                        pieces: mean(valid.map { Double($0.pieces) }), seconds: mean(valid.map(\.seconds)))
+                                        pieces: mean(valid.map { Double($0.pieces) }), seconds: mean(valid.map(\.seconds)),
+                                        moves: mean(valid.map { Double($0.moves) }), forced: mean(valid.map(\.quality.forcedShare)))
         let s = existing[design.expr]!
-        print(String(format: "%-90@ drafted %d valid %d/%d  diff %5.1f  int %.2f  tiers %@  legacy %.0f", design.expr, draftCount, s.valid, seeds,
-                     s.difficulty, s.interest, tiers.map(String.init).joined(separator: "/"), s.legacy))
+        print(String(format: "%-90@ drafted %d valid %d/%d  diff %5.1f  int %.2f  tiers %@  legacy %.0f  moves %.0f  forced %.2f", design.expr, draftCount, s.valid, seeds,
+                     s.difficulty, s.interest, tiers.map(String.init).joined(separator: "/"), s.legacy, s.moves ?? 0, s.forced ?? 0))
     }
     // --sheet FILE: the first valid boards of each design, one row per design.
     if let sheet = arguments.options["sheet"], !sheetRows.isEmpty {
@@ -663,8 +730,15 @@ func picturesCommand(_ arguments: Arguments) throws {
     if arguments.options["verbose"] != nil { LevelTemplate.debug = { print("    \($0)") } }
     // Every picture: those with a slot at their level, the others at level 100.
     let slotted = PictureLibrary.milestones.sorted { $0.key < $1.key }
-    let milestones = slotted + PictureLibrary.all.keys.sorted().filter { name in !slotted.contains { $0.value == name } }.map { (100, $0) }
+    var milestones = slotted + PictureLibrary.all.keys.sorted().filter { name in !slotted.contains { $0.value == name } }.map { (100, $0) }
+    // --only a,b: those pictures alone.
+    if let only = arguments.options["only"] {
+        let names = Set(only.split(separator: ",").map(String.init))
+        milestones = milestones.filter { names.contains($0.1) }
+    }
     let locks = arguments.int("locks") ?? 0
+    // --tails X: the share of rings with a tail (the template's default otherwise).
+    let tails = arguments.options["tails"].flatMap(Double.init) ?? 0.3
     // --locks-for a,b,c: one lock on those pictures only (as their reward levels use them).
     let lockedPictures = Set((arguments.options["locks-for"] ?? "").split(separator: ",").map(String.init))
     struct Built { var file: LevelFile; var quality: LevelQuality?; var failure: String? }
@@ -672,7 +746,7 @@ func picturesCommand(_ arguments: Arguments) throws {
     let lock = NSLock()
     DispatchQueue.concurrentPerform(iterations: built.count) { j in
         let (level, name) = milestones[j / seeds]
-        let template = Compositions.picture(name, locks: lockedPictures.contains(name) ? 1 : locks)
+        let template = Compositions.picture(name, tails: tails, locks: lockedPictures.contains(name) ? 1 : locks)
         var rng = SplitMix64(seed: LevelGenerator.candidateSeed(master: 20_261_029, level: level, index: j % seeds))
         var result: Built?
         if var draft = template.build(level, &rng) {
@@ -807,6 +881,7 @@ do {
     switch arguments.command {
     case "solve": try solveCommand(arguments)
     case "report": try reportCommand(arguments)
+    case "remeasure": try remeasureCommand(arguments)
     case "generate": try generateCommand(arguments)
     case "probe": try probeCommand(arguments)
     case "motif": try motifCommand(arguments)

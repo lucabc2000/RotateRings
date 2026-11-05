@@ -8,7 +8,7 @@
 # the planners offered before (chapter-trial-scores.json, the measured snapshot, the catalogue as it
 # stands), and the new ones of LEVEL-DESIGN.md §15 (outlined webs, locks, the lock introduction,
 # mirrored knots, silhouettes and anchors, hole patterns, small breathers).
-import json, re
+import json, re, sys
 
 swift = open('RotateRings/Model/Generation/Compositions.swift').read()
 table = {int(n): e for n, e in re.findall(r'case (\d+): return \[(.*)\]\n', swift)}
@@ -77,9 +77,35 @@ NEW += ['knot("hubs-mini", holders: 2, small: true)', 'knot("hubs-mini", holders
         'knot("hubs-minigem", holders: 2, tails: 0.4, mirror: true, small: true)',
         'hubWeb("hubs-mini", clips: 2...3, holders: 3, tails: 0.85, small: true)', 'hubWeb("hubs-mini12", clips: 2...3, holders: 3, small: true)',
         'freeKnot(rings: 8...12, holders: 3, tails: 0.4, small: true)', 'freeKnot(rings: 8...12, holders: 3, tails: 0.4, mirror: true, small: true)']
-# Pictures for the reward levels (§15, Step 6), as the planner writes them (planlib.PICTURE_SLOTS).
-NEW += ['picture("key", locks: 1)', 'picture("tree")', 'picture("house")', 'picture("snail", locks: 1)',
-        'picture("lighthouse", locks: 1)', 'picture("anchor", locks: 1)', 'picture("padlock")', 'picture("crown", locks: 1)']
+# Light boards on the standard board for the opening and the breathers (§16): nine to fourteen
+# pieces outside the grid families, which had only trivial designs at that size.
+NEW += ['freeKnot(rings: 10...14, holders: 3, tails: 0.4)', 'freeKnot(rings: 10...14, holders: 3, tails: 0.5, gate: true)',
+        'freeKnot(rings: 10...14, holders: 3, tails: 0.4, pokes: 2)', 'freeKnot(rings: 9...13, holders: 3, tails: 0.4, anchors: 1)',
+        'freeKnot(rings: 10...14, holders: 3, tails: 0.4, mirror: true)',
+        'freeKnot(rings: 8...12, holders: 3, tails: 0.3, pokes: 2, giant: 120)',
+        'freeKnot(rings: 7...12, holders: 3, tails: 0.5, gate: true, silhouette: "circle")',
+        'freeKnot(rings: 7...12, holders: 3, tails: 0.5, gate: true, silhouette: "diamond")',
+        'net("weave-diamond", lock: lock, tails: 2)', 'net("figure-block", lock: lock, tails: 2)',
+        'net("weave-kite", lock: lock, crossClips: 1, tails: 2)',
+        # Breathers that are not a 3×3 grid: the little gem as a web and a lock knot, wild knots with more tails.
+        'hubWeb("hubs-minigem", clips: 2...3, holders: 3, tails: 0.85, small: true)', 'hubWeb("hubs-minigem", clips: 2...3, holders: 3, small: true)',
+        'knot("hubs-minigem", holders: 2, locks: 1, small: true)', 'knot("hubs-minigem", holders: 2, tails: 0.4, locks: 1, small: true)',
+        'freeKnot(rings: 8...12, holders: 3, tails: 0.6)', 'freeKnot(rings: 10...14, holders: 3, tails: 0.6)',
+        'hubWeb("hubs-mini", clips: 3...4, holders: 3, tails: 0.85, small: true)', 'hubWeb("hubs-minigem", clips: 3...4, holders: 3, tails: 0.85, small: true)',
+        'hubWeb("hubs-mini", clips: 2...3, holders: 2, small: true)', 'hubWeb("hubs-minigem", clips: 2...3, holders: 2, tails: 0.85, small: true)']
+# The late game (§17): heavier through size, on the huge board, for levels after 120 only.
+NEW += ['hubWeb("hubs-citadel", clips: 2...3, holders: 3, tails: 0.85, huge: true)', 'hubWeb("hubs-citadel", holders: 3, tails: 0.85, huge: true)',
+        'hubWeb("hubs-bastion", clips: 2...3, holders: 3, tails: 0.85, huge: true)', 'hubWeb("hubs-bastion", holders: 3, tails: 0.85, huge: true)',
+        'hubWeb("hubs-tower", clips: 2...3, holders: 3, tails: 0.85, huge: true)', 'hubWeb("hubs-tower", holders: 3, tails: 0.85, huge: true)',
+        'hubWeb("hubs-citadel", clips: 2...3, holders: 3, bars: 2, tails: 0.85, huge: true)', 'hubWeb("hubs-tower", clips: 2...3, holders: 3, bars: 2, tails: 0.85, huge: true)',
+        'knot("hubs-citadel", holders: 3, bars: 2, uBars: 2, tails: 0.4, huge: true)', 'knot("hubs-tower", holders: 3, uBars: 2, tails: 0.4, huge: true)',
+        'knot("hubs-bastion", holders: 3, bars: 2, tails: 0.4, huge: true)',
+        'freeKnot(rings: 30...38, holders: 3, tails: 0.4, dense: true, huge: true)', 'freeKnot(rings: 30...38, holders: 3, tails: 0.4, pokes: 2, dense: true, huge: true)',
+        'freeKnot(rings: 26...34, holders: 3, tails: 0.4, pokes: 2, giant: 170, huge: true)', 'freeKnot(rings: 26...34, holders: 3, tails: 0.4, giant: 170, huge: true)']
+# Pictures for the reward levels (§16, Step 5), as the planner writes them (planlib.PICTURE_SLOTS).
+sys.path.insert(0, 'LevelForge')
+from planlib import PICTURE_SLOTS
+NEW += list(PICTURE_SLOTS.values())
 exprs |= set(NEW)
 # The designs of Steps 3 and 5 come only from the lists above, so retuned ones replace the old.
 exprs = {e for e in exprs if e in NEW or not any(k in e for k in ('silhouette:', 'anchors:', 'small:', 'picture('))}
