@@ -287,8 +287,10 @@ enum Tangle {
             for leaf in openLeaves.shuffled(using: &rng) {
                 // The bar is a turning piece, so once released it only leaves when nothing touches
                 // it. The leaf's arc ends come within r·sin(40°) of the bar, which must exceed the
-                // touching distance: a small leaf would hold the dropped bar forever.
-                guard let r = radius[leaf], r * sin(AngleMath.radians(fromDegrees: ForgeRules.defaultGapDegrees / 2)) >= GameRules.touchDistance + 2,
+                // touching distance: a small leaf would hold the dropped bar forever. The bound is
+                // the one these levels were drafted with (touching distance 16, plus 2), kept as a
+                // literal so a seed still rebuilds the same board now that the distance is 12.
+                guard let r = radius[leaf], r * sin(AngleMath.radians(fromDegrees: ForgeRules.defaultGapDegrees / 2)) >= 18,
                       let center = draft[leaf]?.position else { continue }
                 for degrees in gapDirections(for: leaf) {
                     let dir = direction(degrees)

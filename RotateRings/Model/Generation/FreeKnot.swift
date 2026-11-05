@@ -734,6 +734,13 @@ enum FreeKnot {
                     except.insert(s.id)
                     exitEnd = r.center + dir * end
                 }
+                if LevelTemplate.debug != nil {
+                    let angles = ((holders[r.id] ?? []) + (targets[r.id] ?? [])).map { Int(linkAngle(r.id, $0)) }
+                    let width = Int(gapWidth(r.id))
+                    let gapOK = draft.gapIsValid(centerDegrees: degrees, gapDegrees: gapWidth(r.id), for: r.id)
+                    let room = barRoom(r.center + dir * (r.radius + 8), exitEnd, except: except)
+                    LevelTemplate.debug?("\(options.template): bar \(number) on \(r.id): closed \(closed.contains(r.id)) fixed \(fixedGaps.contains(r.id)) links \(angles) gap \(gapOK) width \(width) travel \(Int(end - start)) room \(room) to \(Int(exitEnd.x)),\(Int(exitEnd.y)) extent \(Int(extent.x)),\(Int(extent.y))")
+                }
                 if takes(r), end - start >= 2 * GridWorld.hubInset, barRoom(r.center + dir * (r.radius + 8), exitEnd, except: except) {
                     piece = .slideBar("p\(bars.count)", at: r.center + dir * (start + GridWorld.hubInset), from: -GridWorld.hubInset,
                                       to: end - start - GridWorld.hubInset, angleDegrees: degrees)

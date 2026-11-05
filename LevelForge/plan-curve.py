@@ -33,6 +33,10 @@ targets = [round(max(10, min(64, 12 + 18 * (i / (count - 1)) ** 0.9 + offs[i])))
 # Tier-2 peaks aim at what tier-2 boards measure.
 targets = [max(t, planlib.tier2_target(FIRST + i)) if planlib.wants_tier2(offs[i], t, FIRST + i) else t for i, t in enumerate(targets)]
 planner.tier2_peaks = {FIRST + i for i in range(count) if planlib.wants_tier2(offs[i], targets[i], FIRST + i)}
+# Confidence boards: level 11 and the lightest of 13–15.
+planner.confidence = {11, min(range(13, 16), key=lambda n: offs[n - FIRST])}
+# One big but easy board in the opening: the heavier of 18 and 19.
+planner.big_easy = {max((18, 19), key=lambda n: offs[n - FIRST])}
 plan, fields = [], 0
 for i, level in enumerate(range(FIRST, LAST + 1)):
     target = targets[i]
@@ -40,11 +44,15 @@ for i, level in enumerate(range(FIRST, LAST + 1)):
     before_tier2 = i + 1 < count and planlib.wants_tier2(offs[i + 1], targets[i + 1], level + 1)
     d = planner.choose(level, target, offs[i], looks, left, fields, 0.4 * count, extra, counts, before_tier2)
     fields += d['spacing'] == 'gridField'
-    expr, bombs = planner.add_bombs(level, d, 26)
+    expr, bombs = planner.add_bombs(level, d, planlib.OPENING_LAST)   # no bombs in the opening
+    if planner.last_light:
+        target = planlib.light_target(d, target)
     plan.append(dict(level=level, target=target, offset=offs[i], expr=expr, look=d['look'], exp=d['exp'], bombs=bombs,
+                     pieces=d['pieces'], range=planner.last_range, light=planner.last_light, interest=d['interest'], tier=d['tier'],
                      peak=planlib.wants_tier2(offs[i], target, level) and level not in planlib.PICTURE_SLOTS,
-                     breather=d['look'] in ('small', 'picture')))
+                     breather=planner.last_small or (planner.last_light and planner.last_range[1] <= 10)))
 
 planlib.print_plan(plan)
+planlib.print_pacing(plan)
 if '--apply' in sys.argv:
     planlib.apply(plan)
